@@ -12,11 +12,15 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.model.CaptchaWhitelistProperties;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.mock.env.MockEnvironment;
 
 public class PreAuthSessionServiceImplTest {
     private static final String CAPTCHA_ITEM = "CAPTCHA";
@@ -27,7 +31,7 @@ public class PreAuthSessionServiceImplTest {
     @Before
     public void setUp() {
         preAuthSessionDao = new RecordingPreAuthSessionDao();
-        service = new PreAuthSessionServiceImpl(preAuthSessionDao);
+        service = new PreAuthSessionServiceImpl(preAuthSessionDao, CaptchaWhitelistProperties.disabled());
     }
 
     @Test
@@ -74,6 +78,54 @@ public class PreAuthSessionServiceImplTest {
                 session.getId(), CAPTCHA_ITEM, "2345", System.currentTimeMillis() - 1L));
 
         assertNull(service.getValue(new PreAuthSessionValueQuery(session.getId(), CAPTCHA_ITEM)));
+    }
+
+    @Test
+    public void shouldMatchCaptchaWhitelistWhenIntegrationSwitchEnabled() {
+        service = new PreAuthSessionServiceImpl(
+                preAuthSessionDao, CaptchaWhitelistProperties.of(true, Arrays.asList("6666", "8888")));
+        PreAuthSession session = service.create(new CreatePreAuthSessionCommand(60));
+
+        assertTrue(service.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                PreAuthSessionId.of("missing-session"), CAPTCHA_ITEM, "6666", null, null)));
+        assertTrue(service.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                PreAuthSessionId.of("missing-session"), CAPTCHA_ITEM, "8888", null, null)));
+        assertFalse(service.existsValidatedValue(
+                new PreAuthSessionValueValidateQuery(session.getId(), CAPTCHA_ITEM, "1234", null, null)));
+    }
+
+    @Test
+    public void shouldNotMatchCaptchaWhitelistWhenIntegrationSwitchDisabled() {
+        service = new PreAuthSessionServiceImpl(
+                preAuthSessionDao, CaptchaWhitelistProperties.of(false, Arrays.asList("6666", "8888")));
+        PreAuthSession session = service.create(new CreatePreAuthSessionCommand(60));
+
+        assertFalse(service.existsValidatedValue(
+                new PreAuthSessionValueValidateQuery(session.getId(), CAPTCHA_ITEM, "6666", null, null)));
+    }
+
+    @Test
+    public void shouldLoadCaptchaWhitelistFromIntegrationEnvironment() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty(CaptchaWhitelistProperties.ENABLED_PROPERTY, "true")
+                .withProperty(CaptchaWhitelistProperties.WHITELIST_VALUES_PROPERTY, "6666,8888");
+        environment.setActiveProfiles(CaptchaWhitelistProperties.INTEGRATION_PROFILE);
+
+        CaptchaWhitelistProperties properties = CaptchaWhitelistProperties.from(environment);
+
+        assertTrue(properties.matches("6666"));
+        assertTrue(properties.matches("8888"));
+    }
+
+    @Test
+    public void shouldIgnoreCaptchaWhitelistOutsideIntegrationProfile() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty(CaptchaWhitelistProperties.ENABLED_PROPERTY, "true")
+                .withProperty(CaptchaWhitelistProperties.WHITELIST_VALUES_PROPERTY, "6666,8888");
+
+        CaptchaWhitelistProperties properties = CaptchaWhitelistProperties.from(environment);
+
+        assertFalse(properties.matches("6666"));
     }
 
     @Test(expected = BizException.class)

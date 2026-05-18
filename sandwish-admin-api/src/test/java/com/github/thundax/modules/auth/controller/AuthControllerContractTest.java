@@ -23,6 +23,7 @@ import com.github.thundax.modules.auth.service.PreAuthSessionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;
 import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
@@ -66,6 +67,8 @@ public class AuthControllerContractTest {
         PreAuthSessionService preAuthSessionService = mock(PreAuthSessionService.class);
         PreAuthSessionId sessionId = PreAuthSessionId.of("session-1");
         when(preAuthSessionService.getIdByToken(any(PreAuthSessionToken.class))).thenReturn(sessionId);
+        when(preAuthSessionService.existsValidatedValue(any(PreAuthSessionValueValidateQuery.class)))
+                .thenReturn(true);
         when(preAuthSessionService.getValue(any(PreAuthSessionValueQuery.class)))
                 .thenReturn("1234", keyPair.getPrivateKey());
         when(authService.authenticatePassword(any(AdminAuthCommand.class))).thenReturn(user());

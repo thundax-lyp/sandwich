@@ -11,7 +11,12 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
+import com.github.thundax.modules.auth.service.model.CaptchaWhitelistProperties;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,9 +24,17 @@ import org.springframework.stereotype.Service;
 public class PreAuthSessionServiceImpl implements PreAuthSessionService {
 
     private final PreAuthSessionDao preAuthSessionDao;
+    private final CaptchaWhitelistProperties captchaWhitelistProperties;
 
-    public PreAuthSessionServiceImpl(PreAuthSessionDao preAuthSessionDao) {
+    @Autowired
+    public PreAuthSessionServiceImpl(PreAuthSessionDao preAuthSessionDao, Environment environment) {
+        this(preAuthSessionDao, CaptchaWhitelistProperties.from(environment));
+    }
+
+    PreAuthSessionServiceImpl(
+            PreAuthSessionDao preAuthSessionDao, CaptchaWhitelistProperties captchaWhitelistProperties) {
         this.preAuthSessionDao = preAuthSessionDao;
+        this.captchaWhitelistProperties = captchaWhitelistProperties;
     }
 
     @Override
@@ -78,5 +91,21 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     @Override
     public String getValue(PreAuthSessionValueQuery query) {
         return get(query.getId()).findValue(query.getName());
+    }
+
+    @Override
+    public boolean existsValidatedValue(PreAuthSessionValueValidateQuery query) {
+        if (query == null) {
+            return false;
+        }
+        if (captchaWhitelistProperties.matches(query.getValue())) {
+            return true;
+        }
+        PreAuthSession session = get(query.getId());
+        if (!StringUtils.equals(query.getValue(), session.findValue(query.getName()))) {
+            return false;
+        }
+        return StringUtils.isBlank(query.getBindName())
+                || StringUtils.equals(query.getBindValue(), session.findValue(query.getBindName()));
     }
 }

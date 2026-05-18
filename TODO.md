@@ -11,14 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `captcha`：补齐验证码值白名单能力
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/model/CaptchaWhitelistProperties.java
-  - 范围文件：sandwish-biz/src/main/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImpl.java
-  - 范围文件：sandwish-biz/src/test/java/com/github/thundax/modules/auth/service/impl/PreAuthSessionServiceImplTest.java
-  - 处理动作：新增验证码值白名单配置模型，并接入验证码校验链路
-  - 验收点：模型能表达 `6666`、`8888` 等值；白名单值放行、非白名单值走原校验、非 integration profile 不放行
-  - 重要度：10/10
-
 - [ ] `integration-support`：补齐集成测试 HTTP 与认证客户端
   - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationHttpClient.java
   - 范围文件：sandwish-common/sandwish-common-test/src/main/java/com/github/thundax/common/test/integration/IntegrationAuthClient.java

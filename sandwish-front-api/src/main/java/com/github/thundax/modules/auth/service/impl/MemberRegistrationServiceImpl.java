@@ -25,6 +25,7 @@ import com.github.thundax.modules.auth.service.command.PrincipalIdentityCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalCredentialQuery;
 import com.github.thundax.modules.auth.service.query.PrincipalIdentityQuery;
 import com.github.thundax.modules.auth.utils.PasswordHelper;
@@ -272,41 +273,20 @@ public class MemberRegistrationServiceImpl implements MemberRegistrationService 
     }
 
     private boolean validateCaptcha(PreAuthSessionToken token, String captcha) {
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), captcha)) {
-            return true;
-        }
-        return StringUtils.equals(
-                captcha,
-                preAuthSessionService.getValue(new PreAuthSessionValueQuery(requireSessionId(token), CAPTCHA_ITEM)));
+        return preAuthSessionService.existsValidatedValue(
+                new PreAuthSessionValueValidateQuery(requireSessionId(token), CAPTCHA_ITEM, captcha, null, null));
     }
 
     private boolean validateSmsValidateCode(PreAuthSessionToken token, String mobile, String validateCode) {
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
-            return true;
-        }
         PreAuthSessionId sessionId = requireSessionId(token);
-        return StringUtils.equals(
-                        preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, SMS_MOBILE_ITEM)),
-                        mobile)
-                && StringUtils.equals(
-                        preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, SMS_VALIDATE_CODE_ITEM)),
-                        validateCode);
+        return preAuthSessionService.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                sessionId, SMS_VALIDATE_CODE_ITEM, validateCode, SMS_MOBILE_ITEM, mobile));
     }
 
     private boolean validateEmailValidateCode(PreAuthSessionToken token, String email, String validateCode) {
-        if (StringUtils.isNotBlank(authProperties.getWhiteCaptcha())
-                && StringUtils.equals(authProperties.getWhiteCaptcha(), validateCode)) {
-            return true;
-        }
         PreAuthSessionId sessionId = requireSessionId(token);
-        return StringUtils.equals(
-                        preAuthSessionService.getValue(new PreAuthSessionValueQuery(sessionId, EMAIL_ITEM)), email)
-                && StringUtils.equals(
-                        preAuthSessionService.getValue(
-                                new PreAuthSessionValueQuery(sessionId, EMAIL_VALIDATE_CODE_ITEM)),
-                        validateCode);
+        return preAuthSessionService.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                sessionId, EMAIL_VALIDATE_CODE_ITEM, validateCode, EMAIL_ITEM, email));
     }
 
     private String decryptRsaValue(PreAuthSessionToken token, String encryptedValue) {

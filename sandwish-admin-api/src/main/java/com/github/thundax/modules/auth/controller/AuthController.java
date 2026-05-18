@@ -43,6 +43,7 @@ import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionComm
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
 import com.github.thundax.modules.auth.service.query.AdminAuthQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
+import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
 import com.github.thundax.modules.auth.service.result.AuthAccessTokenResult;
 import com.github.thundax.modules.auth.utils.PreAuthCodeHelper;
 import com.github.thundax.modules.sys.aop.annotation.SysLogger;
@@ -319,38 +320,19 @@ public class AuthController {
     }
 
     private boolean validateCaptcha(String loginToken, String captcha) {
-        if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
-                && StringUtils.equals(properties.getWhiteCaptcha(), captcha)) {
-            return true;
-        }
-        return StringUtils.equals(captcha, getCaptcha(loginToken));
-    }
-
-    private String getCaptcha(String loginToken) {
-        String captcha = preAuthSessionService.getValue(valueQuery(requireSessionIdByToken(loginToken), CAPTCHA_ITEM));
-        if (StringUtils.isEmpty(captcha)) {
-            throw new InvalidCaptchaException();
-        }
-        return captcha;
+        return preAuthSessionService.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                requireSessionIdByToken(loginToken), CAPTCHA_ITEM, captcha, null, null));
     }
 
     private boolean validateSmsValidateCode(String loginToken, String mobile, String validateCode) {
-        if (StringUtils.isNotBlank(properties.getWhiteCaptcha())
-                && StringUtils.equals(properties.getWhiteCaptcha(), validateCode)) {
-            return true;
-        }
         PreAuthSessionId sessionId = requireSessionIdByToken(loginToken);
-        String savedMobile = preAuthSessionService.getValue(valueQuery(sessionId, SMS_MOBILE_ITEM));
-        String savedValidateCode = preAuthSessionService.getValue(valueQuery(sessionId, SMS_VALIDATE_CODE_ITEM));
-        if (StringUtils.isEmpty(savedMobile) || StringUtils.isEmpty(savedValidateCode)) {
-            throw new InvalidCaptchaException();
-        }
-        return StringUtils.equals(savedMobile, mobile) && StringUtils.equals(savedValidateCode, validateCode);
+        return preAuthSessionService.existsValidatedValue(new PreAuthSessionValueValidateQuery(
+                sessionId, SMS_VALIDATE_CODE_ITEM, validateCode, SMS_MOBILE_ITEM, mobile));
     }
 
     private String getPrivateKey(String loginToken) {
-        String privateKey =
-                preAuthSessionService.getValue(valueQuery(requireSessionIdByToken(loginToken), PRIVATE_KEY_ITEM));
+        String privateKey = preAuthSessionService.getValue(
+                new PreAuthSessionValueQuery(requireSessionIdByToken(loginToken), PRIVATE_KEY_ITEM));
         if (StringUtils.isBlank(privateKey)) {
             throw AdminResponseExceptions.invalidToken();
         }
@@ -360,10 +342,6 @@ public class AuthController {
     private void writeCaptcha(PreAuthSessionId sessionId, String captcha) {
         preAuthSessionService.upsertValue(new UpsertPreAuthSessionValueCommand(
                 sessionId, CAPTCHA_ITEM, captcha, System.currentTimeMillis() + CAPTCHA_EXPIRED_SECONDS * 1000L));
-    }
-
-    private PreAuthSessionValueQuery valueQuery(PreAuthSessionId sessionId, String name) {
-        return new PreAuthSessionValueQuery(sessionId, name);
     }
 
     private PreAuthSessionId requireSessionIdByToken(String token) {

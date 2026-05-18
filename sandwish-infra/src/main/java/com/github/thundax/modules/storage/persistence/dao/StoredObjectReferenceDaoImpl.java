@@ -26,9 +26,9 @@ public class StoredObjectReferenceDaoImpl implements StoredObjectReferenceDao {
     public List<String> listReferenceOwnerTypes() {
         return mapper
                 .selectObjs(new QueryWrapper<StoredObjectReferenceDO>()
-                        .select("business_type")
-                        .groupBy("business_type")
-                        .orderByAsc("business_type"))
+                        .select("reference_owner_type")
+                        .groupBy("reference_owner_type")
+                        .orderByAsc("reference_owner_type"))
                 .stream()
                 .filter(Objects::nonNull)
                 .map(String::valueOf)

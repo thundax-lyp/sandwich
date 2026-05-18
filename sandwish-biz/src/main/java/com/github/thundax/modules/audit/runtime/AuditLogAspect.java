@@ -10,11 +10,14 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
 public class AuditLogAspect {
+
+    static final String SERVICE_METHOD_POINTCUT = "execution(public * com.github.thundax.modules..service..*.*(..))";
 
     private final AuditService auditService;
     private final AuditExpressionEvaluator expressionEvaluator;
@@ -35,9 +38,13 @@ public class AuditLogAspect {
         this.operatorResolver = operatorResolver;
     }
 
-    @Around("@annotation(auditLog)")
-    public Object around(ProceedingJoinPoint joinPoint, AuditLog auditLog) throws Throwable {
-        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+    @Around(SERVICE_METHOD_POINTCUT)
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        Method method = mostSpecificMethod(joinPoint);
+        AuditLog auditLog = method.getAnnotation(AuditLog.class);
+        if (auditLog == null) {
+            return joinPoint.proceed();
+        }
         Object[] args = joinPoint.getArgs();
         if (!expressionEvaluator.booleanValue(auditLog.condition(), method, args, true)) {
             return joinPoint.proceed();
@@ -63,6 +70,13 @@ public class AuditLogAspect {
         command.setOperatorName(operatorResolver.operatorName());
         auditService.record(command);
         return result;
+    }
+
+    private Method mostSpecificMethod(ProceedingJoinPoint joinPoint) {
+        Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        Class<?> targetClass =
+                joinPoint.getTarget() == null ? null : joinPoint.getTarget().getClass();
+        return targetClass == null ? method : AopUtils.getMostSpecificMethod(method, targetClass);
     }
 
     private AuditSnapshot snapshot(String objectType, String objectId) {

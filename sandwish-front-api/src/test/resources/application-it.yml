@@ -1,0 +1,66 @@
+server:
+    port: ${SANDWISH_IT_FRONT_API_PORT:12002}
+    servlet:
+        context-path: /front-api
+    tomcat:
+        uri-encoding: UTF-8
+
+spring:
+    application:
+        name: sandwish-front-api-it
+    main:
+        banner-mode: "off"
+    jmx:
+        default-domain: sandwish-front-api-it
+    datasource:
+        driver-class-name: ${SANDWISH_IT_DB_DRIVER:com.mysql.jdbc.Driver}
+        url: "jdbc:mysql://127.0.0.1:${SANDWISH_IT_MYSQL_PORT:13306}/${SANDWISH_IT_MYSQL_DATABASE:sandwish_integration}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+        username: ${SANDWISH_IT_MYSQL_USER:sandwish_it}
+        password: ${SANDWISH_IT_MYSQL_PASSWORD:sandwish_it_password}
+    redis:
+        url: "redis://:${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}@127.0.0.1:${SANDWISH_IT_REDIS_PORT:16379}/0"
+        password: ${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}
+        timeout: ${SANDWISH_IT_REDIS_TIMEOUT:5s}
+    mvc:
+        throw-exception-if-no-handler-found: true
+    thymeleaf:
+        enabled: false
+    resources:
+        add-mappings: false
+    messages:
+        basename: i18n/messages
+    servlet:
+        multipart:
+            max-file-size: 20971520
+            max-request-size: 20971520
+
+jetcache:
+    remote:
+        default:
+            uri: "redis://:${SANDWISH_IT_REDIS_PASSWORD:sandwish_it_redis}@127.0.0.1:${SANDWISH_IT_REDIS_PORT:16379}/0"
+
+rocketmq:
+    name-server: "127.0.0.1:${SANDWISH_IT_ROCKETMQ_NAMESRV_PORT:19876}"
+    producer:
+        group: ${SANDWISH_IT_ROCKETMQ_GROUP_PREFIX:sandwish-it-}front-api-producer
+
+sandwish:
+    integration-test:
+        enabled: ${SANDWISH_INTEGRATION_TEST_ENABLED:true}
+        captcha:
+            whitelist-values: ${SANDWISH_IT_CAPTCHA_WHITELIST:6666,8888}
+    mq:
+        enabled: true
+        type: ROCKETMQ
+    oss:
+        type: ${SANDWISH_IT_OSS_TYPE:local}
+        local:
+            root-path: ${SANDWISH_IT_OSS_LOCAL_ROOT:target/integration-test/oss}
+            location-prefix: ${SANDWISH_IT_OSS_LOCAL_LOCATION_PREFIX:file:}
+
+swagger:
+    enabled: false
+
+logging:
+    level:
+        com.github.thundax: INFO

@@ -11,12 +11,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-profile`：补充 front API 集成测试配置
-  - 范围文件：sandwish-front-api/src/test/resources/application-it.yml
-  - 处理动作：新增 front 入口集成测试 profile 配置
-  - 验收点：front 集成测试能读取 MySQL、Redis、RocketMQ、本地 OSS、验证码白名单和防误连配置
-  - 重要度：9/10
-
 - [ ] `integration-profile`：补充 open API 集成测试配置
   - 范围文件：sandwish-open-api/src/test/resources/application-it.yml
   - 处理动作：新增 open 入口集成测试 profile 配置

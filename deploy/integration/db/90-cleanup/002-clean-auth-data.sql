@@ -7,6 +7,7 @@ SET NAMES utf8mb4;
 DELETE FROM `auth_principal_login_event`
 WHERE `id` LIKE 'it-%'
    OR `client_id` LIKE 'it-%'
+   OR `client_id` = 'member-api'
    OR (`principal_type` = 'USER'
        AND `principal_id` BETWEEN 9100000000000000100 AND 9100000000000000999)
    OR (`principal_type` = 'MEMBER'
@@ -37,6 +38,12 @@ WHERE `id` BETWEEN 9100000000000010200 AND 9100000000000010999
        WHERE `principal_type` = 'OPEN_CLIENT'
          AND `identity_type` = 'API_KEY'
          AND `identity_value` LIKE 'swak_%'
+   )
+   OR `identity_id` IN (
+       SELECT `id`
+       FROM `auth_principal_identity`
+       WHERE `identity_value` LIKE 'it-%'
+          OR `identity_value` LIKE '%@sandwish.local'
    )
    OR (`principal_type` = 'USER'
        AND `principal_id` BETWEEN 9100000000000000100 AND 9100000000000000999)

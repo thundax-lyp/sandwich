@@ -9,17 +9,6 @@
 
 ## 当前任务项
 
-- [ ] `front-it`：补齐前台认证与注册集成测试
-  - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontAuthSessionIT.java
-  - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontRegisterAccountIT.java
-  - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontRegisterMobileIT.java
-  - 范围文件：sandwish-front-api/src/test/java/com/github/thundax/integration/auth/FrontRegisterEmailIT.java
-  - 处理动作：覆盖预认证会话、账号登录、短信登录替身链路、token refresh、login status、check-login、logout、账号/手机号/邮箱注册接口
-  - 验收点：LoginController 和会员注册链路具备成功链路；验证码、凭据、token、重复账号/手机号/邮箱失败链路具备断言
-  - 重要度：10/10
-
-## 待审阅任务项
-
 - [ ] `open-api-it`：补齐开放接口签名与提交集成测试
   - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/auth/OpenApiSignatureIT.java
   - 范围文件：sandwish-open-api/src/test/java/com/github/thundax/integration/submission/OpenSubmissionQueryIT.java
@@ -28,6 +17,8 @@
   - 处理动作：覆盖签名成功、签名失败、nonce 重放、IP 白名单失败、开放 submission 查询/创建/状态变更/图片上传接口
   - 验收点：OpenAPI 认证过滤链路和开放提交业务接口通过真实 HTTP 入口完成成功和失败断言
   - 重要度：10/10
+
+## 待审阅任务项
 
 - [ ] `integration-docs`：补齐接口覆盖清单和最终运行说明
   - 范围文件：deploy/integration/API-COVERAGE.md

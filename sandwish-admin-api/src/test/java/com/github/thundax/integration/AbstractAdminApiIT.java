@@ -31,6 +31,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = AdminApiApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public abstract class AbstractAdminApiIT {
 
+    private static final String SANDWISH_CACHE_PREFIX = "_SANDWISH_";
+
     @Autowired
     protected Environment environment;
 
@@ -71,7 +73,9 @@ public abstract class AbstractAdminApiIT {
     }
 
     protected void cleanRedis() {
-        new IntegrationRedisCleaner(redisConnectionFactory).cleanByPrefix(redisKeyPrefix);
+        IntegrationRedisCleaner cleaner = new IntegrationRedisCleaner(redisConnectionFactory);
+        cleaner.cleanByPrefix(redisKeyPrefix);
+        cleaner.cleanByPrefix(SANDWISH_CACHE_PREFIX);
     }
 
     protected void cleanOss() {

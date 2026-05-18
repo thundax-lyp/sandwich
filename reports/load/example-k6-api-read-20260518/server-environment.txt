@@ -1,0 +1,536 @@
+# Host
+   Static hostname: example-host
+         Icon name: computer-server
+           Chassis: server
+        Machine ID: <redacted>
+           Boot ID: <redacted>
+  Operating System: Ubuntu 20.04.6 LTS
+            Kernel: Linux 5.4.0-216-generic
+      Architecture: x86-64
+
+# Kernel
+Linux example-host 5.4.0-216-generic #236-Ubuntu SMP Fri Apr 11 19:53:21 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+# CPU
+Architecture:                       x86_64
+CPU op-mode(s):                     32-bit, 64-bit
+Byte Order:                         Little Endian
+Address sizes:                      46 bits physical, 48 bits virtual
+CPU(s):                             64
+On-line CPU(s) list:                0-63
+Thread(s) per core:                 2
+Core(s) per socket:                 16
+Socket(s):                          2
+NUMA node(s):                       2
+Vendor ID:                          GenuineIntel
+CPU family:                         6
+Model:                              79
+Model name:                         Intel(R) Xeon(R) CPU E5-2683 v4 @ 2.10GHz
+Stepping:                           1
+CPU MHz:                            2095.574
+CPU max MHz:                        2100.0000
+CPU min MHz:                        1200.0000
+BogoMIPS:                           4190.59
+Virtualization:                     VT-x
+L1d cache:                          1 MiB
+L1i cache:                          1 MiB
+L2 cache:                           8 MiB
+L3 cache:                           80 MiB
+NUMA node0 CPU(s):                  0-15,32-47
+NUMA node1 CPU(s):                  16-31,48-63
+Vulnerability Gather data sampling: Not affected
+Vulnerability Itlb multihit:        KVM: Mitigation: Split huge pages
+Vulnerability L1tf:                 Mitigation; PTE Inversion; VMX conditional cache flushes, SMT vulnerable
+Vulnerability Mds:                  Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Meltdown:             Mitigation; PTI
+Vulnerability Mmio stale data:      Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Retbleed:             Not affected
+Vulnerability Spec store bypass:    Mitigation; Speculative Store Bypass disabled via prctl and seccomp
+Vulnerability Spectre v1:           Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:           Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP conditional; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                Not affected
+Vulnerability Tsx async abort:      Mitigation; Clear CPU buffers; SMT vulnerable
+Flags:                              fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single pti intel_ppin ssbd ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap intel_pt xsaveopt cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm arat pln pts md_clear flush_l1d
+
+# Memory
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        17Gi        27Gi       6.0Mi        17Gi        44Gi
+Swap:          71Gi          0B        71Gi
+
+# Disk
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda4       9.7T  323G  8.9T   4% /
+/dev/sda4       9.7T  323G  8.9T   4% /
+/dev/sda4       9.7T  323G  8.9T   4% /
+
+# Docker
+Docker version 28.1.1, build 4eba377
+Docker Compose version v2.35.1
+
+# Images
+sandwish/admin-api:dev 40acd15fe477 339MB 9 minutes ago
+sandwish/front-api:dev 855cb45dd8c4 339MB About an hour ago
+sandwish/k6:dev eab2b09f3b5c 75.5MB 7 months ago
+sandwish/minio-mc:RELEASE.2025-02-21T16-00-46Z 19b49a2c873b 82.3MB 14 months ago
+sandwish/minio:RELEASE.2025-02-28T09-55-16Z 377fe6127f60 180MB 14 months ago
+sandwish/mysql:8.4 1487abffa4fa 812MB 5 days ago
+sandwish/nginx:dev ceda5777fa0c 50.7MB About an hour ago
+sandwish/open-api:dev 2f3be48048fc 329MB About an hour ago
+sandwish/redis:7.4-alpine 487efc061638 39.1MB 10 days ago
+sandwish/rocketmq:5.4.0 e6efcb24a53c 375MB 2 months ago
+
+# Compose PS
+NAME                          IMAGE                                         COMMAND                  SERVICE              CREATED         STATUS                   PORTS
+deploy-minio-1                sandwish/minio:RELEASE.2025-02-28T09-55-16Z   "/usr/bin/docker-ent…"   minio                4 minutes ago   Up 3 minutes (healthy)   0.0.0.0:19000->9000/tcp, [::]:19000->9000/tcp, 0.0.0.0:19001->9001/tcp, [::]:19001->9001/tcp
+deploy-mysql-1                sandwish/mysql:8.4                            "docker-entrypoint.s…"   mysql                4 minutes ago   Up 3 minutes (healthy)   3306/tcp, 33060/tcp
+deploy-nginx-1                sandwish/nginx:dev                            "/docker-entrypoint.…"   nginx                3 minutes ago   Up 3 minutes             0.0.0.0:18080->80/tcp, [::]:18080->80/tcp
+deploy-redis-1                sandwish/redis:7.4-alpine                     "docker-entrypoint.s…"   redis                4 minutes ago   Up 3 minutes (healthy)   6379/tcp
+deploy-rocketmq-broker-1      sandwish/rocketmq:5.4.0                       "./docker-entrypoint…"   rocketmq-broker      4 minutes ago   Up 3 minutes (healthy)   9876/tcp, 10912/tcp, 0.0.0.0:20909->10909/tcp, [::]:20909->10909/tcp, 0.0.0.0:20911->10911/tcp, [::]:20911->10911/tcp
+deploy-rocketmq-namesrv-1     sandwish/rocketmq:5.4.0                       "./docker-entrypoint…"   rocketmq-namesrv     4 minutes ago   Up 3 minutes (healthy)   10909/tcp, 10911-10912/tcp, 0.0.0.0:19876->9876/tcp, [::]:19876->9876/tcp
+deploy-sandwish-admin-api-1   sandwish/admin-api:dev                        "/__cacert_entrypoin…"   sandwish-admin-api   4 minutes ago   Up 3 minutes             8080/tcp
+deploy-sandwish-front-api-1   sandwish/front-api:dev                        "/__cacert_entrypoin…"   sandwish-front-api   4 minutes ago   Up 3 minutes             8080/tcp
+deploy-sandwish-open-api-1    sandwish/open-api:dev                         "/__cacert_entrypoin…"   sandwish-open-api    4 minutes ago   Up 3 minutes             8080/tcp
+
+# Compose config sanitized
+name: deploy
+services:
+  minio:
+    command:
+      - server
+      - /data
+      - --console-address
+      - :9001
+    environment:
+      MINIO_ROOT_PASSWORD: *******
+      MINIO_ROOT_USER: sandwishminio
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://127.0.0.1:9000/minio/health/ready
+      timeout: 5s
+      interval: 5s
+      retries: 30
+      start_period: 10s
+    image: sandwish/minio:RELEASE.2025-02-28T09-55-16Z
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        target: 9000
+        published: "19000"
+        protocol: tcp
+      - mode: ingress
+        target: 9001
+        published: "19001"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /srv/sandwish/deploy/data/minio
+        target: /data
+        bind:
+          create_host_path: true
+  minio-init:
+    depends_on:
+      minio:
+        condition: service_healthy
+        required: true
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set sandwish http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"; do sleep 2; done
+        mc mb --ignore-existing "sandwish/$${SANDWISH_OSS_S3_BUCKET}"
+    environment:
+      MINIO_ROOT_PASSWORD: *******
+      MINIO_ROOT_USER: sandwishminio
+      SANDWISH_OSS_S3_BUCKET: sandwish-storage
+    image: sandwish/minio-mc:RELEASE.2025-02-21T16-00-46Z
+    networks:
+      backend: null
+  mysql:
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: sandwish
+      MYSQL_PASSWORD: *******
+      MYSQL_ROOT_PASSWORD: *******
+      MYSQL_USER: sandwish
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent
+      timeout: 5s
+      interval: 5s
+      retries: 30
+      start_period: 20s
+    image: sandwish/mysql:8.4
+    networks:
+      backend: null
+    volumes:
+      - type: bind
+        source: /srv/sandwish/deploy/data/mysql
+        target: /var/lib/mysql
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/system.sql
+        target: /docker-entrypoint-initdb.d/01-schema-system.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/system.sql
+        target: /docker-entrypoint-initdb.d/02-data-system.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/auth.sql
+        target: /docker-entrypoint-initdb.d/03-schema-auth.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/auth.sql
+        target: /docker-entrypoint-initdb.d/04-data-auth.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/storage.sql
+        target: /docker-entrypoint-initdb.d/05-schema-storage.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/storage.sql
+        target: /docker-entrypoint-initdb.d/06-data-storage.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/submission.sql
+        target: /docker-entrypoint-initdb.d/07-schema-submission.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/submission.sql
+        target: /docker-entrypoint-initdb.d/08-data-submission.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/open.sql
+        target: /docker-entrypoint-initdb.d/09-schema-open.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/open.sql
+        target: /docker-entrypoint-initdb.d/10-data-open.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/member.sql
+        target: /docker-entrypoint-initdb.d/11-schema-member.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/member.sql
+        target: /docker-entrypoint-initdb.d/12-data-member.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/schema/audit.sql
+        target: /docker-entrypoint-initdb.d/13-schema-audit.sql
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/db/data/audit.sql
+        target: /docker-entrypoint-initdb.d/14-data-audit.sql
+        read_only: true
+        bind:
+          create_host_path: true
+  nginx:
+    depends_on:
+      sandwish-admin-api:
+        condition: service_started
+        required: true
+      sandwish-front-api:
+        condition: service_started
+        required: true
+      sandwish-open-api:
+        condition: service_started
+        required: true
+    image: sandwish/nginx:dev
+    networks:
+      backend: null
+      public: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "18080"
+        protocol: tcp
+  redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      timeout: 3s
+      interval: 5s
+      retries: 30
+      start_period: 5s
+    image: sandwish/redis:7.4-alpine
+    networks:
+      backend: null
+    volumes:
+      - type: volume
+        source: sandwish-redis-data
+        target: /data
+        volume: {}
+  rocketmq-broker:
+    command:
+      - sh
+      - mqbroker
+      - -n
+      - rocketmq-namesrv:9876
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_healthy
+        required: true
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -ec '</dev/tcp/127.0.0.1/10911'
+      timeout: 5s
+      interval: 5s
+      retries: 30
+      start_period: 20s
+    image: sandwish/rocketmq:5.4.0
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        target: 10911
+        published: "20911"
+        protocol: tcp
+      - mode: ingress
+        target: 10909
+        published: "20909"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /srv/sandwish/deploy/data/rocketmq/broker/store
+        target: /home/rocketmq/store
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /srv/sandwish/deploy/data/rocketmq/broker/logs
+        target: /home/rocketmq/logs
+        bind:
+          create_host_path: true
+  rocketmq-namesrv:
+    command:
+      - sh
+      - mqnamesrv
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - bash -ec '</dev/tcp/127.0.0.1/9876'
+      timeout: 5s
+      interval: 5s
+      retries: 30
+      start_period: 10s
+    image: sandwish/rocketmq:5.4.0
+    networks:
+      backend: null
+    ports:
+      - mode: ingress
+        target: 9876
+        published: "19876"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /srv/sandwish/deploy/data/rocketmq/namesrv/logs
+        target: /home/rocketmq/logs
+        bind:
+          create_host_path: true
+  sandwish-admin-api:
+    command:
+      - sh
+      - -c
+      - java -Xms512m -Xmx512m -jar /app/app.jar
+    depends_on:
+      minio:
+        condition: service_healthy
+        required: true
+      mysql:
+        condition: service_healthy
+        required: true
+      redis:
+        condition: service_healthy
+        required: true
+      rocketmq-broker:
+        condition: service_healthy
+        required: true
+    environment:
+      JAVA_OPTS: -Xms512m -Xmx512m
+      SANDWISH_LOG_STORAGE_PATH: /app/storage/sys-log
+      SANDWISH_LOG_SYS_CONSUMER_GROUP: sandwish-admin-api-sys-log-consumer
+      SANDWISH_LOG_SYS_TAG: '*'
+      SANDWISH_LOG_SYS_TOPIC: sandwish_save_log
+      SANDWISH_MQ_ENABLED: "true"
+      SANDWISH_MQ_TYPE: ROCKETMQ
+      SANDWISH_OSS_LOCAL_LOCATION_PREFIX: 'file:'
+      SANDWISH_OSS_LOCAL_ROOT_PATH: /app/storage
+      SANDWISH_OSS_S3_ACCESS_KEY: *******
+      SANDWISH_OSS_S3_BUCKET: sandwish-storage
+      SANDWISH_OSS_S3_ENDPOINT: http://minio:9000
+      SANDWISH_OSS_S3_LOCATION_PREFIX: http://127.0.0.1:19000/sandwish-storage/
+      SANDWISH_OSS_S3_PATH_STYLE_ACCESS: "true"
+      SANDWISH_OSS_S3_REGION: us-east-1
+      SANDWISH_OSS_S3_SECRET_KEY: *******
+      SANDWISH_OSS_TYPE: s3
+      SANDWISH_REDIS_PASSWORD: *******
+      SANDWISH_REDIS_TIMEOUT: 5s
+      SANDWISH_REDIS_URI: redis://redis:6379/0
+      SANDWISH_ROCKETMQ_NAME_SERVER: rocketmq-namesrv:9876
+      SANDWISH_ROCKETMQ_PRODUCER_GROUP: sandwish-admin-api-producer
+      SERVER_PORT: "8080"
+      SERVER_SERVLET_CONTEXT_PATH: /admin-api
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
+      SPRING_DATASOURCE_PASSWORD: *******
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sandwish?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: sandwish
+      SPRING_PROFILES_ACTIVE: docker
+    image: sandwish/admin-api:dev
+    networks:
+      backend: null
+    volumes:
+      - type: volume
+        source: admin-storage
+        target: /app/storage
+        volume: {}
+    working_dir: /app
+  sandwish-front-api:
+    command:
+      - sh
+      - -c
+      - java -Xms512m -Xmx512m -jar /app/app.jar
+    depends_on:
+      minio:
+        condition: service_healthy
+        required: true
+      mysql:
+        condition: service_healthy
+        required: true
+      redis:
+        condition: service_healthy
+        required: true
+    environment:
+      JAVA_OPTS: -Xms512m -Xmx512m
+      SANDWISH_OSS_LOCAL_LOCATION_PREFIX: 'file:'
+      SANDWISH_OSS_LOCAL_ROOT_PATH: /app/storage
+      SANDWISH_OSS_S3_ACCESS_KEY: *******
+      SANDWISH_OSS_S3_BUCKET: sandwish-storage
+      SANDWISH_OSS_S3_ENDPOINT: http://minio:9000
+      SANDWISH_OSS_S3_LOCATION_PREFIX: http://127.0.0.1:19000/sandwish-storage/
+      SANDWISH_OSS_S3_PATH_STYLE_ACCESS: "true"
+      SANDWISH_OSS_S3_REGION: us-east-1
+      SANDWISH_OSS_S3_SECRET_KEY: *******
+      SANDWISH_OSS_TYPE: s3
+      SANDWISH_REDIS_PASSWORD: *******
+      SANDWISH_REDIS_TIMEOUT: 5s
+      SANDWISH_REDIS_URI: redis://redis:6379/0
+      SERVER_PORT: "8080"
+      SERVER_SERVLET_CONTEXT_PATH: /front-api
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
+      SPRING_DATASOURCE_PASSWORD: *******
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sandwish?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: sandwish
+      SPRING_PROFILES_ACTIVE: docker
+    image: sandwish/front-api:dev
+    networks:
+      backend: null
+    volumes:
+      - type: volume
+        source: front-storage
+        target: /app/storage
+        volume: {}
+    working_dir: /app
+  sandwish-open-api:
+    command:
+      - sh
+      - -c
+      - java -Xms512m -Xmx512m -jar /app/app.jar
+    depends_on:
+      minio:
+        condition: service_healthy
+        required: true
+      mysql:
+        condition: service_healthy
+        required: true
+      redis:
+        condition: service_healthy
+        required: true
+    environment:
+      JAVA_OPTS: -Xms512m -Xmx512m
+      SANDWISH_OSS_LOCAL_LOCATION_PREFIX: 'file:'
+      SANDWISH_OSS_LOCAL_ROOT_PATH: /app/storage
+      SANDWISH_OSS_S3_ACCESS_KEY: *******
+      SANDWISH_OSS_S3_BUCKET: sandwish-storage
+      SANDWISH_OSS_S3_ENDPOINT: http://minio:9000
+      SANDWISH_OSS_S3_LOCATION_PREFIX: http://127.0.0.1:19000/sandwish-storage/
+      SANDWISH_OSS_S3_PATH_STYLE_ACCESS: "true"
+      SANDWISH_OSS_S3_REGION: us-east-1
+      SANDWISH_OSS_S3_SECRET_KEY: *******
+      SANDWISH_OSS_TYPE: s3
+      SANDWISH_REDIS_PASSWORD: *******
+      SANDWISH_REDIS_TIMEOUT: 5s
+      SANDWISH_REDIS_URI: redis://redis:6379/0
+      SERVER_PORT: "8080"
+      SERVER_SERVLET_CONTEXT_PATH: /open-api
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
+      SPRING_DATASOURCE_PASSWORD: *******
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sandwish?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: sandwish
+      SPRING_PROFILES_ACTIVE: docker
+    image: sandwish/open-api:dev
+    networks:
+      backend: null
+    volumes:
+      - type: volume
+        source: open-storage
+        target: /app/storage
+        volume: {}
+    working_dir: /app
+networks:
+  backend:
+    name: deploy_backend
+  public:
+    name: deploy_public
+volumes:
+  admin-storage:
+    name: deploy_admin-storage
+  front-storage:
+    name: deploy_front-storage
+  open-storage:
+    name: deploy_open-storage
+  sandwish-redis-data:
+    name: deploy_sandwish-redis-data

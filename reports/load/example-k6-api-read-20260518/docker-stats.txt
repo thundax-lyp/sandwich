@@ -1,0 +1,110 @@
+Mon May 18 11:30:27 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                0.00%     55.41MiB / 62.49GiB   166kB / 177kB     0B / 4.1kB
+deploy-sandwish-admin-api-1   2.39%     746.4MiB / 62.49GiB   213kB / 299kB     0B / 73.7kB
+deploy-rocketmq-broker-1      5.04%     2.417GiB / 62.49GiB   148kB / 107kB     0B / 6.12MB
+deploy-sandwish-front-api-1   0.08%     674.9MiB / 62.49GiB   42.5kB / 61kB     0B / 0B
+deploy-sandwish-open-api-1    0.07%     661.8MiB / 62.49GiB   31.4kB / 29.7kB   0B / 0B
+deploy-mysql-1                0.21%     470.9MiB / 62.49GiB   94.9kB / 92.4kB   40.4MB / 19.3MB
+deploy-rocketmq-namesrv-1     0.86%     369.4MiB / 62.49GiB   67.9kB / 45.2kB   0B / 2.72MB
+deploy-minio-1                1.17%     106.4MiB / 62.49GiB   19.1kB / 8.8kB    0B / 262kB
+deploy-redis-1                0.47%     22.43MiB / 62.49GiB   74.9kB / 12.9kB   2.24MB / 90.1kB
+Mon May 18 11:31:29 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                8.02%     62MiB / 62.49GiB      13.9MB / 15.5MB   0B / 4.1kB
+deploy-sandwish-admin-api-1   460.58%   861.1MiB / 62.49GiB   23.2MB / 33.4MB   0B / 73.7kB
+deploy-rocketmq-broker-1      9.44%     2.455GiB / 62.49GiB   2.24MB / 1.89MB   0B / 8.35MB
+deploy-sandwish-front-api-1   18.64%    687.6MiB / 62.49GiB   842kB / 883kB     0B / 0B
+deploy-sandwish-open-api-1    4.37%     668.7MiB / 62.49GiB   814kB / 845kB     0B / 0B
+deploy-mysql-1                27.00%    479.9MiB / 62.49GiB   14.3MB / 16.3MB   40.6MB / 37.2MB
+deploy-rocketmq-namesrv-1     0.16%     371.7MiB / 62.49GiB   84.2kB / 56.9kB   0B / 2.72MB
+deploy-minio-1                0.00%     107.8MiB / 62.49GiB   19.1kB / 8.8kB    0B / 328kB
+deploy-redis-1                1.76%     25.78MiB / 62.49GiB   8.03MB / 408kB    2.27MB / 7.51MB
+Mon May 18 11:32:32 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                10.62%    62.55MiB / 62.49GiB   52.5MB / 57.2MB   0B / 4.1kB
+deploy-sandwish-admin-api-1   138.72%   887.7MiB / 62.49GiB   84.7MB / 119MB    0B / 73.7kB
+deploy-rocketmq-broker-1      94.08%    2.477GiB / 62.49GiB   7.39MB / 6.37MB   0B / 12.5MB
+deploy-sandwish-front-api-1   4.63%     690.7MiB / 62.49GiB   3.13MB / 3.33MB   0B / 0B
+deploy-sandwish-open-api-1    3.11%     678.8MiB / 62.49GiB   2.92MB / 3.16MB   0B / 0B
+deploy-mysql-1                39.34%    485.6MiB / 62.49GiB   49.4MB / 60.8MB   40.9MB / 78.2MB
+deploy-rocketmq-namesrv-1     8.63%     374.6MiB / 62.49GiB   100kB / 68.2kB    0B / 2.72MB
+deploy-minio-1                3.58%     109.4MiB / 62.49GiB   19.1kB / 8.8kB    0B / 393kB
+deploy-redis-1                5.17%     27.98MiB / 62.49GiB   29.7MB / 1.47MB   2.31MB / 27.7MB
+Mon May 18 11:33:34 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                15.08%    64.53MiB / 62.49GiB   104MB / 112MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   81.15%    915.9MiB / 62.49GiB   169MB / 232MB     0B / 73.7kB
+deploy-rocketmq-broker-1      10.68%    2.471GiB / 62.49GiB   14MB / 12.2MB     0B / 17.3MB
+deploy-sandwish-front-api-1   4.27%     697MiB / 62.49GiB     6.07MB / 6.57MB   0B / 0B
+deploy-sandwish-open-api-1    2.87%     676.5MiB / 62.49GiB   5.65MB / 6.24MB   0B / 0B
+deploy-mysql-1                53.82%    489.4MiB / 62.49GiB   92.1MB / 119MB    40.9MB / 127MB
+deploy-rocketmq-namesrv-1     0.11%     376.8MiB / 62.49GiB   116kB / 80kB      0B / 2.72MB
+deploy-minio-1                0.03%     110.8MiB / 62.49GiB   19.1kB / 8.8kB    0B / 459kB
+deploy-redis-1                2.31%     29.32MiB / 62.49GiB   58.4MB / 2.87MB   2.34MB / 54MB
+Mon May 18 11:34:37 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                18.61%    64MiB / 62.49GiB      168MB / 182MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   213.57%   943.1MiB / 62.49GiB   273MB / 375MB     0B / 73.7kB
+deploy-rocketmq-broker-1      12.36%    2.473GiB / 62.49GiB   22.7MB / 19.8MB   0B / 23.5MB
+deploy-sandwish-front-api-1   5.28%     708.3MiB / 62.49GiB   9.79MB / 10.7MB   0B / 0B
+deploy-sandwish-open-api-1    3.34%     676.7MiB / 62.49GiB   9.07MB / 10.2MB   0B / 0B
+deploy-mysql-1                55.15%    493.9MiB / 62.49GiB   149MB / 194MB     40.9MB / 190MB
+deploy-rocketmq-namesrv-1     0.11%     378.1MiB / 62.49GiB   132kB / 91.3kB    0B / 2.72MB
+deploy-minio-1                0.08%     111.4MiB / 62.49GiB   19.1kB / 8.8kB    0B / 524kB
+deploy-redis-1                2.55%     30.88MiB / 62.49GiB   93.9MB / 4.6MB    2.38MB / 86.6MB
+Mon May 18 11:35:40 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                21.88%    65.45MiB / 62.49GiB   232MB / 250MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   21.47%    962.4MiB / 62.49GiB   336MB / 459MB     0B / 73.7kB
+deploy-rocketmq-broker-1      5.03%     2.473GiB / 62.49GiB   26.7MB / 23.2MB   0B / 26.9MB
+deploy-sandwish-front-api-1   6.36%     723.7MiB / 62.49GiB   14.6MB / 16MB     0B / 0B
+deploy-sandwish-open-api-1    4.03%     677.4MiB / 62.49GiB   13.5MB / 15.2MB   0B / 0B
+deploy-mysql-1                0.24%     497MiB / 62.49GiB     174MB / 228MB     40.9MB / 233MB
+deploy-rocketmq-namesrv-1     0.09%     379.2MiB / 62.49GiB   149kB / 103kB     0B / 2.72MB
+deploy-minio-1                0.00%     112.2MiB / 62.49GiB   19.2kB / 8.8kB    0B / 590kB
+deploy-redis-1                2.12%     31.18MiB / 62.49GiB   115MB / 6.5MB     2.39MB / 103MB
+Mon May 18 11:36:42 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                27.32%    66.69MiB / 62.49GiB   302MB / 324MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   27.28%    969.4MiB / 62.49GiB   369MB / 502MB     0B / 73.7kB
+deploy-rocketmq-broker-1      9.19%     2.474GiB / 62.49GiB   26.7MB / 23.2MB   0B / 27.8MB
+deploy-sandwish-front-api-1   6.87%     733.2MiB / 62.49GiB   20.9MB / 23.1MB   0B / 0B
+deploy-sandwish-open-api-1    5.06%     678MiB / 62.49GiB     19.2MB / 21.8MB   0B / 0B
+deploy-mysql-1                0.27%     497.6MiB / 62.49GiB   174MB / 228MB     40.9MB / 233MB
+deploy-rocketmq-namesrv-1     0.19%     382.5MiB / 62.49GiB   165kB / 115kB     0B / 2.72MB
+deploy-minio-1                0.09%     114MiB / 62.49GiB     19.2kB / 8.8kB    0B / 659kB
+deploy-redis-1                2.40%     31.7MiB / 62.49GiB    124MB / 9.05MB    2.39MB / 103MB
+Mon May 18 11:37:45 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                28.14%    67.62MiB / 62.49GiB   388MB / 416MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   26.80%    971MiB / 62.49GiB     408MB / 554MB     0B / 73.7kB
+deploy-rocketmq-broker-1      5.38%     2.475GiB / 62.49GiB   26.7MB / 23.2MB   0B / 28.7MB
+deploy-sandwish-front-api-1   8.06%     733.9MiB / 62.49GiB   28.7MB / 31.8MB   0B / 0B
+deploy-sandwish-open-api-1    4.96%     678.4MiB / 62.49GiB   26.4MB / 30.1MB   0B / 0B
+deploy-mysql-1                0.25%     498.5MiB / 62.49GiB   174MB / 228MB     40.9MB / 233MB
+deploy-rocketmq-namesrv-1     0.10%     383.8MiB / 62.49GiB   181kB / 126kB     0B / 2.72MB
+deploy-minio-1                0.04%     114.5MiB / 62.49GiB   19.2kB / 8.8kB    0B / 725kB
+deploy-redis-1                2.55%     32.16MiB / 62.49GiB   136MB / 12.2MB    2.39MB / 103MB
+Mon May 18 11:38:47 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                0.00%     65.09MiB / 62.49GiB   420MB / 450MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   0.20%     975.1MiB / 62.49GiB   424MB / 574MB     0B / 73.7kB
+deploy-rocketmq-broker-1      5.11%     2.475GiB / 62.49GiB   26.8MB / 23.3MB   0B / 29.6MB
+deploy-sandwish-front-api-1   0.08%     734.5MiB / 62.49GiB   31.6MB / 35MB     0B / 0B
+deploy-sandwish-open-api-1    0.10%     680.2MiB / 62.49GiB   29.1MB / 33.1MB   0B / 0B
+deploy-mysql-1                0.21%     499.1MiB / 62.49GiB   174MB / 228MB     40.9MB / 233MB
+deploy-rocketmq-namesrv-1     0.29%     391.3MiB / 62.49GiB   202kB / 138kB     0B / 2.72MB
+deploy-minio-1                0.06%     115.2MiB / 62.49GiB   19.2kB / 8.8kB    0B / 791kB
+deploy-redis-1                0.52%     33.05MiB / 62.49GiB   140MB / 13.3MB    2.39MB / 103MB
+Mon May 18 11:39:50 CST 2026
+NAME                          CPU %     MEM USAGE / LIMIT     NET I/O           BLOCK I/O
+deploy-nginx-1                0.00%     65.09MiB / 62.49GiB   420MB / 450MB     0B / 4.1kB
+deploy-sandwish-admin-api-1   3.06%     967.2MiB / 62.49GiB   424MB / 574MB     0B / 73.7kB
+deploy-rocketmq-broker-1      7.84%     2.476GiB / 62.49GiB   26.8MB / 23.3MB   0B / 30.5MB
+deploy-sandwish-front-api-1   0.06%     729.5MiB / 62.49GiB   31.6MB / 35MB     0B / 0B
+deploy-sandwish-open-api-1    0.07%     675MiB / 62.49GiB     29.1MB / 33.1MB   0B / 0B
+deploy-mysql-1                6.41%     500.1MiB / 62.49GiB   174MB / 228MB     40.9MB / 233MB
+deploy-rocketmq-namesrv-1     3.75%     391.2MiB / 62.49GiB   219kB / 151kB     0B / 2.72MB
+deploy-minio-1                3.66%     115.6MiB / 62.49GiB   19.2kB / 8.8kB    0B / 856kB
+deploy-redis-1                4.04%     33.21MiB / 62.49GiB   140MB / 13.3MB    2.39MB / 103MB

@@ -12,12 +12,6 @@
 
 ## 待审阅任务项
 
-- [ ] `integration-db`：补充集成测试数据库目录说明
-  - 范围文件：deploy/integration/db/README.md
-  - 处理动作：新增 schema、baseline、scenario、cleanup SQL 的职责和执行顺序说明
-  - 验收点：README 明确 `00-schema`、`10-baseline`、`20-scenarios`、`90-cleanup` 的边界
-  - 重要度：8/10
-
 - [ ] `integration-db`：建立集成测试 SQL 目录骨架
   - 范围文件：deploy/integration/db/00-schema/.gitkeep
   - 范围文件：deploy/integration/db/10-baseline/.gitkeep

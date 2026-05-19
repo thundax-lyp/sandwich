@@ -1,4 +1,4 @@
-import { ADMIN_API_BASE_URL, postJson } from "./http";
+import { ADMIN_API_BASE_URL, postJson } from "@/api/http";
 
 export interface LoginFormResponse {
     loginToken: string;
@@ -57,7 +57,7 @@ export const logout = (request: LogoutRequest) => {
     });
 };
 
-export const buildCaptchaUrl = (loginToken: string, version: number) => {
+export const getCaptchaUrl = (loginToken: string, version: number) => {
     const params = new URLSearchParams({
         loginToken,
         width: "150",

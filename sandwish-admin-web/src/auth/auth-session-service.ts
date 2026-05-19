@@ -1,5 +1,5 @@
-import { login } from "../api/auth-api";
-import type { AccessTokenResponse, LoginRequest } from "../api/auth-api";
+import { login } from "./auth-service";
+import type { AccessTokenResponse, LoginRequest } from "./auth-service";
 import { listCurrentUserPerms } from "../service/current-user-service";
 import { clearPermissions, replacePermissions } from "./permission-storage";
 import { clearAccessToken, saveTokenSession } from "./token-storage";

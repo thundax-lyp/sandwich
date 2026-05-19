@@ -63,6 +63,7 @@
 
 - `ADMIN_WEB_LAYER_FETCH_ONLY_HTTP`：`sandwish-admin-web/src` 下只有 `src/api/http.ts` 可以直接调用 `fetch`。
 - `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` 和 `postFormData` 只允许在 `*-service.ts` 中导入和调用。
+- `ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE`：页面、布局和组件中的 `queryFn` / `mutationFn` 请求逻辑必须调用 service 方法，不直接调用 HTTP helper。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE`：`src/components/` 下的共享组件不得导入 `src/pages/`。
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
@@ -82,6 +83,7 @@
 - `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
 - `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
 - `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：前端代码禁止使用嵌套三元表达式。
+- `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
@@ -115,9 +117,7 @@
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
-- `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
-- 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 
 ### Naming
 
@@ -127,7 +127,6 @@
 - TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。
 - TypeScript interface 响应类型命名优先沿用后端模型语义，例如 `DictResponse`。
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
-- 普通方法和变量使用 camelCase。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 - 权限判断变量使用 `canXxx`。
 - `Sandwish*` 只用于项目自有通用 UI 技术组件，不承载具体业务价值；业务页面、业务表单、业务弹窗和业务操作组件使用真实业务名，例如 `UserPage`、`UserFilterForm`、`UserEditDrawer`。

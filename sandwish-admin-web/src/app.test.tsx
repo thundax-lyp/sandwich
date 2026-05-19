@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClientProvider } from "@tanstack/react-query";
 import App from "./app";
-import { postJson } from "./api/http";
 import { clearPermissions, hasPermission, replacePermissions } from "./auth/permission-storage";
 import { SandwishTable } from "./components/sandwish-table";
 import { AuditLogPage } from "./pages/audit/audit-log/audit-log-page";
@@ -12,6 +11,7 @@ import { DepartmentPage } from "./pages/system/department/department-page";
 import { DictionaryPage } from "./pages/system/dictionary/dictionary-page";
 import { UserPage } from "./pages/system/user/user-page";
 import { queryClient } from "./query/query-client";
+import { getCurrentUserInfo, listCurrentUserMenus } from "./service/current-user-service";
 
 vi.mock("sm-crypto", () => ({
     sm2: {
@@ -1407,14 +1407,14 @@ describe("App", () => {
             );
         });
 
-        const infoRequest = postJson("/sys/current-user/info").catch(() => null);
+        const infoRequest = getCurrentUserInfo().catch(() => null);
         await waitFor(() =>
             expect(globalThis.fetch).toHaveBeenCalledWith(
                 "/admin-api/api/auth/session/token/refresh",
                 expect.any(Object)
             )
         );
-        const menuRequest = postJson("/sys/current-user/menus");
+        const menuRequest = listCurrentUserMenus();
 
         expect(globalThis.fetch).not.toHaveBeenCalledWith(
             "/admin-api/api/sys/current-user/menus",

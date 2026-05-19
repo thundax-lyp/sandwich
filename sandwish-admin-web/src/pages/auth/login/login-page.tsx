@@ -4,7 +4,7 @@ import { Alert, App, Button, Card, Form, Input, Space, Typography } from "antd";
 import { sm2 } from "sm-crypto";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { buildCaptchaUrl, createLoginForm, refreshCaptcha } from "@/api/auth-api";
+import { createLoginForm, getCaptchaUrl, refreshCaptcha } from "@/auth/auth-service";
 import { loginWithPermissions } from "@/auth/auth-session-service";
 import { getAccessToken } from "@/auth/token-storage";
 import "./login-page.css";
@@ -41,7 +41,7 @@ export const LoginPage = () => {
 
     const loginForm = loginFormQuery.data;
     const captchaUrl = loginForm?.loginToken
-        ? buildCaptchaUrl(loginForm.loginToken, captchaVersion)
+        ? getCaptchaUrl(loginForm.loginToken, captchaVersion)
         : "";
 
     const refreshCaptchaMutation = useMutation({

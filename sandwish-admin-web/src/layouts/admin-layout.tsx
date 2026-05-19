@@ -23,7 +23,7 @@ import type { MenuProps } from "antd";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../api/auth-api";
+import { logout } from "@/auth/auth-service";
 import { refreshAccessTokenIfNeeded } from "../api/http";
 import { useCurrentAccessToken } from "../auth/hooks";
 import { replacePermissions } from "../auth/permission-storage";

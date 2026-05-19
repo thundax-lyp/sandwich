@@ -273,6 +273,44 @@ const localRules = {
                 };
             }
         },
+        "post-helper-service-only": {
+            create(context) {
+                return {
+                    ImportDeclaration(node) {
+                        const importPath = node.source.value;
+                        if (
+                            importPath !== "@/api/http" &&
+                            importPath !== "../api/http" &&
+                            importPath !== "./api/http"
+                        ) {
+                            return;
+                        }
+
+                        const importsPostHelper = node.specifiers.some((specifier) => {
+                            return (
+                                specifier.type === "ImportSpecifier" &&
+                                (specifier.imported.name === "postJson" ||
+                                    specifier.imported.name === "postFormData")
+                            );
+                        });
+                        if (!importsPostHelper) {
+                            return;
+                        }
+
+                        const fileName = path.basename(context.physicalFilename);
+                        if (fileName.endsWith("-service.ts")) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY / ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE: postJson and postFormData may only be imported by *-service.ts files."
+                        });
+                    }
+                };
+            }
+        },
         "service-method-verb-prefix": {
             create(context) {
                 const startsWithServiceVerb = (name) => {
@@ -419,7 +457,25 @@ export default tseslint.config(
             "local/page-component-single-export": "error",
             "local/page-no-parent-relative-import": "error",
             "local/page-style-file": "error",
+            "local/post-helper-service-only": "error",
             "local/service-method-verb-prefix": "error",
+            "@typescript-eslint/naming-convention": [
+                "error",
+                {
+                    selector: "variableLike",
+                    format: ["camelCase", "PascalCase", "UPPER_CASE"],
+                    leadingUnderscore: "allow"
+                },
+                {
+                    selector: "method",
+                    format: ["camelCase"],
+                    leadingUnderscore: "allow"
+                },
+                {
+                    selector: "typeLike",
+                    format: ["PascalCase"]
+                }
+            ],
             "no-restricted-imports": [
                 "error",
                 {

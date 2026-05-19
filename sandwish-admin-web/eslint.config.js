@@ -126,6 +126,32 @@ const localRules = {
                 };
             }
         },
+        "page-no-parent-relative-import": {
+            create(context) {
+                return {
+                    ImportDeclaration(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+                        const importPath = node.source.value;
+
+                        if (
+                            !normalizedFilePath.includes("/src/pages/") ||
+                            !normalizedFilePath.endsWith("-page.tsx") ||
+                            typeof importPath !== "string" ||
+                            !importPath.startsWith("../")
+                        ) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT: page files must use ./ for same page-domain imports and @/ for cross-domain or shared imports."
+                        });
+                    }
+                };
+            }
+        },
         "page-component-single-export": {
             create(context) {
                 const isPascalCase = (name) => /^[A-Z][A-Za-z0-9]*$/.test(name);
@@ -339,6 +365,7 @@ export default tseslint.config(
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
             "local/page-component-single-export": "error",
+            "local/page-no-parent-relative-import": "error",
             "local/page-style-file": "error",
             "local/service-method-verb-prefix": "error",
             "no-restricted-imports": [

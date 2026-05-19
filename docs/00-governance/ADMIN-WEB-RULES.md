@@ -67,6 +67,7 @@
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
 - `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
+- `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：`src/pages/<module>/<domain>/<domain>-page.tsx` 不得使用 `../` 相对 import；本页目录内引用使用 `./`，跨页面域或共享目录引用使用 `@/`。
 
 ### Naming
 
@@ -113,7 +114,7 @@
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
-- `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`，同目录或父级目录内引用可以使用 `./` 或 `../`。
+- `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - 共享组件不得依赖具体页面 service、路由路径、权限字符串或业务页面状态。
 - `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。

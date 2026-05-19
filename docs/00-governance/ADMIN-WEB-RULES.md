@@ -62,7 +62,6 @@
 ### Architecture
 
 - `ADMIN_WEB_LAYER_FETCH_ONLY_HTTP`：`sandwish-admin-web/src` 下只有 `src/api/http.ts` 可以直接调用 `fetch`。
-- `ADMIN_WEB_LAYER_REQUEST_HELPER_PRIVATE`：`requestJson` 和 `requestFormData` 固定为 `src/api/http.ts` 内部私有 helper，不从 `src/api/http.ts` 导出，不被其他文件调用。
 - `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` 和 `postFormData` 只允许在 `*-service.ts` 中导入和调用。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE_SERVICE`：`src/components/` 下的共享组件不得导入页面目录中的 `*-service.ts`。
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。

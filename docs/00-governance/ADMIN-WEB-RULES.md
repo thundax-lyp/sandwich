@@ -108,16 +108,6 @@
 - `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 放在 `e2e/<module>/<domain>/<domain>.spec.ts`。
 - `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：布局 E2E 放在 `e2e/layout/*.spec.ts`。
 
-### UI
-
-### Service
-
-### State
-
-### Permission
-
-### Testing
-
 ## Review Rules
 
 ### Architecture
@@ -129,6 +119,7 @@
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
+
 ### Placement
 
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
@@ -520,8 +511,6 @@ JPG / PNG
 - 页面传给 service 的业务动作参数使用 `XxxCommand`，例如创建、保存、变更、批量移除等动作。
 - service 简单动作可以使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
 - service 方法内部负责把 `XxxQuery` / `XxxCommand` 转成 `XxxRequest`，并把 `XxxResponse` 转成 `XxxRecord` / `XxxNode` 后返回。
-
-### State
 
 ### Permission
 

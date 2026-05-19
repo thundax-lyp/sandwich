@@ -595,6 +595,40 @@ const localRules = {
                     }
                 };
             }
+        },
+        "api-contract-type-location": {
+            create(context) {
+                const isApiContractName = (name) => /(?:Request|Response)$/.test(name);
+
+                const isAllowedFile = () => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    return (
+                        normalizedFilePath.endsWith("-service.ts") ||
+                        normalizedFilePath.includes("/src/api/")
+                    );
+                };
+
+                const reportInvalidApiContractType = (node, name) => {
+                    if (!isApiContractName(name) || isAllowedFile()) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION: XxxRequest/XxxResponse types may only be defined in *-service.ts or src/api/."
+                    });
+                };
+
+                return {
+                    TSInterfaceDeclaration(node) {
+                        reportInvalidApiContractType(node.id, node.id.name);
+                    },
+                    TSTypeAliasDeclaration(node) {
+                        reportInvalidApiContractType(node.id, node.id.name);
+                    }
+                };
+            }
         }
     }
 };
@@ -687,6 +721,7 @@ export default tseslint.config(
                     ]
                 }
             ],
+            "local/api-contract-type-location": "error",
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
             "local/page-component-no-external-page": "error",

@@ -61,52 +61,52 @@
 
 ### Architecture
 
-- `ADMIN_WEB_LAYER_FETCH_ONLY_HTTP`：`sandwish-admin-web/src` 下只有 `src/api/http.ts` 可以直接调用 `fetch`。
-- `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` 和 `postFormData` 只允许在 `*-service.ts` 中导入和调用。
-- `ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE`：页面、布局和组件中的 `queryFn` / `mutationFn` 请求逻辑必须调用 service 方法，不直接调用 HTTP helper。
-- `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE`：`src/components/` 下的共享组件不得导入 `src/pages/`。
-- `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
-- `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
-- `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
-- `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：`src/pages/<module>/<domain>/<domain>-page.tsx` 不得使用 `../` 相对 import；本页目录内引用使用 `./`，跨页面域或共享目录引用使用 `@/`。
-- `ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE`：`src/pages/<module>/<domain>/components/` 下文件不得引用当前页面域之外的 `src/pages/` 内容；当前页面域内引用使用 `./` 或 `../`，共享能力使用 `@/`。
-- `ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL`：`src/components/` 下的共享组件不得通过 `../*.css` 引用上层或外部样式。
+- `ADMIN_WEB_LAYER_FETCH_ONLY_HTTP`：只有 `src/api/http.ts` 可直接调用 `fetch`。
+- `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` / `postFormData` 只在 `*-service.ts` 使用。
+- `ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE`：`queryFn` / `mutationFn` 只调用 service 方法。
+- `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE`：`src/components/` 不导入 `src/pages/`。
+- `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不导入页面、布局或组件。
+- `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不导入页面、布局或页面 service。
+- `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`src` 下禁止 `../../` 及更深相对 import。
+- `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：页面文件禁止 `../` import。
+- `ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE`：页面私有组件不引用其他页面域。
+- `ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL`：共享组件禁止 `../*.css` import。
 
 ### Naming
 
-- `ADMIN_WEB_NAME_FILE_KEBAB_CASE`：`sandwish-admin-web/src` 下新增文件名固定使用 kebab-case。
-- `ADMIN_WEB_NAME_PAGE_FILE`：页面文件固定命名为 `<domain>-page.tsx`。
-- `ADMIN_WEB_NAME_PAGE_STYLE_FILE`：页面专属样式文件固定与页面同目录，命名为 `<domain>-page.css`。
-- `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面专属 service 文件固定命名为 `<domain>-service.ts`。
-- `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面专属类型文件固定命名为 `<domain>-types.ts`。
-- `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件固定使用 PascalCase named export。
-- `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：`src/pages/<module>/<domain>/components/*.tsx` 每个文件最多导出一个 PascalCase React 组件；私有子组件不导出，可以留在同文件。
-- `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
-- `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
-- `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：前端代码禁止使用嵌套三元表达式。
-- `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
-- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
-- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 类型定义只允许出现在 `*-service.ts` 或 `src/api/` 中。
-- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 类型定义只允许出现在 `*-service.ts` 中；通用 `PageQuery<T>` 固定在 `src/types/page.ts`。
-- `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 类型定义只允许出现在明确边界的 `*-types.ts` 中，例如页面域 `<domain>-types.ts` 或 `src/service/<domain>-types.ts`。
-- `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
+- `ADMIN_WEB_NAME_FILE_KEBAB_CASE`：`src` 文件名使用 kebab-case。
+- `ADMIN_WEB_NAME_PAGE_FILE`：页面文件命名为 `<domain>-page.tsx`。
+- `ADMIN_WEB_NAME_PAGE_STYLE_FILE`：页面样式命名为 `<domain>-page.css`。
+- `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面 service 命名为 `<domain>-service.ts`。
+- `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面类型命名为 `<domain>-types.ts`。
+- `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件使用 PascalCase named export。
+- `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：页面私有组件文件最多导出一个 PascalCase 组件。
+- `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件使用 `export const XxxPage = () => {}`。
+- `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数。
+- `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：禁止嵌套三元表达式。
+- `ADMIN_WEB_NAME_CAMEL_CASE`：变量和方法使用 camelCase。
+- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法必须使用固定动词前缀。
+- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 只定义在 `*-service.ts` 或 `src/api/`。
+- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 只定义在 `*-service.ts`；`PageQuery<T>` 只定义在 `src/types/page.ts`。
+- `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 只定义在明确边界的 `*-types.ts`。
+- `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
-- `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。
-- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面文件中的本页 `className` 必须使用页面域前缀，例如 `dictionary-page`、`dictionary-list-panel`；共享组件样式 class 允许使用 `sandwish-` 前缀。
+- `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。
+- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面 `className` 使用页面域前缀；共享组件 class 使用 `sandwish-`。
 
 ### Placement
 
-- `ADMIN_WEB_PATH_PAGE_SHAPE`：页面固定按 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-page.tsx` 放置。
-- `ADMIN_WEB_PATH_PAGE_COMPONENTS`：页面专属组件固定放在 `sandwish-admin-web/src/pages/<module>/<domain>/components/`。
-- `ADMIN_WEB_PATH_PAGE_SERVICE`：页面专属 service 固定放在页面目录，命名为 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-service.ts`。
-- `ADMIN_WEB_PATH_AUTH`：token、权限和登录会话持久化固定放在 `sandwish-admin-web/src/auth/`。
-- `ADMIN_WEB_PATH_ROUTER`：路由表和路由保护固定放在 `sandwish-admin-web/src/router/`。
-- `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
-- `ADMIN_WEB_PATH_HOOK_FILE`：hook 文件固定放在 `sandwish-admin-web/src/**/hooks/use-<name>.ts`，文件名使用 `use-` 前缀和 kebab-case。
-- `ADMIN_WEB_PATH_GLOBAL_TYPES`：第三方库声明、环境声明和真正跨页面共享的全局前端类型固定放在 `sandwish-admin-web/src/types/`。
-- `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑固定放在 `sandwish-admin-web/src/test/`。
-- `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 测试固定放在 `sandwish-admin-web/e2e/<module>/<domain>/<domain>.spec.ts`，对应 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-page.tsx`。
-- `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：不归属单个页面的后台壳层、布局和跨页面导航 E2E 测试固定放在 `sandwish-admin-web/e2e/layout/*.spec.ts`。
+- `ADMIN_WEB_PATH_PAGE_SHAPE`：页面放在 `src/pages/<module>/<domain>/<domain>-page.tsx`。
+- `ADMIN_WEB_PATH_PAGE_COMPONENTS`：页面私有组件放在同页面域 `components/`。
+- `ADMIN_WEB_PATH_PAGE_SERVICE`：页面 service 放在同页面域 `<domain>-service.ts`。
+- `ADMIN_WEB_PATH_AUTH`：认证、token、权限持久化放在 `src/auth/`。
+- `ADMIN_WEB_PATH_ROUTER`：路由放在 `src/router/`。
+- `ADMIN_WEB_PATH_QUERY`：TanStack Query 基线放在 `src/query/`。
+- `ADMIN_WEB_PATH_HOOK_FILE`：hook 文件放在 `*/hooks/use-<name>.ts`。
+- `ADMIN_WEB_PATH_GLOBAL_TYPES`：跨页面通用类型放在 `src/types/`。
+- `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑放在 `src/test/`。
+- `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 放在 `e2e/<module>/<domain>/<domain>.spec.ts`。
+- `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：布局 E2E 放在 `e2e/layout/*.spec.ts`。
 
 ### UI
 
@@ -128,30 +128,20 @@
 ### Naming
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
-- 页面内部展示用类型可使用 `XxxView`、`XxxTableRecord` 或 `XxxFormValues`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
-- 权限判断变量使用 `canXxx`。
 - 通用业务页面骨架不使用 `Sandwish*` 前缀，例如 `ListPage`；它表达稳定页面范式，内部可以组合 `Sandwish*` 技术组件。
 - 不使用 `SandwishUserTable`、`SandwishDictionaryEditor` 这类混合命名；如果组件表达用户、字典、部门等业务语义，优先使用对应业务前缀。
-- 共享组件样式必须使用组件域前缀，避免污染页面样式。
 
 ### Placement
 
 - 页面专属 service 不被其他页面域直接导入；如果出现跨页面复用，应先提升到 `src/service/`。
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
 - 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
-- hook 文件固定放在对应边界的 `hooks/` 目录；跨页面复用放在 `src/hooks/`，页面域内复用放在页面域目录下的 `hooks/`。
-- 通用请求能力、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
-- 多个页面域复用的组件放在 `src/components/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
 - 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
-- service 公开参数类型 `XxxQuery` / `XxxCommand` 属于 service 入参协议，固定放在 `*-service.ts`。
-- service 返回给页面的业务数据类型 `XxxRecord` / `XxxNode` 属于业务类型，固定放在对应 `*-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
-- 跨页面通用数据形态放在 `src/types/`，例如分页查询和分页返回固定使用 `src/types/page.ts` 中的 `PageQuery<T>` / `Page<T>`。
-- `src/types/` 不承载页面专属 request / response / form values / table record 类型。
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。

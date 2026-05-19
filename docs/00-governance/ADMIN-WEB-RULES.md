@@ -86,7 +86,6 @@
 - `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：前端代码禁止使用嵌套三元表达式。
 - `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
-- `ADMIN_WEB_NAME_SERVICE_API_TYPE`：`*-service.ts` 导出的 TypeScript interface 必须使用后端 API 契约语义命名，并以 `Request` 或 `Response` 结尾。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。
@@ -126,7 +125,7 @@
 ### Naming
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
-- 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
+- 页面内部展示用类型可使用 `XxxView`、`XxxTableRecord` 或 `XxxFormValues`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 - 权限判断变量使用 `canXxx`。
 - 通用业务页面骨架不使用 `Sandwish*` 前缀，例如 `ListPage`；它表达稳定页面范式，内部可以组合 `Sandwish*` 技术组件。
@@ -145,7 +144,7 @@
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
 - 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
-- 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
+- API 契约 `XxxRequest` / `XxxResponse` 类型少且只被 service 内部使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
 - API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
@@ -526,6 +525,13 @@ JPG / PNG
 
 ### Service
 
+- API 内部契约类型使用 `XxxRequest` / `XxxResponse` 命名，只存在于 `*-service.ts` 内部，不作为页面、布局或组件直接依赖的公开类型。
+- service 对页面暴露的业务数据类型使用 `XxxRecord`；树、层级、菜单、部门等结构使用 `XxxNode`。
+- 页面传给 service 的查询参数使用 `XxxQuery`，例如分页、筛选和搜索条件。
+- 页面传给 service 的业务动作参数使用 `XxxCommand`，例如创建、保存、变更、批量移除等动作。
+- service 简单动作可以使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
+- service 方法内部负责把 `XxxQuery` / `XxxCommand` 转成 `XxxRequest`，并把 `XxxResponse` 转成 `XxxRecord` / `XxxNode` 后返回。
+
 ### State
 
 ### Permission
@@ -627,3 +633,4 @@ test("delete requires confirmation", async ({ page }) => {
 - 是否把导出默认范围固定为当前筛选结果。
 - 是否为大数据量导出引入任务中心或等价异步任务反馈机制。
 - Playwright 默认覆盖重点是否包含上传、导入 / 导出和核心业务流程。
+- 是否在完成 service 类型分层迁移后，将 `XxxRequest` / `XxxResponse` 不导出、页面不得导入 API 契约类型沉淀为 ESLint hard rule。

@@ -595,36 +595,6 @@ const localRules = {
                     }
                 };
             }
-        },
-        "service-api-type-name": {
-            create(context) {
-                const reportInvalidServiceApiType = (node, name) => {
-                    if (/(?:Request|Response)$/.test(name)) {
-                        return;
-                    }
-
-                    context.report({
-                        node,
-                        message: `ADMIN_WEB_NAME_SERVICE_API_TYPE: exported service interface "${name}" must end with Request or Response.`
-                    });
-                };
-
-                return {
-                    ExportNamedDeclaration(node) {
-                        const filePath = context.physicalFilename;
-                        if (!filePath.endsWith("-service.ts")) {
-                            return;
-                        }
-
-                        if (node.declaration?.type === "TSInterfaceDeclaration") {
-                            reportInvalidServiceApiType(
-                                node.declaration.id,
-                                node.declaration.id.name
-                            );
-                        }
-                    }
-                };
-            }
         }
     }
 };
@@ -726,7 +696,6 @@ export default tseslint.config(
             "local/page-style-file": "error",
             "local/post-helper-service-only": "error",
             "local/sandwish-component-name": "error",
-            "local/service-api-type-name": "error",
             "local/service-method-verb-prefix": "error",
             "local/shared-component-css-local": "error",
             "local/hook-file-path": "error",

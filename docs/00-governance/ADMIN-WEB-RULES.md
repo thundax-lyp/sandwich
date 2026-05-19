@@ -145,8 +145,8 @@
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
 - 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
-- service 公开参数类型 `XxxQuery` / `XxxCommand` 默认放在 `*-service.ts`；如果同页面多个组件需要直接声明或组装该类型，提升到 `<domain>-types.ts`。
-- service 返回给页面的业务数据类型 `XxxRecord` / `XxxNode` 默认放在 `*-service.ts`；如果同页面多个组件复用，或 service 文件过长，提升到 `<domain>-types.ts`。
+- service 公开参数类型 `XxxQuery` / `XxxCommand` 属于 service 入参协议，固定放在 `*-service.ts`。
+- service 返回给页面的业务数据类型 `XxxRecord` / `XxxNode` 属于页面业务类型，固定放在 `<domain>-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
 - API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。

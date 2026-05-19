@@ -129,7 +129,6 @@
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
-- 通用业务页面骨架不使用 `Sandwish*` 前缀，例如 `ListPage`；它表达稳定页面范式，内部可以组合 `Sandwish*` 技术组件。
 - 不使用 `SandwishUserTable`、`SandwishDictionaryEditor` 这类混合命名；如果组件表达用户、字典、部门等业务语义，优先使用对应业务前缀。
 
 ### Placement

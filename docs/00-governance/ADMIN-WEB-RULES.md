@@ -113,24 +113,12 @@
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
-- `page` 负责页面状态、用户交互、表格/表单组装和调用 service。
-- `components` 负责可复用 UI 片段，不直接知道 HTTP 细节。
-- `service` 负责 API path、request / response 类型和调用 `postJson`。
-- `api` 负责通用 HTTP 能力，不承载业务页面语义。
-- `auth` 负责 token、权限和登录会话持久化，不承载页面 UI。
-- `router` 负责路由表和路由保护，不承载页面业务交互。
-- `query` 负责 TanStack Query client 基线，不承载业务 query key 拼装策略之外的页面逻辑。
 - 业务请求文件固定使用 `*-service.ts` 命名；`*-api.ts` 不作为新增业务请求文件命名。
 - `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`，同目录或父级目录内引用可以使用 `./` 或 `../`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - 共享组件不得依赖具体页面 service、路由路径、权限字符串或业务页面状态。
-- `Sandwish*` 通用技术组件的 CSS 变量只能表达组件自身的技术主题，不引用 `--user-*`、`--dictionary-*` 等业务 token；业务页面不得反向覆盖组件内部变量来实现页面语义。
-- `SandwishPage` 只负责页面外壳布局与视觉，不内置列表、表格、筛选、表单等页面内容形态配置。
-- `SandwishFilterPanel` 作为独立通用面板暴露，不与 `SandwishPage` 联动；筛选按钮、展开状态和查询行为由业务页面拥有。
-- `SandwishDrawer` 只薄包装 AntD `Drawer` 的外壳视觉和 `full`、`large`、`middle`、`small` 四档宽度；`open`、`onClose`、`title`、`footer` 和内容仍按 AntD API 透传，不承载业务编辑语义。
-- `SandwishBatchActionBar` 只负责选中数量展示、右侧操作布局和未选中时的禁用态视觉；具体批量操作、按钮文案和业务禁用条件由业务页面拥有。
-- `SandwishTable` 只薄包装 AntD `Table` 的外壳视觉、滚动/分页样式、列宽拖动、操作列格式、响应式行为和行拖拽排序交互协议；`columns`、`pagination`、`rowSelection` 等成熟 AntD API 保持透传，排序结果通过 `onSort` 交还业务页面处理。
-- `ListPage` 是通用业务列表页骨架，负责搜索、新增、筛选展开、批量操作条和表格的显示编排；它可组合 `SandwishPage`、`SandwishFilterPanel`、`SandwishBatchActionBar` 和 `SandwishTable`，但查询条件、批量动作、表格数据、排序结果和弹窗等具体业务状态仍由业务页面拥有。
+- `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
+- `ListPage` 只承载列表页通用编排，查询条件、表格数据、批量动作和弹窗状态由业务页面拥有。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 
 ### Naming

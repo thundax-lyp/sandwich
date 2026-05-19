@@ -1,7 +1,7 @@
 import { CameraOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select, Switch, Upload } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
     listUserRoles,
     type CreateUserForm,
@@ -10,7 +10,6 @@ import {
     type UserResponse
 } from "../user-service";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
 import { UserAvatar } from "./user-avatar";
 
@@ -19,31 +18,31 @@ interface UserEditProps {
     title: string;
     saveText: string;
     user?: UserResponse | null;
+    currentUser?: CurrentUserInfoResponse | null;
     departments?: UserDepartmentResponse[];
     saving?: boolean;
     onClose: () => void;
-    onSave?: () => void;
+    onSave?: (form: CreateUserForm) => void;
     onCreate?: (form: CreateUserForm) => void;
     onAvatarUpload?: (file: File) => Promise<unknown> | void;
-    onRolesChange?: (roles: UserRoleResponse[]) => void;
 }
-
-const normalizeSearch = (value?: string | null) => {
-    const normalizedValue = value?.trim();
-    return normalizedValue || undefined;
-};
-
-const readUserName = (user: UserResponse) => {
-    return normalizeSearch(user.name) || normalizeSearch(user.loginName) || `用户 ${user.id}`;
-};
-
-const readDepartmentName = (user: UserResponse) => {
-    return user.department?.namePath || user.department?.name || "";
-};
 
 const readRoleIds = (roles?: UserRoleResponse[] | null) => {
     return (roles || []).map((role) => role.id);
 };
+
+const readUserForm = (user: UserResponse): CreateUserForm => ({
+    loginName: user.loginName || "",
+    loginPass: "",
+    name: user.name || "",
+    email: user.email || "",
+    mobile: user.mobile || "",
+    departmentId: user.department?.id || null,
+    roleIds: readRoleIds(user.roles),
+    ranks: user.ranks ?? 0,
+    admin: Boolean(user.admin),
+    enable: Boolean(user.enable)
+});
 
 const readRankValue = (user?: Pick<CurrentUserInfoResponse, "ranks" | "superAdmin"> | null) => {
     if (!user) {
@@ -93,20 +92,32 @@ export const UserEdit = ({
     title,
     saveText,
     user,
+    currentUser,
     departments = [],
     saving,
     onClose,
     onSave,
     onCreate,
-    onAvatarUpload,
-    onRolesChange
+    onAvatarUpload
 }: UserEditProps) => {
     const [avatarUploading, setAvatarUploading] = useState(false);
-    const [createForm, setCreateForm] = useState<CreateUserForm>(DEFAULT_CREATE_USER_FORM);
-    const createInitializedRef = useRef(false);
     const editing = Boolean(user?.id);
     const visible = Boolean(open);
     const creating = visible && !editing;
+    const editableMaxRank = currentUser ? maxCreatableRank(currentUser) : (user?.ranks ?? 0);
+    const [createForm, setCreateForm] = useState<CreateUserForm>(() => {
+        const initialForm =
+            user && editing
+                ? readUserForm(user)
+                : {
+                      ...DEFAULT_CREATE_USER_FORM,
+                      departmentId: user?.department?.id || null,
+                      ranks: editableMaxRank
+                  };
+        return initialForm.ranks > editableMaxRank
+            ? { ...initialForm, ranks: editableMaxRank }
+            : initialForm;
+    });
     const updateForm = (values: Partial<CreateUserForm>) => {
         setCreateForm((currentForm) => ({ ...currentForm, ...values }));
     };
@@ -116,13 +127,6 @@ export const UserEdit = ({
         enabled: visible,
         retry: false
     });
-    const currentUserQuery = useQuery({
-        queryKey: ["current-user", "info"],
-        queryFn: getCurrentUserInfo,
-        enabled: creating && visible,
-        retry: false
-    });
-    const createMaxRank = maxCreatableRank(currentUserQuery.data);
     const roleById = useMemo(() => {
         const roleById = new Map<string, UserRoleResponse>();
         [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(user?.roles ?? [])].forEach((role) => {
@@ -138,39 +142,12 @@ export const UserEdit = ({
             label: role.name || role.id
         }));
     }, [roleById]);
-    useEffect(() => {
-        if (!creating || !visible) {
-            createInitializedRef.current = false;
-            return;
-        }
-        if (createInitializedRef.current) {
-            setCreateForm((currentForm) =>
-                currentForm.ranks > createMaxRank
-                    ? { ...currentForm, ranks: createMaxRank }
-                    : currentForm
-            );
-            return;
-        }
-        createInitializedRef.current = true;
-        setCreateForm({
-            ...DEFAULT_CREATE_USER_FORM,
-            departmentId: user?.department?.id || null,
-            ranks: createMaxRank
-        });
-    }, [createMaxRank, creating, user?.department?.id, visible]);
-
-    const selectRoles = (roleIds: string[]) => {
-        onRolesChange?.(
-            roleIds.map((roleId) => roleById.get(roleId) ?? { id: roleId, name: roleId })
-        );
-    };
-
     const saveForm = () => {
         if (creating) {
             onCreate?.(createForm);
             return;
         }
-        onSave?.();
+        onSave?.(createForm);
     };
 
     return (
@@ -220,33 +197,78 @@ export const UserEdit = ({
                     </div>
                     <label>
                         <span>姓名</span>
-                        <Input value={readUserName(user)} readOnly />
+                        <Input
+                            value={createForm.name}
+                            placeholder="用户姓名"
+                            onChange={(event) => updateForm({ name: event.target.value })}
+                        />
                     </label>
                     <label>
                         <span>登录名</span>
-                        <Input value={user.loginName || ""} readOnly />
+                        <Input
+                            value={createForm.loginName}
+                            placeholder="lin.zhiyuan"
+                            onChange={(event) => updateForm({ loginName: event.target.value })}
+                        />
                     </label>
                     <label>
                         <span>邮箱</span>
-                        <Input value={user.email || ""} readOnly />
+                        <Input
+                            value={createForm.email || ""}
+                            placeholder="name@example.com"
+                            onChange={(event) => updateForm({ email: event.target.value })}
+                        />
                     </label>
                     <label>
                         <span>手机</span>
-                        <Input value={user.mobile || ""} readOnly />
+                        <Input
+                            value={createForm.mobile || ""}
+                            placeholder="手机号"
+                            onChange={(event) => updateForm({ mobile: event.target.value })}
+                        />
                     </label>
                     <label>
                         <span>部门</span>
-                        <Input value={readDepartmentName(user)} readOnly />
+                        <Select
+                            value={createForm.departmentId || undefined}
+                            options={departmentOptions(departments)}
+                            placeholder="选择部门"
+                            showSearch
+                            optionFilterProp="label"
+                            onChange={(departmentId) => updateForm({ departmentId })}
+                        />
                     </label>
                     <label>
                         <span>角色</span>
                         <Select
                             mode="multiple"
-                            value={readRoleIds(user.roles)}
+                            value={createForm.roleIds}
                             options={roleOptions}
                             loading={userRoleQuery.isFetching}
                             placeholder="选择角色"
-                            onChange={selectRoles}
+                            onChange={(roleIds) => updateForm({ roleIds })}
+                        />
+                    </label>
+                    <label>
+                        <span>等级</span>
+                        <Select
+                            value={createForm.ranks}
+                            options={rankOptions(editableMaxRank)}
+                            onChange={(ranks) => updateForm({ ranks })}
+                        />
+                    </label>
+                    <label className="user-edit-switch-row">
+                        <span>管理员</span>
+                        <Switch
+                            checked={createForm.admin}
+                            onChange={(admin) => updateForm({ admin })}
+                        />
+                    </label>
+                    <label className="user-edit-switch-row">
+                        <span>启用</span>
+                        <Switch
+                            checked={createForm.enable}
+                            onChange={(enable) => updateForm({ enable })}
                         />
                     </label>
                 </div>
@@ -319,7 +341,7 @@ export const UserEdit = ({
                         <span>等级</span>
                         <Select
                             value={createForm.ranks}
-                            options={rankOptions(createMaxRank)}
+                            options={rankOptions(editableMaxRank)}
                             onChange={(ranks) => updateForm({ ranks })}
                         />
                     </label>

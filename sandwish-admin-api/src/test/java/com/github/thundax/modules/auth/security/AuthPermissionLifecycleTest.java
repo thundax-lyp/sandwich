@@ -823,6 +823,16 @@ public class AuthPermissionLifecycleTest {
         }
 
         @Override
+        public boolean existsEmail(UserQuery query) {
+            return false;
+        }
+
+        @Override
+        public boolean existsMobile(UserQuery query) {
+            return false;
+        }
+
+        @Override
         public UserId create(CreateUserCommand command) {
             return UserIdCodec.toDomain(1L);
         }

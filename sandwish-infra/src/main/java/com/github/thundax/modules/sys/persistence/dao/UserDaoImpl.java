@@ -109,6 +109,16 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public int countByEmail(String email, UserId excludedId) {
+        return countByColumn("email", email, excludedId);
+    }
+
+    @Override
+    public int countByMobile(String mobile, UserId excludedId) {
+        return countByColumn("mobile", mobile, excludedId);
+    }
+
+    @Override
     public UserId insert(User entity) {
         UserDO dataObject = UserPersistenceAssembler.toDataObject(entity);
         dataObject.setId(idGenerator.nextId().value());
@@ -209,6 +219,19 @@ public class UserDaoImpl implements UserDao {
         }
         wrapper.orderByAsc("id");
         return wrapper;
+    }
+
+    private int countByColumn(String column, String value, UserId excludedId) {
+        if (StringUtils.isBlank(value)) {
+            return 0;
+        }
+        QueryWrapper<UserDO> wrapper = new QueryWrapper<>();
+        wrapper.eq(column, value);
+        if (excludedId != null) {
+            wrapper.ne("id", UserIdCodec.toValue(excludedId));
+        }
+        Long count = mapper.selectCount(wrapper);
+        return count == null ? 0 : count.intValue();
     }
 
     private void removeUserCaches(Long userId) {

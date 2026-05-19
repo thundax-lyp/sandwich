@@ -17,8 +17,11 @@ public class UserQuery {
     private UserId id;
     private DepartmentId departmentId;
     private String loginName;
+    private String email;
+    private String mobile;
     private String name;
     private UserStatus status;
     private UserPrivilege privilege;
     private String orderBy;
+    private UserId excludedId;
 }

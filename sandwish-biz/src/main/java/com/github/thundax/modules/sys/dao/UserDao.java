@@ -24,6 +24,10 @@ public interface UserDao {
             int pageNo,
             int pageSize);
 
+    int countByEmail(String email, UserId excludedId);
+
+    int countByMobile(String mobile, UserId excludedId);
+
     UserId insert(User user);
 
     int update(User user);

@@ -72,6 +72,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean existsEmail(UserQuery query) {
+        return query != null && dao.countByEmail(query.getEmail(), query.getExcludedId()) > 0;
+    }
+
+    @Override
+    public boolean existsMobile(UserQuery query) {
+        return query != null && dao.countByMobile(query.getMobile(), query.getExcludedId()) > 0;
+    }
+
+    @Override
     @AuditLog(type = "User", id = "", action = AuditAction.CREATE, summary = "创建后台用户", recordWhenUnchanged = true)
     @Transactional(rollbackFor = Exception.class)
     public UserId create(CreateUserCommand command) {

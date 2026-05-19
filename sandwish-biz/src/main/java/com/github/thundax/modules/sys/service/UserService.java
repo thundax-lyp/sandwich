@@ -19,6 +19,10 @@ public interface UserService {
 
     PageResult<User> page(UserQuery query, PageQuery page);
 
+    boolean existsEmail(UserQuery query);
+
+    boolean existsMobile(UserQuery query);
+
     UserId create(CreateUserCommand command);
 
     void changeInfo(ChangeUserInfoCommand command);

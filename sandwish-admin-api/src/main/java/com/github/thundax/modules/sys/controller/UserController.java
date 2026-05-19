@@ -216,6 +216,7 @@ public class UserController {
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
             throw AdminResponseExceptions.invalidParameter("loginName");
         }
+        validateUniqueContact(request);
 
         if (StringUtils.isBlank(request.getLoginPass())) {
             throw AdminResponseExceptions.invalidParameter("password");
@@ -265,6 +266,7 @@ public class UserController {
         if (!isLoginNameAvailable(request.getLoginName(), request.getId())) {
             throw AdminResponseExceptions.invalidParameter("loginName");
         }
+        validateUniqueContact(request);
 
         User bean = userService.get(UserIdCodec.toDomain(request.getId()));
         if (bean == null) {
@@ -276,6 +278,7 @@ public class UserController {
         if (!currentUser.isSuper() && Boolean.TRUE.equals(request.getAdmin()) != bean.isAdmin()) {
             throw AdminResponseExceptions.permissionDenied();
         }
+        validateEditableRank(currentUser, request);
 
         User entity = UserInterfaceAssembler.toEntity(bean, request);
 
@@ -568,6 +571,26 @@ public class UserController {
         return UserIdCodec.toValue(UserIdCodec.toDomain(id));
     }
 
+    private void validateUniqueContact(UserSaveRequest request) {
+        UserId excludedId = UserIdCodec.toDomain(request.getId());
+        if (StringUtils.isNotBlank(request.getEmail())) {
+            UserQuery query = new UserQuery();
+            query.setEmail(request.getEmail());
+            query.setExcludedId(excludedId);
+            if (userService.existsEmail(query)) {
+                throw AdminResponseExceptions.invalidParameter("email");
+            }
+        }
+        if (StringUtils.isNotBlank(request.getMobile())) {
+            UserQuery query = new UserQuery();
+            query.setMobile(request.getMobile());
+            query.setExcludedId(excludedId);
+            if (userService.existsMobile(query)) {
+                throw AdminResponseExceptions.invalidParameter("mobile");
+            }
+        }
+    }
+
     private void validateEditableUser(User currentUser, User targetUser) {
         if (currentUser != null && currentUser.isSuper()) {
             return;
@@ -577,6 +600,18 @@ public class UserController {
                 || targetUser == null
                 || targetUser.getRank() == null
                 || targetUser.getRank().value() >= currentUser.getRank().value()) {
+            throw AdminResponseExceptions.permissionDenied();
+        }
+    }
+
+    private void validateEditableRank(User currentUser, UserSaveRequest request) {
+        if (currentUser != null && currentUser.isSuper()) {
+            return;
+        }
+        int currentRank = currentUser == null || currentUser.getRank() == null
+                ? AccessRank.MIN_VALUE
+                : currentUser.getRank().value();
+        if (request.getRanks() != null && request.getRanks() >= currentRank) {
             throw AdminResponseExceptions.permissionDenied();
         }
     }

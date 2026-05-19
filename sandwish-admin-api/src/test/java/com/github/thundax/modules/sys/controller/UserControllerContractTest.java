@@ -43,6 +43,7 @@ import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.DepartmentService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
+import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import java.util.Collections;
@@ -177,6 +178,78 @@ public class UserControllerContractTest {
     }
 
     @Test
+    public void shouldRejectUpdatingUserWhenEmailExistsOnAnotherUser() {
+        UserService userService = mock(UserService.class);
+        DepartmentService departmentService = mock(DepartmentService.class);
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+        User currentUser = user();
+        User targetUser = user();
+        UserSaveRequest request = editableUserRequest();
+
+        currentUser.setRank(AccessRank.of(3));
+        targetUser.setRank(AccessRank.of(2));
+        request.setRanks(2);
+        request.setEmail("exists@example.com");
+
+        when(userService.get(UserIdCodec.toDomain("1001"))).thenReturn(targetUser);
+        when(userService.existsEmail(any(UserQuery.class))).thenReturn(true);
+        when(departmentService.get(any(DepartmentId.class))).thenReturn(department());
+        when(currentUserResolver.currentUser()).thenReturn(currentUser);
+
+        try {
+            new UserController(
+                            userService,
+                            departmentService,
+                            mock(RoleService.class),
+                            mock(PrincipalIdentityService.class),
+                            mock(PrincipalCredentialService.class),
+                            mock(PreAuthSessionService.class),
+                            currentUserResolver,
+                            mock(CurrentUserService.class))
+                    .update(request);
+            org.junit.Assert.fail("duplicate email should be rejected");
+        } catch (SandwishException e) {
+            org.junit.Assert.assertEquals(WebErrorCode.BAD_REQUEST, e.getErrorCode());
+        }
+        verify(userService, never()).changeInfo(any(ChangeUserInfoCommand.class));
+    }
+
+    @Test
+    public void shouldRejectUpdatingUserWhenNewRankIsNotLowerThanCurrentUser() {
+        UserService userService = mock(UserService.class);
+        DepartmentService departmentService = mock(DepartmentService.class);
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+        User currentUser = user();
+        User targetUser = user();
+        UserSaveRequest request = editableUserRequest();
+
+        currentUser.setRank(AccessRank.of(3));
+        targetUser.setRank(AccessRank.of(2));
+        request.setRanks(3);
+
+        when(userService.get(UserIdCodec.toDomain("1001"))).thenReturn(targetUser);
+        when(departmentService.get(any(DepartmentId.class))).thenReturn(department());
+        when(currentUserResolver.currentUser()).thenReturn(currentUser);
+
+        try {
+            new UserController(
+                            userService,
+                            departmentService,
+                            mock(RoleService.class),
+                            mock(PrincipalIdentityService.class),
+                            mock(PrincipalCredentialService.class),
+                            mock(PreAuthSessionService.class),
+                            currentUserResolver,
+                            mock(CurrentUserService.class))
+                    .update(request);
+            org.junit.Assert.fail("updating user to same rank as current user should be rejected");
+        } catch (SandwishException e) {
+            org.junit.Assert.assertEquals(WebErrorCode.FORBIDDEN, e.getErrorCode());
+        }
+        verify(userService, never()).changeInfo(any(ChangeUserInfoCommand.class));
+    }
+
+    @Test
     public void shouldBuildAvatarUrlWithContextPath() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setContextPath("/admin-api");
@@ -213,5 +286,21 @@ public class UserControllerContractTest {
         role.setName("系统管理员");
         role.setStatus(RoleStatus.ENABLED);
         return role;
+    }
+
+    private UserSaveRequest editableUserRequest() {
+        UserDepartmentRequest departmentRequest = new UserDepartmentRequest();
+        departmentRequest.setId("2001");
+
+        UserSaveRequest request = new UserSaveRequest();
+        request.setId("1001");
+        request.setLoginName("server.user");
+        request.setName("服务端用户A");
+        request.setEmail("server.user@example.com");
+        request.setMobile("13800000000");
+        request.setAdmin(false);
+        request.setEnable(true);
+        request.setDepartment(departmentRequest);
+        return request;
     }
 }

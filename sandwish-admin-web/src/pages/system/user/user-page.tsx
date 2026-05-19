@@ -37,7 +37,6 @@ import type {
     UserDepartmentResponse,
     UserPageRequest,
     UserResponse,
-    UserRoleResponse,
     UserSaveRequest
 } from "./user-service";
 import "./user-page.css";
@@ -462,28 +461,18 @@ export const UserPage = () => {
         setUserEditorOpen(true);
     };
 
-    const changeEditingUserRoles = (roles: UserRoleResponse[]) => {
-        if (!activeUser) {
-            return;
-        }
-        setActiveUser({
-            ...activeUser,
-            roles
-        });
-    };
-
-    const toUserSaveRequest = (user: UserResponse): UserSaveRequest => ({
+    const toUserSaveRequest = (user: UserResponse, form: CreateUserForm): UserSaveRequest => ({
         id: user.id,
         remarks: user.remarks,
-        loginName: user.loginName,
-        ranks: user.ranks,
-        name: user.name,
-        email: user.email,
-        mobile: user.mobile,
-        admin: user.admin,
-        enable: user.enable,
-        department: user.department?.id ? { id: user.department.id } : null,
-        roles: (user.roles || []).map((role) => ({ id: role.id }))
+        loginName: normalizeSearch(form.loginName),
+        ranks: form.ranks,
+        name: normalizeSearch(form.name),
+        email: normalizeSearch(form.email),
+        mobile: normalizeSearch(form.mobile),
+        admin: form.admin,
+        enable: form.enable,
+        department: form.departmentId ? { id: form.departmentId } : null,
+        roles: form.roleIds.map((roleId) => ({ id: roleId }))
     });
 
     const toCreateUserSaveRequest = (
@@ -524,11 +513,23 @@ export const UserPage = () => {
         createMutation.mutate(form);
     };
 
-    const saveEditingUser = () => {
+    const saveEditingUser = (form: CreateUserForm) => {
         if (!activeUser) {
             return;
         }
-        updateMutation.mutate(toUserSaveRequest(activeUser));
+        if (!normalizeSearch(form.loginName)) {
+            messageApi.error("请填写登录名");
+            return;
+        }
+        if (!normalizeSearch(form.name)) {
+            messageApi.error("请填写姓名");
+            return;
+        }
+        if (!form.departmentId) {
+            messageApi.error("请选择部门");
+            return;
+        }
+        updateMutation.mutate(toUserSaveRequest(activeUser, form));
     };
 
     const columns: SandwishTableProps<UserResponse>["columns"] = [
@@ -828,10 +829,12 @@ export const UserPage = () => {
             />
 
             <UserEdit
+                key={`${userEditorOpen ? "open" : "closed"}-${activeUser?.id || "create"}-${currentUserQuery.data?.ranks ?? "rank"}`}
                 open={userEditorOpen}
                 title={isCreatingUser ? "新增用户" : "编辑用户"}
                 saveText={isCreatingUser ? "新增用户" : "更新用户"}
                 user={activeUser}
+                currentUser={currentUserQuery.data}
                 departments={departments}
                 saving={isCreatingUser ? createMutation.isPending : updateMutation.isPending}
                 onClose={() => {
@@ -846,7 +849,6 @@ export const UserPage = () => {
                     }
                     return undefined;
                 }}
-                onRolesChange={changeEditingUserRoles}
             />
 
             <SandwishConfirmModal

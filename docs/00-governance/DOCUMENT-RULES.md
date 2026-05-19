@@ -34,7 +34,7 @@
 
 - 架构、模块边界、三层职责：[`ARCHITECTURE.md`](./ARCHITECTURE.md)
 - 命名、目录、类归属：[`NAMING-AND-PLACEMENT-RULES.md`](./NAMING-AND-PLACEMENT-RULES.md)
-- admin-web 命名、目录和前端代码归属：[`ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md`](./ADMIN-WEB-NAMING-AND-PLACEMENT-RULES.md)
+- admin-web 前端治理、命名、目录和交互规则：[`ADMIN-WEB-RULES.md`](./ADMIN-WEB-RULES.md)
 - 数据库、DAO、Mapper、SQL、持久化对象：[`DATABASE-RULES.md`](./DATABASE-RULES.md)
 - 领域标识、数据库主键和业务编号边界：[`UNIFIED-ID-DESIGN.md`](./UNIFIED-ID-DESIGN.md)
 - HTTP API 注解矩阵：[`API-ANNOTATION-MATRIX.md`](./API-ANNOTATION-MATRIX.md)

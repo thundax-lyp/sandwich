@@ -124,7 +124,7 @@
 
 ### Naming
 
-- 避免使用泛化动作文案，例如 `操作`、`变更状态`、`处理`。
+- 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
 - TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。
 - TypeScript interface 响应类型命名优先沿用后端模型语义，例如 `DictResponse`。
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。

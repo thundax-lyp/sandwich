@@ -52,6 +52,28 @@ cd sandwish-admin-web && npm ci && npm run build
 SANDWISH_IMAGE_TAG=dev deploy/build-images.sh
 ```
 
+只同步新 API 包到本地 API 镜像：
+
+```bash
+SANDWISH_IMAGE_TAG=dev deploy/sync-api-images.sh
+```
+
+只同步单个入口：
+
+```bash
+SANDWISH_IMAGE_TAG=dev deploy/sync-api-images.sh admin-api
+SANDWISH_IMAGE_TAG=dev deploy/sync-api-images.sh front-api
+SANDWISH_IMAGE_TAG=dev deploy/sync-api-images.sh open-api
+```
+
+同步新 API 包并重建 Compose 中对应 API 容器：
+
+```bash
+SANDWISH_SYNC_RECREATE_CONTAINERS=true deploy/sync-api-images.sh
+```
+
+重建容器时默认读取 `deploy/.env`。如果使用其他 env 文件，设置 `SANDWISH_COMPOSE_ENV_FILE`。
+
 只构建并导出 k6 压测镜像：
 
 ```bash

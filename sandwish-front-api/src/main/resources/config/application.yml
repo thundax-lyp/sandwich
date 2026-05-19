@@ -70,21 +70,6 @@ mybatis-plus:
   global-config:
     banner: false
 
-sandwish:
-  oss:
-    type: ${SANDWISH_OSS_TYPE:local}
-    local:
-      root-path: ${SANDWISH_OSS_LOCAL_ROOT_PATH:storage}
-      location-prefix: ${SANDWISH_OSS_LOCAL_LOCATION_PREFIX:file:}
-    s3:
-      endpoint: ${SANDWISH_OSS_S3_ENDPOINT:}
-      region: ${SANDWISH_OSS_S3_REGION:us-east-1}
-      bucket: ${SANDWISH_OSS_S3_BUCKET:}
-      access-key: ${SANDWISH_OSS_S3_ACCESS_KEY:}
-      secret-key: ${SANDWISH_OSS_S3_SECRET_KEY:}
-      location-prefix: ${SANDWISH_OSS_S3_LOCATION_PREFIX:}
-      path-style-access: ${SANDWISH_OSS_S3_PATH_STYLE_ACCESS:true}
-
 logging:
   config: classpath:config/logback-spring.xml
   level:
@@ -104,3 +89,18 @@ swagger:
   base-package: com.github.thundax.modules
   title: Sandwich Front API
   description: Sandwich 前台服务接口
+
+sandwish:
+  oss:
+    type: ${SANDWISH_OSS_TYPE:local}
+    local:
+      root-path: ${SANDWISH_OSS_LOCAL_ROOT_PATH:storage}
+      location-prefix: ${SANDWISH_OSS_LOCAL_LOCATION_PREFIX:file:}
+    s3:
+      endpoint: ${SANDWISH_OSS_S3_ENDPOINT:}
+      region: ${SANDWISH_OSS_S3_REGION:us-east-1}
+      bucket: ${SANDWISH_OSS_S3_BUCKET:}
+      access-key: ${SANDWISH_OSS_S3_ACCESS_KEY:}
+      secret-key: ${SANDWISH_OSS_S3_SECRET_KEY:}
+      location-prefix: ${SANDWISH_OSS_S3_LOCATION_PREFIX:}
+      path-style-access: ${SANDWISH_OSS_S3_PATH_STYLE_ACCESS:true}

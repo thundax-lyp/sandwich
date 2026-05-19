@@ -82,6 +82,26 @@ rocketmq:
   producer:
     group: ${SANDWISH_ROCKETMQ_PRODUCER_GROUP:sandwish-admin-api-producer}
 
+logging:
+  config: classpath:config/logback-spring.xml
+  level:
+    com.github.thundax: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+swagger:
+  enabled: ${SANDWISH_SWAGGER_ENABLED:true}
+  base-package: com.github.thundax.modules
+  title: Sandwich Admin API
+  description: Sandwich 后台服务接口
+
 sandwish:
   mq:
     enabled: ${SANDWISH_MQ_ENABLED:true}
@@ -111,23 +131,3 @@ sandwish:
       secret-key: ${SANDWISH_OSS_S3_SECRET_KEY:}
       location-prefix: ${SANDWISH_OSS_S3_LOCATION_PREFIX:}
       path-style-access: ${SANDWISH_OSS_S3_PATH_STYLE_ACCESS:true}
-
-logging:
-  config: classpath:config/logback-spring.xml
-  level:
-    com.github.thundax: INFO
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health
-  endpoint:
-    health:
-      show-details: never
-
-swagger:
-  enabled: ${SANDWISH_SWAGGER_ENABLED:true}
-  base-package: com.github.thundax.modules
-  title: Sandwich Admin API
-  description: Sandwich 后台服务接口

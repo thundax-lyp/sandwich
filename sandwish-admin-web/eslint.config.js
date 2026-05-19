@@ -679,17 +679,18 @@ const localRules = {
                         }
 
                         node.body.forEach((statement) => {
-                            if (
-                                statement.type === "ExportNamedDeclaration" ||
-                                statement.type === "ExportAllDeclaration"
-                            ) {
+                            if (statement.type === "ExportAllDeclaration" && statement.source) {
+                                return;
+                            }
+
+                            if (statement.type === "ExportNamedDeclaration" && statement.source) {
                                 return;
                             }
 
                             context.report({
                                 node: statement,
                                 message:
-                                    "ADMIN_WEB_LAYER_COMPONENT_INDEX_EXPORT_ONLY: component index.ts files may contain export declarations only."
+                                    "ADMIN_WEB_LAYER_COMPONENT_INDEX_EXPORT_ONLY: component index.ts files may contain re-export declarations only."
                             });
                         });
                     }

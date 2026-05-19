@@ -103,6 +103,10 @@ swagger:
   description: Sandwich 后台服务接口
 
 sandwish:
+  auth:
+    captcha:
+      whitelist-enabled: ${SANDWISH_AUTH_CAPTCHA_WHITELIST_ENABLED:false}
+      whitelist-values: ${SANDWISH_AUTH_CAPTCHA_WHITELIST_VALUES:}
   mq:
     enabled: ${SANDWISH_MQ_ENABLED:true}
     type: ${SANDWISH_MQ_TYPE:RABBITMQ}

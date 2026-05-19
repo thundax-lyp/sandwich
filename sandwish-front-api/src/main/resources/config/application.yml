@@ -91,6 +91,10 @@ swagger:
   description: Sandwich 前台服务接口
 
 sandwish:
+  auth:
+    captcha:
+      whitelist-enabled: ${SANDWISH_AUTH_CAPTCHA_WHITELIST_ENABLED:false}
+      whitelist-values: ${SANDWISH_AUTH_CAPTCHA_WHITELIST_VALUES:}
   oss:
     type: ${SANDWISH_OSS_TYPE:local}
     local:

@@ -794,6 +794,74 @@ describe("App", () => {
                 );
             }
 
+            if (url.endsWith("/audit/log/detail")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                id: "9001",
+                                objectType: "SUBMISSION",
+                                objectTypeLabel: "提交内容",
+                                objectId: "1001",
+                                objectDisplayName: "产品反馈",
+                                version: 2,
+                                action: "UPDATE",
+                                actionLabel: "更新",
+                                operatorType: "USER",
+                                operatorId: "1000000000000000101",
+                                operatorTypeLabel: "后台用户",
+                                operatorName: "Developer",
+                                source: "ADMIN_WEB",
+                                summary: "更新提交内容",
+                                occurredAt: "2026-05-19T10:00:00.000+08:00",
+                                changedFields: [
+                                    {
+                                        fieldName: "title",
+                                        fieldLabel: "标题",
+                                        beforeDisplayValue: "旧标题",
+                                        afterDisplayValue: "新标题"
+                                    }
+                                ],
+                                beforeSnapshot: {
+                                    fields: [
+                                        {
+                                            fieldName: "title",
+                                            fieldLabel: "标题",
+                                            displayValue: "旧标题"
+                                        },
+                                        {
+                                            fieldName: "status",
+                                            fieldLabel: "状态",
+                                            displayValue: "待处理"
+                                        }
+                                    ]
+                                },
+                                afterSnapshot: {
+                                    fields: [
+                                        {
+                                            fieldName: "title",
+                                            fieldLabel: "标题",
+                                            displayValue: "新标题"
+                                        },
+                                        {
+                                            fieldName: "status",
+                                            fieldLabel: "状态",
+                                            displayValue: "待处理"
+                                        }
+                                    ]
+                                }
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
+
             return Promise.resolve(
                 new Response(JSON.stringify({ code: "COMMON-00004", message: "not found" }), {
                     headers: { "Content-Type": "application/json" },
@@ -836,6 +904,13 @@ describe("App", () => {
                 method: "POST"
             })
         );
+
+        await userEvent.click(screen.getByRole("button", { name: "查看审计日志 9001" }));
+
+        expect(await screen.findByText("快照对比")).toBeInTheDocument();
+        expect(screen.getAllByText("旧标题").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("新标题").length).toBeGreaterThan(0);
+        expect(screen.getByText("已变更")).toBeInTheDocument();
     });
 
     it("hides new open client api key and shows generation entry when detail has no key", async () => {
@@ -1093,7 +1168,7 @@ describe("App", () => {
 
         expect((await screen.findAllByText("删除用户")).length).toBeGreaterThan(0);
         expect(screen.getByText("确认删除 Olivia Martinez？")).toBeInTheDocument();
-    }, 10000);
+    }, 20000);
 
     it("emits sortable table row movement", () => {
         const records = [

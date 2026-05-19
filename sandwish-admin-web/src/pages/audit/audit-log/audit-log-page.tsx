@@ -21,6 +21,7 @@ import type {
     AuditFieldResponse,
     AuditLogPageRequest,
     AuditLogResponse,
+    AuditSnapshotFieldResponse,
     AuditSnapshotResponse
 } from "./audit-log-service";
 import "./audit-log-page.css";
@@ -149,19 +150,98 @@ const renderChangedFields = (fields?: AuditFieldResponse[] | null) => {
     );
 };
 
-const renderSnapshot = (snapshot?: AuditSnapshotResponse | null) => {
-    if (!snapshot?.fields?.length) {
+const snapshotFieldKey = (field: Pick<AuditSnapshotFieldResponse, "fieldName" | "fieldLabel">) => {
+    return field.fieldName || field.fieldLabel || "";
+};
+
+const snapshotFieldValue = (field?: AuditSnapshotFieldResponse | null) => {
+    return field?.displayValue || "-";
+};
+
+const changedFieldKeys = (fields?: AuditFieldResponse[] | null) => {
+    const keys = new Set<string>();
+    (fields || []).forEach((field) => {
+        if (field.fieldName) {
+            keys.add(field.fieldName);
+        }
+        if (field.fieldLabel) {
+            keys.add(field.fieldLabel);
+        }
+    });
+    return keys;
+};
+
+const snapshotFieldMap = (snapshot?: AuditSnapshotResponse | null) => {
+    const fields = new Map<string, AuditSnapshotFieldResponse>();
+    (snapshot?.fields || []).forEach((field) => {
+        const key = snapshotFieldKey(field);
+        if (key) {
+            fields.set(key, field);
+        }
+    });
+    return fields;
+};
+
+const snapshotFieldKeys = (
+    beforeSnapshot?: AuditSnapshotResponse | null,
+    afterSnapshot?: AuditSnapshotResponse | null
+) => {
+    const keys: string[] = [];
+    [...(beforeSnapshot?.fields || []), ...(afterSnapshot?.fields || [])].forEach((field) => {
+        const key = snapshotFieldKey(field);
+        if (key && !keys.includes(key)) {
+            keys.push(key);
+        }
+    });
+    return keys;
+};
+
+const renderSnapshotCompare = (
+    beforeSnapshot?: AuditSnapshotResponse | null,
+    afterSnapshot?: AuditSnapshotResponse | null,
+    fields?: AuditFieldResponse[] | null
+) => {
+    const keys = snapshotFieldKeys(beforeSnapshot, afterSnapshot);
+    if (!keys.length) {
         return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无快照" />;
     }
+    const beforeFields = snapshotFieldMap(beforeSnapshot);
+    const afterFields = snapshotFieldMap(afterSnapshot);
+    const changedKeys = changedFieldKeys(fields);
 
     return (
-        <div className="audit-log-snapshot">
-            {snapshot.fields.map((field) => (
-                <div key={field.fieldName || field.fieldLabel} className="audit-log-snapshot-row">
-                    <Text type="secondary">{field.fieldLabel || field.fieldName}</Text>
-                    <Text>{field.displayValue || "-"}</Text>
-                </div>
-            ))}
+        <div className="audit-log-snapshot-compare">
+            <div className="audit-log-snapshot-head">
+                <Text type="secondary">字段</Text>
+                <Text type="secondary">变更前</Text>
+                <Text type="secondary">变更后</Text>
+            </div>
+            {keys.map((key) => {
+                const beforeField = beforeFields.get(key);
+                const afterField = afterFields.get(key);
+                const beforeValue = snapshotFieldValue(beforeField);
+                const afterValue = snapshotFieldValue(afterField);
+                const changed = changedKeys.has(key) || beforeValue !== afterValue;
+                return (
+                    <div
+                        key={key}
+                        className={
+                            changed
+                                ? "audit-log-snapshot-row audit-log-snapshot-row-changed"
+                                : "audit-log-snapshot-row"
+                        }
+                    >
+                        <div className="audit-log-snapshot-field">
+                            <Text strong={changed}>
+                                {beforeField?.fieldLabel || afterField?.fieldLabel || key}
+                            </Text>
+                            {changed ? <Tag className="audit-log-changed-tag">已变更</Tag> : null}
+                        </div>
+                        <Text type="secondary">{beforeValue}</Text>
+                        <Text strong={changed}>{afterValue}</Text>
+                    </div>
+                );
+            })}
         </div>
     );
 };
@@ -606,13 +686,12 @@ export const AuditLogPage = () => {
                         </section>
 
                         <section>
-                            <Text type="secondary">变更前快照</Text>
-                            {renderSnapshot(detailLog.beforeSnapshot)}
-                        </section>
-
-                        <section>
-                            <Text type="secondary">变更后快照</Text>
-                            {renderSnapshot(detailLog.afterSnapshot)}
+                            <Text type="secondary">快照对比</Text>
+                            {renderSnapshotCompare(
+                                detailLog.beforeSnapshot,
+                                detailLog.afterSnapshot,
+                                detailLog.changedFields
+                            )}
                         </section>
                     </div>
                 ) : detailQuery.isError ? (

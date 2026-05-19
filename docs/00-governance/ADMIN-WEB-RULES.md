@@ -68,6 +68,7 @@
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
 - `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
 - `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：`src/pages/<module>/<domain>/<domain>-page.tsx` 不得使用 `../` 相对 import；本页目录内引用使用 `./`，跨页面域或共享目录引用使用 `@/`。
+- `ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE`：`src/pages/<module>/<domain>/components/` 下文件不得引用当前页面域之外的 `src/pages/` 内容；当前页面域内引用使用 `./` 或 `../`，共享能力使用 `@/`。
 
 ### Naming
 

@@ -152,6 +152,57 @@ const localRules = {
                 };
             }
         },
+        "page-component-no-external-page": {
+            create(context) {
+                const readPageDomainRoot = (normalizedFilePath) => {
+                    const match = normalizedFilePath.match(/\/src\/pages\/[^/]+\/[^/]+\//);
+                    return match?.[0];
+                };
+
+                return {
+                    ImportDeclaration(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+                        const importPath = node.source.value;
+                        const pageDomainRoot = readPageDomainRoot(normalizedFilePath);
+
+                        if (
+                            !pageDomainRoot ||
+                            !normalizedFilePath.includes(`${pageDomainRoot}components/`) ||
+                            typeof importPath !== "string"
+                        ) {
+                            return;
+                        }
+
+                        if (importPath.startsWith("@/pages/")) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE: page components must not import from other page domains."
+                            });
+                            return;
+                        }
+
+                        if (!importPath.startsWith(".")) {
+                            return;
+                        }
+
+                        const resolvedImportPath = path
+                            .resolve(path.dirname(filePath), importPath)
+                            .split(path.sep)
+                            .join("/");
+
+                        if (!resolvedImportPath.includes(pageDomainRoot)) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE: page components may only use relative imports inside their own page domain."
+                            });
+                        }
+                    }
+                };
+            }
+        },
         "page-component-single-export": {
             create(context) {
                 const isPascalCase = (name) => /^[A-Z][A-Za-z0-9]*$/.test(name);
@@ -364,6 +415,7 @@ export default tseslint.config(
             ],
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
+            "local/page-component-no-external-page": "error",
             "local/page-component-single-export": "error",
             "local/page-no-parent-relative-import": "error",
             "local/page-style-file": "error",

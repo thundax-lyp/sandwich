@@ -115,23 +115,17 @@
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
-- `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 
 ### Naming
 
-- React 组件使用 PascalCase。
 - Hook 使用 `useXxx`。
-- 常量使用 `UPPER_SNAKE_CASE`。
 - 状态动作文案使用明确业务动词，例如 `启用`、`禁用`、`发布`、`下线`、`归档`、`恢复`。
 - 避免使用泛化动作文案，例如 `操作`、`变更状态`、`处理`。
-- `<module>` 使用稳定业务模块名，例如 `system`、`auth`、`dashboard`、`storage`。
-- `<domain>` 使用页面域名，例如 `dictionary`、`department`、`login`。
 - TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。
 - TypeScript interface 响应类型命名优先沿用后端模型语义，例如 `DictResponse`。
-- `src/types/` 下的声明文件固定使用 kebab-case，并以 `.d.ts` 结尾，例如 `sm-crypto.d.ts`。
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
 - 普通方法和变量使用 camelCase。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
@@ -144,26 +138,20 @@
 
 ### Placement
 
-- 页面目录只承载该页面域直接拥有的文件，不作为跨域共享目录。
 - 页面专属 service 不被其他页面域直接导入；如果出现跨页面复用，应先提升到 `src/service/`。
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
 - 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
 - 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
-- 只服务单个页面域的组件放在页面目录下的 `components/`。
 - 多个页面域复用的组件放在 `src/components/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
 - 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
-- 页面专属组件不得从其他页面域目录直接导入。
 - 请求 / 响应类型少且只被 service 与同页面 page 使用时，不单独拆文件。
 - 类型被同页面多个组件复用，或 service 文件过长时，拆到 `<domain>-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
 - API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
-- 第三方库缺失类型声明、Vite 环境声明和全局前端扩展类型放在 `src/types/`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。
-- 页面专属样式固定与页面同目录放置，形成 `pages/<module>/<domain>/<domain>-page.tsx` + `<domain>-page.css` 组合；页面组件由 `*-page.tsx` 显式 import 同目录 CSS。
-- 页面当前没有专属样式时，允许同目录 `*-page.css` 为空文件，用于保留稳定页面样式槽位。
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。

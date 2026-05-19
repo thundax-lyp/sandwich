@@ -9,7 +9,7 @@ public class ServletRegistrationArchitectureTest extends AbstractArchitectureTes
 
     @Test
     public void shouldNotRegisterServletEndpoints() {
-        JavaClasses classes = importPackages("com.github.thundax.autoconfigure", "com.github.thundax.modules");
+        JavaClasses classes = importPackages("com.github.thundax.configure", "com.github.thundax.modules");
 
         LayerArchitectureRuleSupport.servletRegistrationBeanShouldNotBeUsed().check(classes);
     }

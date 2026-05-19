@@ -5,7 +5,7 @@ import com.github.thundax.common.exception.FrontResponseExceptions;
 import com.github.thundax.common.security.annotation.PublicApi;
 import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.MemberLoginInterfaceAssembler;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.controller.request.MemberAccountLoginRequest;
 import com.github.thundax.modules.auth.controller.request.MemberLogoutRequest;
 import com.github.thundax.modules.auth.controller.request.MemberRefreshTokenRequest;

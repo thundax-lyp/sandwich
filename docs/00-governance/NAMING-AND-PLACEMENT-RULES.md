@@ -62,6 +62,7 @@
 - `PATH_SERVICE_COMMAND_BIZ_OWNERSHIP`：Service 写入口对象固定归属 `sandwish-biz/src/main/java/com/github/thundax/modules/{module}/service/command/`，不进入 API、Entity、DAO、infra 或 common 包。
 - `PATH_COMMON_PAGE_MODEL`：`PageQuery` 和 `PageResult` 固定归属 `sandwish-common-core` 的 `com.github.thundax.common.page` 包。
 - `PATH_ENTRY_SERVICE_API_ONLY`：入口注册编排 Service 固定归属 API 入口模块；前台会员注册编排命名为 `MemberRegistrationService` / `MemberRegistrationServiceImpl`；后台权限会话适配 Service 固定归属 `sandwish-admin-api` 的 `auth.service`；后台系统日志消息发送和消费服务固定归属 `sandwish-admin-api` 的 `sys.service` / `sys.service.impl`，命名为 `SysLogMessageService` / `SysLogMessageServiceImpl`；可复用认证业务 Service 可以归属 `sandwish-biz` 的 `auth.service`，但不得依赖 API Request / Response、Servlet、安全框架上下文或入口专用 provider；`sandwish-biz` 不得声明 `*RegistrationService`、`PermissionService` 或对应 `*ServiceImpl`。
+- `PATH_CONFIGURATION_ANNOTATED_CLASS`：`@Configuration` / `@ConfigurationProperties` 类必须放在 `..configure..`。
 
 ### Layer
 
@@ -110,6 +111,9 @@
 - `NAME_SERVICE_TOKEN`：Service 单一 token 标识命名固定为 `{业务对象名}Token`，例如 `PreAuthSessionToken`；不得用裸 `String` 替代业务 token 标识。
 - `NAME_SERVICE_COMMAND`：Service 写入口对象命名固定为 `{业务动作}{业务对象}Command` 或 `{业务动作}Command`，例如 `CreateDictCommand`、`RenameRoleCommand`、`BindRoleMenusCommand`；不得使用 API `Request`、`Param`、`DTO` 或业务 `Entity` 替代。
 - `NAME_SERVICE_METHOD_BUSINESS_ACTION`：Service 写方法固定使用业务动作名，不使用 `update*`、`save*`、`insert*`、`batch*` 等泛化或过时命名；条件清理动作允许使用 `deleteByXxx(*Query)` 窄口径。
+- `NAME_CONFIGURATION_PROPERTIES`：`@ConfigurationProperties` 类必须命名为 `*Properties`。
+- `NAME_CONFIGURATION_CLASS`：`@Configuration` 类必须命名为 `*Configuration`；禁止 `*AutoConfiguration`。
+- `NAME_CONFIGURATION_ANNOTATION_EXCLUSIVE`：同一类禁止同时使用 `@Configuration` 和 `@ConfigurationProperties`。
 
 ## Review Rules（AI/人工审阅，暂不强门禁）
 

@@ -8,10 +8,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.security.annotation.HasPermission;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.auth.security.OpenApiHeaders;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.entity.StoredObject;

@@ -4,7 +4,7 @@ import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.FrontBizExceptions;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;
 import com.github.thundax.modules.auth.dao.PrincipalAuthSessionDao;
 import com.github.thundax.modules.auth.dao.PrincipalLoginEventDao;

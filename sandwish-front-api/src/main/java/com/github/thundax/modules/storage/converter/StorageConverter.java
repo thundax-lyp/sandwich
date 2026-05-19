@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.converter;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.storage.entity.StoredObject;
 import com.github.thundax.modules.storage.entity.valueobject.StoredObjectIdCodec;
 import com.github.thundax.modules.storage.service.StorageService;

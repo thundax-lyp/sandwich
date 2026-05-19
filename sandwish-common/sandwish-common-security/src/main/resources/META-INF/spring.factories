@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.security.config.SandwishSecurityAutoConfiguration
+com.github.thundax.common.security.configure.SandwishSecurityConfiguration

@@ -8,7 +8,7 @@ import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.exception.SandwishException;
 import com.github.thundax.common.web.util.RequestIpUtils;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.controller.request.AuthLoginFormRefreshRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLoginRequest;
 import com.github.thundax.modules.auth.controller.request.AuthLogoutRequest;

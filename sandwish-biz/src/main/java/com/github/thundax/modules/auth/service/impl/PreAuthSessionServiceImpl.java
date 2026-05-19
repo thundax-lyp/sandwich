@@ -2,6 +2,7 @@ package com.github.thundax.modules.auth.service.impl;
 
 import com.github.thundax.common.exception.BizException;
 import com.github.thundax.common.exception.BizExceptionBoundary;
+import com.github.thundax.modules.auth.configure.CaptchaWhitelistProperties;
 import com.github.thundax.modules.auth.dao.PreAuthSessionDao;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.valueobject.PreAuthSessionId;
@@ -11,12 +12,10 @@ import com.github.thundax.modules.auth.service.command.CreatePreAuthSessionComma
 import com.github.thundax.modules.auth.service.command.RefreshPreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.ReleasePreAuthSessionCommand;
 import com.github.thundax.modules.auth.service.command.UpsertPreAuthSessionValueCommand;
-import com.github.thundax.modules.auth.service.model.CaptchaWhitelistProperties;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueValidateQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,14 +26,11 @@ public class PreAuthSessionServiceImpl implements PreAuthSessionService {
     private final CaptchaWhitelistProperties captchaWhitelistProperties;
 
     @Autowired
-    public PreAuthSessionServiceImpl(PreAuthSessionDao preAuthSessionDao, Environment environment) {
-        this(preAuthSessionDao, CaptchaWhitelistProperties.from(environment));
-    }
-
-    PreAuthSessionServiceImpl(
+    public PreAuthSessionServiceImpl(
             PreAuthSessionDao preAuthSessionDao, CaptchaWhitelistProperties captchaWhitelistProperties) {
         this.preAuthSessionDao = preAuthSessionDao;
-        this.captchaWhitelistProperties = captchaWhitelistProperties;
+        this.captchaWhitelistProperties =
+                captchaWhitelistProperties == null ? CaptchaWhitelistProperties.disabled() : captchaWhitelistProperties;
     }
 
     @Override

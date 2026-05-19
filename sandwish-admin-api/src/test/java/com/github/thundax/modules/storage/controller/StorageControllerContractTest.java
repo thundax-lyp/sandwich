@@ -9,13 +9,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.page.PageQuery;
 import com.github.thundax.common.page.PageResult;
 import com.github.thundax.common.page.PageRules;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
 import com.github.thundax.common.web.response.PageResponse;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.storage.controller.request.StoragePageRequest;
 import com.github.thundax.modules.storage.controller.response.StorageResponse;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;

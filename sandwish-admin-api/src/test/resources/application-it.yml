@@ -28,10 +28,12 @@ rocketmq:
         send-message-timeout: ${SANDWISH_IT_ROCKETMQ_SEND_TIMEOUT_MS:15000}
 
 sandwish:
+    auth:
+        captcha:
+            whitelist-enabled: ${SANDWISH_IT_CAPTCHA_WHITELIST_ENABLED:true}
+            whitelist-values: ${SANDWISH_IT_CAPTCHA_WHITELIST:6666,8888}
     integration-test:
         enabled: ${SANDWISH_INTEGRATION_TEST_ENABLED:true}
-        captcha:
-            whitelist-values: ${SANDWISH_IT_CAPTCHA_WHITELIST:6666,8888}
     mq:
         enabled: true
         type: ROCKETMQ

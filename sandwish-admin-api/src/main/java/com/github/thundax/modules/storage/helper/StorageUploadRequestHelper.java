@@ -1,6 +1,6 @@
 package com.github.thundax.modules.storage.helper;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;
 import com.github.thundax.modules.storage.converter.StorageConverter;

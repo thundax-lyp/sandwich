@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.thundax.common.crypto.Sm2Crypto;
 import com.github.thundax.common.web.advice.ApiResponseBodyAdvice;
 import com.github.thundax.common.web.response.ApiResponse;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.entity.PreAuthSession;
 import com.github.thundax.modules.auth.entity.PrincipalAccessToken;
 import com.github.thundax.modules.auth.entity.enums.PrincipalType;

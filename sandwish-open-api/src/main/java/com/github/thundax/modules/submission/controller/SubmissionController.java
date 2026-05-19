@@ -1,11 +1,11 @@
 package com.github.thundax.modules.submission.controller;
 
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.web.annotation.WrappedApiController;
 import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.response.PageResponse;
 import com.github.thundax.common.web.response.PageResponseHelper;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.auth.security.OpenApiHeaders;
 import com.github.thundax.modules.storage.assembler.StorageInterfaceAssembler;
 import com.github.thundax.modules.storage.controller.response.StorageUploadResponse;

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.persistence.config.MybatisPlusConfiguration
+com.github.thundax.common.persistence.configure.MybatisPlusConfiguration

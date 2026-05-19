@@ -1,10 +1,10 @@
 package com.github.thundax.modules.auth.service.impl;
 
-import com.github.thundax.autoconfigure.LoginProperties;
 import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.id.UuidHelper;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.configure.LoginProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.dao.OAuthAuthorizationDao;
 import com.github.thundax.modules.auth.dao.OAuthClientDao;
 import com.github.thundax.modules.auth.dao.PrincipalAccessTokenDao;

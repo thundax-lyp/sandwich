@@ -1,12 +1,12 @@
 package com.github.thundax.modules.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.security.context.SandwishSubjectType;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.exception.WebErrorCode;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.auth.service.AdminAuthService;
 import com.github.thundax.modules.auth.service.PermissionService;
 import com.github.thundax.modules.auth.service.command.AdminAuthCommand;

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.cache.config.JetCacheAutoConfiguration
+com.github.thundax.common.cache.configure.JetCacheConfiguration

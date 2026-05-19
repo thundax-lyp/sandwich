@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.oss.config.SandwishOssAutoConfiguration
+com.github.thundax.common.oss.configure.SandwishOssConfiguration

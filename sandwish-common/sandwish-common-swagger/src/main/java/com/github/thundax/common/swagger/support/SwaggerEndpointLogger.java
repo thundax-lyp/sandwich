@@ -1,0 +1,41 @@
+package com.github.thundax.common.swagger.support;
+
+import com.github.thundax.common.swagger.configure.SwaggerProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.core.env.Environment;
+
+@Slf4j
+public class SwaggerEndpointLogger implements ApplicationListener<ApplicationReadyEvent> {
+
+    private static final String LOCALHOST = "127.0.0.1";
+    private static final String SWAGGER_UI_PATH = "/swagger-ui.html";
+
+    private final SwaggerProperties properties;
+
+    public SwaggerEndpointLogger(SwaggerProperties properties) {
+        this.properties = properties;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        if (!properties.isEnabled()) {
+            return;
+        }
+
+        Environment environment = event.getApplicationContext().getEnvironment();
+        String port = environment.getProperty("local.server.port", environment.getProperty("server.port", "8080"));
+        String contextPath = environment.getProperty("server.servlet.context-path", "");
+
+        log.info("Swagger UI: http://" + LOCALHOST + ":" + port + normalizeContextPath(contextPath) + SWAGGER_UI_PATH);
+    }
+
+    private String normalizeContextPath(String contextPath) {
+        if (contextPath == null || contextPath.trim().isEmpty() || "/".equals(contextPath.trim())) {
+            return "";
+        }
+        String normalizedContextPath = contextPath.trim();
+        return normalizedContextPath.startsWith("/") ? normalizedContextPath : "/" + normalizedContextPath;
+    }
+}

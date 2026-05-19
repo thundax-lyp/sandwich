@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.mq.config.SandwishMqAutoConfiguration
+com.github.thundax.common.mq.configure.SandwishMqConfiguration

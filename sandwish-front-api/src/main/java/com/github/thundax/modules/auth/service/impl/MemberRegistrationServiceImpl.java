@@ -3,7 +3,7 @@ package com.github.thundax.modules.auth.service.impl;
 import com.github.thundax.common.crypto.RsaCrypto;
 import com.github.thundax.common.exception.FrontBizExceptions;
 import com.github.thundax.common.id.EntityId;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.entity.PrincipalCredential;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalCredentialStatus;

@@ -1,8 +1,6 @@
 package com.github.thundax.modules.auth.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.thundax.autoconfigure.LoginProperties;
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.crypto.Sha256Digest;
 import com.github.thundax.common.id.EntityId;
 import com.github.thundax.common.id.EntityIdCodec;
@@ -12,10 +10,12 @@ import com.github.thundax.common.security.context.SandwishContextHolder;
 import com.github.thundax.common.security.context.SandwishSubject;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.exception.SandwishException;
+import com.github.thundax.configure.LoginProperties;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.auth.assembler.AuthInterfaceAssembler;
 import com.github.thundax.modules.auth.codec.PrincipalAccessTokenIdCodec;
 import com.github.thundax.modules.auth.codec.PrincipalRefreshTokenIdCodec;
-import com.github.thundax.modules.auth.config.AuthProperties;
+import com.github.thundax.modules.auth.configure.AuthProperties;
 import com.github.thundax.modules.auth.controller.response.OAuth2IntrospectionResponse;
 import com.github.thundax.modules.auth.controller.response.OAuth2UserinfoResponse;
 import com.github.thundax.modules.auth.dao.*;

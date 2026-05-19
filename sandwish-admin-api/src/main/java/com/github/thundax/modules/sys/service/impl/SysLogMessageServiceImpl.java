@@ -1,11 +1,11 @@
 package com.github.thundax.modules.sys.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.thundax.autoconfigure.SandwishProperties;
 import com.github.thundax.common.mq.SandwishMqMessage;
-import com.github.thundax.common.mq.SandwishMqProperties;
 import com.github.thundax.common.mq.SandwishMqSender;
 import com.github.thundax.common.mq.SandwishMqType;
+import com.github.thundax.common.mq.configure.SandwishMqProperties;
+import com.github.thundax.configure.SandwishProperties;
 import com.github.thundax.modules.sys.entity.Log;
 import com.github.thundax.modules.sys.service.LogService;
 import com.github.thundax.modules.sys.service.SysLogMessageService;

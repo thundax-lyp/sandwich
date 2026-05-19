@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.thundax.common.swagger.config.SwaggerAutoConfiguration
+com.github.thundax.common.swagger.configure.SwaggerConfiguration

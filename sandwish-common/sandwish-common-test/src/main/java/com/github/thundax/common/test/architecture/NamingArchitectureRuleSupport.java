@@ -22,6 +22,9 @@ import java.util.stream.Stream;
 
 public final class NamingArchitectureRuleSupport {
 
+    private static final String CONFIGURATION_ANNOTATION = "org.springframework.context.annotation.Configuration";
+    private static final String CONFIGURATION_PROPERTIES_ANNOTATION =
+            "org.springframework.boot.context.properties.ConfigurationProperties";
     private static final String ARCHITECTURE_ROLE_SUFFIXES =
             ".*(Mapper|Converter|Assembler|DAO|Service|Controller|Repository|Facade|Gateway|Adapter|Client|Handler"
                     + "|Processor|Manager|Factory)";
@@ -71,6 +74,37 @@ public final class NamingArchitectureRuleSupport {
         }
 
         assertTrue("Layer types must use the fixed suffix for their package: " + violations, violations.isEmpty());
+    }
+
+    public static void assertConfigurationClassNames(JavaClasses classes) {
+        List<String> violations = new ArrayList<String>();
+
+        for (JavaClass javaClass : classes) {
+            if (isNestedClass(javaClass)) {
+                continue;
+            }
+            boolean configuration = javaClass.isAnnotatedWith(CONFIGURATION_ANNOTATION);
+            boolean configurationProperties = javaClass.isAnnotatedWith(CONFIGURATION_PROPERTIES_ANNOTATION);
+            if (configuration && configurationProperties) {
+                violations.add(javaClass.getName() + " must not declare both @Configuration and "
+                        + "@ConfigurationProperties");
+            }
+            if (configurationProperties && !javaClass.getSimpleName().endsWith("Properties")) {
+                violations.add(javaClass.getName() + " must end with Properties");
+            }
+            if (configuration
+                    && (!javaClass.getSimpleName().endsWith("Configuration")
+                            || javaClass.getSimpleName().endsWith("AutoConfiguration"))) {
+                violations.add(javaClass.getName() + " must end with Configuration and must not end with "
+                        + "AutoConfiguration");
+            }
+        }
+
+        assertTrue(
+                "@ConfigurationProperties classes must be *Properties; @Configuration classes must be "
+                        + "*Configuration; one class must not declare both annotations: "
+                        + violations,
+                violations.isEmpty());
     }
 
     public static void assertDaoInterfaceMethodNames(JavaClasses classes) {
@@ -283,6 +317,10 @@ public final class NamingArchitectureRuleSupport {
                 || packageName.contains(".collection")
                 || packageName.contains(".web.request")
                 || packageName.contains(".web.response");
+    }
+
+    private static boolean isNestedClass(JavaClass javaClass) {
+        return javaClass.getName().contains("$");
     }
 
     private static void collectLayerTypeNameViolation(JavaClass javaClass, List<String> violations) {

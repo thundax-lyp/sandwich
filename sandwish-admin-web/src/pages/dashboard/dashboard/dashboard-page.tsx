@@ -74,20 +74,20 @@ export const DashboardPage = () => {
             actions={<Text className="dashboard-brand">Sandwich Workspace</Text>}
         >
             <div className="dashboard-content">
-                <section className="metrics" aria-label="核心指标">
+                <section className="dashboard-metrics" aria-label="核心指标">
                     {metricItems.map((metric) => (
                         <Card
-                            className={`metric-card metric-card-${metric.tone}`}
+                            className={`dashboard-metric-card dashboard-metric-card-${metric.tone}`}
                             key={metric.label}
                         >
-                            <div className="metric-card-heading">
+                            <div className="dashboard-metric-card-heading">
                                 <Text>{metric.label}</Text>
                                 <span>{metric.icon}</span>
                             </div>
-                            <div className="metric-card-body">
+                            <div className="dashboard-metric-card-body">
                                 <div>
                                     <strong>{metric.value}</strong>
-                                    <span className="metric-delta">{metric.delta}</span>
+                                    <span className="dashboard-metric-delta">{metric.delta}</span>
                                     <p>较上周</p>
                                 </div>
                                 <svg
@@ -96,40 +96,40 @@ export const DashboardPage = () => {
                                     aria-label={`${metric.label}趋势`}
                                 >
                                     <path
-                                        className="metric-chart-fill"
+                                        className="dashboard-metric-chart-fill"
                                         d={`${metric.line} L112 72 L8 72 Z`}
                                     />
-                                    <path className="metric-chart-line" d={metric.line} />
+                                    <path className="dashboard-metric-chart-line" d={metric.line} />
                                 </svg>
                             </div>
                         </Card>
                     ))}
                 </section>
 
-                <section className="campaign-board">
-                    <div className="section-title-row">
+                <section className="dashboard-campaign-board">
+                    <div className="dashboard-section-title-row">
                         <Title level={3}>今日治理事项</Title>
                         <button type="button">任务台</button>
                     </div>
-                    <div className="operation-columns">
+                    <div className="dashboard-operation-columns">
                         {workColumns.map((column) => (
-                            <div className="operation-column" key={column.title}>
+                            <div className="dashboard-operation-column" key={column.title}>
                                 <Text>
                                     {column.title} <span>{column.count}</span>
                                 </Text>
                                 {column.items.map(([title, description]) => (
-                                    <article className="operation-card" key={title}>
-                                        <div className="operation-card-icon">
+                                    <article className="dashboard-operation-card" key={title}>
+                                        <div className="dashboard-operation-card-icon">
                                             <AppstoreOutlined />
                                         </div>
                                         <strong>{title}</strong>
                                         <p>{description}</p>
-                                        <div className="operation-progress">
+                                        <div className="dashboard-operation-progress">
                                             <span />
                                         </div>
                                     </article>
                                 ))}
-                                <button className="add-operation" type="button">
+                                <button className="dashboard-add-operation" type="button">
                                     + 新建
                                 </button>
                             </div>

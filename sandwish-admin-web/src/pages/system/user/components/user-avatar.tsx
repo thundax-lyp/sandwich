@@ -1,5 +1,5 @@
 import { Avatar } from "antd";
-import { useCurrentAccessToken } from "@/auth/hooks";
+import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import type { UserResponse } from "../user-service";
 

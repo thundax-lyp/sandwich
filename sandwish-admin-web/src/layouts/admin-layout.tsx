@@ -25,7 +25,7 @@ import type { ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "@/auth/auth-service";
 import { refreshAccessTokenIfNeeded } from "../api/http";
-import { useCurrentAccessToken } from "../auth/hooks";
+import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { replacePermissions } from "../auth/permission-storage";
 import { toAuthenticatedResourceUrl } from "../auth/resource-url";
 import { clearAccessToken, getAccessToken } from "../auth/token-storage";

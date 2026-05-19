@@ -70,6 +70,7 @@
 - `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
 - `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：`src/pages/<module>/<domain>/<domain>-page.tsx` 不得使用 `../` 相对 import；本页目录内引用使用 `./`，跨页面域或共享目录引用使用 `@/`。
 - `ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE`：`src/pages/<module>/<domain>/components/` 下文件不得引用当前页面域之外的 `src/pages/` 内容；当前页面域内引用使用 `./` 或 `../`，共享能力使用 `@/`。
+- `ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL`：`src/components/` 下的共享组件不得通过 `../*.css` 引用上层或外部样式。
 
 ### Naming
 
@@ -87,6 +88,8 @@
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
+- `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。
+- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面文件中的本页 `className` 必须使用页面域前缀，例如 `dictionary-page`、`dictionary-list-panel`；共享组件样式 class 允许使用 `sandwish-` 前缀。
 
 ### Placement
 
@@ -118,7 +121,6 @@
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
-- `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
 
 ### Naming
 
@@ -129,10 +131,8 @@
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 - 权限判断变量使用 `canXxx`。
-- `Sandwish*` 只用于项目自有通用 UI 技术组件，不承载具体业务价值；业务页面、业务表单、业务弹窗和业务操作组件使用真实业务名，例如 `UserPage`、`UserFilterForm`、`UserEditDrawer`。
 - 通用业务页面骨架不使用 `Sandwish*` 前缀，例如 `ListPage`；它表达稳定页面范式，内部可以组合 `Sandwish*` 技术组件。
 - 不使用 `SandwishUserTable`、`SandwishDictionaryEditor` 这类混合命名；如果组件表达用户、字典、部门等业务语义，优先使用对应业务前缀。
-- 页面级 className 必须带页面域前缀，例如 `dictionary-page`、`dictionary-list-panel`。
 - 共享组件样式必须使用组件域前缀，避免污染页面样式。
 
 ### Placement

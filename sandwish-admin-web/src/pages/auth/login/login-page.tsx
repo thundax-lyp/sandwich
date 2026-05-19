@@ -192,10 +192,10 @@ export const LoginPage = () => {
                                 name="captcha"
                                 rules={[{ required: true, message: "请输入验证码" }]}
                             >
-                                <Space.Compact className="captcha-row">
+                                <Space.Compact className="login-captcha-row">
                                     <Input size="large" placeholder="验证码" autoComplete="off" />
                                     <button
-                                        className="captcha-image-button"
+                                        className="login-captcha-image-button"
                                         type="button"
                                         onClick={() => refreshCaptchaMutation.mutate()}
                                         disabled={!captchaUrl || refreshCaptchaMutation.isPending}

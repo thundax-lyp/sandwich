@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Avatar, Button, Descriptions, Empty, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { useCurrentAccessToken } from "@/auth/hooks";
+import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ADMIN_API_BASE_URL } from "@/api/http";
 import { ListPage } from "@/components/list-page";

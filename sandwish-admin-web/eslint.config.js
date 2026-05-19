@@ -53,6 +53,24 @@ const localRules = {
         },
         "hook-file-path": {
             create(context) {
+                const isHookFilePath = (normalizedFilePath) => {
+                    return /\/hooks\/use-[a-z0-9]+(?:-[a-z0-9]+)*\.ts$/.test(normalizedFilePath);
+                };
+
+                const isHookName = (name) => /^use[A-Z]/.test(name);
+
+                const reportHookOutsideHookFile = (node, name, normalizedFilePath) => {
+                    if (!isHookName(name) || isHookFilePath(normalizedFilePath)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_PATH_HOOK_FILE: useXxx hook methods must live in hooks/use-<name>.ts."
+                    });
+                };
+
                 return {
                     Program(node) {
                         const filePath = context.physicalFilename;
@@ -78,6 +96,135 @@ const localRules = {
                                     "ADMIN_WEB_PATH_HOOK_FILE: use-*.ts hook files must live in a hooks/ directory."
                             });
                         }
+                    },
+                    FunctionDeclaration(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+                        const name = node.id?.name;
+                        if (name) {
+                            reportHookOutsideHookFile(node.id, name, normalizedFilePath);
+                        }
+                    },
+                    VariableDeclarator(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+
+                        if (node.id.type === "Identifier") {
+                            reportHookOutsideHookFile(node.id, node.id.name, normalizedFilePath);
+                        }
+                    },
+                    ExportNamedDeclaration(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+
+                        node.specifiers.forEach((specifier) => {
+                            if (specifier.exported?.type === "Identifier") {
+                                reportHookOutsideHookFile(
+                                    specifier.exported,
+                                    specifier.exported.name,
+                                    normalizedFilePath
+                                );
+                            }
+                        });
+                    }
+                };
+            }
+        },
+        "sandwish-component-name": {
+            create(context) {
+                const isSandwishName = (name) => /^Sandwish[A-Z]/.test(name);
+
+                const reportSandwishNameOutsideSharedComponents = (
+                    node,
+                    name,
+                    normalizedFilePath
+                ) => {
+                    if (!isSandwishName(name) || normalizedFilePath.includes("/src/components/")) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_SANDWISH_COMPONENT: Sandwish* names may only be defined in src/components/."
+                    });
+                };
+
+                const checkNamedNode = (node) => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    const name = node.id?.name;
+                    if (name) {
+                        reportSandwishNameOutsideSharedComponents(
+                            node.id,
+                            name,
+                            normalizedFilePath
+                        );
+                    }
+                };
+
+                return {
+                    ClassDeclaration: checkNamedNode,
+                    FunctionDeclaration: checkNamedNode,
+                    TSEnumDeclaration: checkNamedNode,
+                    TSInterfaceDeclaration: checkNamedNode,
+                    TSTypeAliasDeclaration: checkNamedNode,
+                    VariableDeclarator(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+
+                        if (node.id.type === "Identifier") {
+                            reportSandwishNameOutsideSharedComponents(
+                                node.id,
+                                node.id.name,
+                                normalizedFilePath
+                            );
+                        }
+                    },
+                    ExportNamedDeclaration(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+
+                        node.specifiers.forEach((specifier) => {
+                            if (specifier.exported?.type === "Identifier") {
+                                reportSandwishNameOutsideSharedComponents(
+                                    specifier.exported,
+                                    specifier.exported.name,
+                                    normalizedFilePath
+                                );
+                            }
+                        });
+                    }
+                };
+            }
+        },
+        "shared-component-css-local": {
+            create(context) {
+                return {
+                    ImportDeclaration(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+                        const importPath = node.source.value;
+
+                        if (
+                            typeof importPath !== "string" ||
+                            !normalizedFilePath.includes("/src/components/") ||
+                            !importPath.startsWith("../") ||
+                            !importPath.endsWith(".css")
+                        ) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL: shared components must import CSS from their own directory."
+                        });
                     }
                 };
             }
@@ -110,6 +257,64 @@ const localRules = {
                                     "ADMIN_WEB_PATH_E2E_PAGE_SPEC / ADMIN_WEB_PATH_E2E_LAYOUT_SPEC: e2e specs must live in e2e/<module>/<domain>/<domain>.spec.ts or e2e/layout/*.spec.ts."
                             });
                         }
+                    }
+                };
+            }
+        },
+        "page-class-name-prefix": {
+            create(context) {
+                const readPageDomain = () => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    const match = normalizedFilePath.match(
+                        /\/src\/pages\/[^/]+\/([^/]+)\/\1-page\.tsx$/
+                    );
+                    return match?.[1] ?? "";
+                };
+
+                const reportInvalidClassName = (node, className, pageDomain) => {
+                    if (
+                        className.startsWith(`${pageDomain}-`) ||
+                        className.startsWith("sandwish-")
+                    ) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message: `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX: page className "${className}" must start with "${pageDomain}-" or "sandwish-".`
+                    });
+                };
+
+                const checkClassNameText = (node, text, pageDomain) => {
+                    text.split(/\s+/)
+                        .filter(Boolean)
+                        .forEach((className) => {
+                            reportInvalidClassName(node, className, pageDomain);
+                        });
+                };
+
+                return {
+                    JSXAttribute(node) {
+                        const pageDomain = readPageDomain();
+                        if (!pageDomain || node.name.name !== "className" || !node.value) {
+                            return;
+                        }
+
+                        if (node.value.type === "Literal" && typeof node.value.value === "string") {
+                            checkClassNameText(node.value, node.value.value, pageDomain);
+                            return;
+                        }
+
+                        if (
+                            node.value.type !== "JSXExpressionContainer" ||
+                            node.value.expression.type !== "TemplateLiteral"
+                        ) {
+                            return;
+                        }
+
+                        node.value.expression.quasis.forEach((quasi) => {
+                            checkClassNameText(quasi, quasi.value.cooked ?? "", pageDomain);
+                        });
                     }
                 };
             }
@@ -486,10 +691,13 @@ export default tseslint.config(
             "local/kebab-case-file-name": "error",
             "local/page-component-no-external-page": "error",
             "local/page-component-single-export": "error",
+            "local/page-class-name-prefix": "error",
             "local/page-no-parent-relative-import": "error",
             "local/page-style-file": "error",
             "local/post-helper-service-only": "error",
+            "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
+            "local/shared-component-css-local": "error",
             "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [
                 "error",

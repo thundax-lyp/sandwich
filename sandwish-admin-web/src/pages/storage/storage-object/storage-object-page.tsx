@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Dropdown, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
-import { useCurrentAccessToken } from "@/auth/hooks";
+import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { hasPermission } from "@/auth/permission-storage";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";

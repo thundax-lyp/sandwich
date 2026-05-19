@@ -17,6 +17,8 @@ public final class SortableArchitectureRuleSupport {
             "\\bprivate\\s+(?:static\\s+final\\s+)?[A-Za-z0-9_<>, ?\\.\\[\\]]+\\s+([A-Za-z][A-Za-z0-9_]*)\\s*(?:=[^;]*)?;");
     private static final Pattern SORT_METHOD_PATTERN = Pattern.compile(
             "((?:\\s*@[^\\n]+\\n)+)\\s*public\\s+void\\s+sort\\s*\\(\\s*([A-Za-z0-9_]+SortCommand)\\s+command\\s*\\)");
+    private static final Pattern UPDATE_METHOD_PATTERN =
+            Pattern.compile("public\\s+int\\s+update\\s*\\([^)]*\\)\\s*\\{(.*?)\\n\\s*\\}", Pattern.DOTALL);
     private static final Pattern TABLE_PATTERN = Pattern.compile(
             "CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?`([^`]+)`\\s*\\((.*?)\\)\\s*ENGINE",
             Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -63,6 +65,18 @@ public final class SortableArchitectureRuleSupport {
         assertTrue("FlatSort tables must declare unique priority keys: " + violations, violations.isEmpty());
     }
 
+    public static void assertSortableDaoNormalUpdateDoesNotSetPriority(Path sourceRoot) throws IOException {
+        Path root = ArchitectureSourceSupport.repositoryRoot();
+        List<String> violations = new ArrayList<String>();
+
+        try (Stream<Path> paths = Files.walk(sourceRoot)) {
+            paths.filter(path -> path.getFileName().toString().endsWith("DaoImpl.java"))
+                    .forEach(path -> collectSortableDaoUpdatePriorityViolations(root, path, violations));
+        }
+
+        assertTrue("Sortable DAO normal update must not set priority: " + violations, violations.isEmpty());
+    }
+
     private static void collectSortCommandFieldViolations(Path root, Path path, List<String> violations) {
         String content = ArchitectureSourceSupport.readSourceWithoutComments(path);
         Matcher matcher = FIELD_PATTERN.matcher(content);
@@ -84,6 +98,20 @@ public final class SortableArchitectureRuleSupport {
             String commandName = matcher.group(2);
             if (!annotations.contains("@Transactional")) {
                 violations.add(ArchitectureSourceSupport.repositoryPath(root, path) + " command=" + commandName);
+            }
+        }
+    }
+
+    private static void collectSortableDaoUpdatePriorityViolations(Path root, Path path, List<String> violations) {
+        String content = ArchitectureSourceSupport.readSourceWithoutComments(path);
+        if (!content.contains("updatePriority")) {
+            return;
+        }
+        Matcher matcher = UPDATE_METHOD_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String methodBody = matcher.group(1);
+            if (methodBody.contains("::getPriority")) {
+                violations.add(ArchitectureSourceSupport.repositoryPath(root, path));
             }
         }
     }

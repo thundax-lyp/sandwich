@@ -167,7 +167,6 @@ public class StoredObjectDaoImpl implements StoredObjectDao {
                         .set(StoredObjectDO::getSize, dataObject.getSize())
                         .set(StoredObjectDO::getAccessEndpoint, dataObject.getAccessEndpoint())
                         .set(StoredObjectDO::getObjectStatus, dataObject.getObjectStatus())
-                        .set(StoredObjectDO::getPriority, dataObject.getPriority())
                         .set(StoredObjectDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(StoredObjectIdCodec.toStringValue(entity.getId()));
         return count;

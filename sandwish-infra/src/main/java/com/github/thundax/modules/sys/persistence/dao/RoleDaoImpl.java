@@ -137,7 +137,6 @@ public class RoleDaoImpl implements RoleDao {
                         .set(RoleDO::getName, dataObject.getName())
                         .set(RoleDO::getPrivilege, dataObject.getPrivilege())
                         .set(RoleDO::getStatus, dataObject.getStatus())
-                        .set(RoleDO::getPriority, dataObject.getPriority())
                         .set(RoleDO::getRemarks, dataObject.getRemarks()));
         cacheSupport.removeById(RoleIdCodec.toValue(entity.getId()));
         return count;

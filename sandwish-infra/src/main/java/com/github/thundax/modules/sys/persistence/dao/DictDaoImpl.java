@@ -123,7 +123,6 @@ public class DictDaoImpl implements DictDao {
                         .set(DictDO::getValue, dataObject.getValue())
                         .set(DictDO::getLabel, dataObject.getLabel())
                         .set(DictDO::getType, dataObject.getType())
-                        .set(DictDO::getPriority, dataObject.getPriority())
                         .set(DictDO::getRemarks, dataObject.getRemarks()));
         if (count > 0) {
             cacheSupport.removeById(dataObject.getId());

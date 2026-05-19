@@ -1,8 +1,12 @@
 package com.github.thundax.configure;
 
 import java.math.BigDecimal;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "sandwish.login")
 public class LoginProperties {
     private boolean enable;
@@ -12,34 +16,6 @@ public class LoginProperties {
 
     public boolean getEnable() {
         return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-    public int getMaxFailCount() {
-        return maxFailCount;
-    }
-
-    public void setMaxFailCount(int maxFailCount) {
-        this.maxFailCount = maxFailCount;
-    }
-
-    public int getExpire() {
-        return expire;
-    }
-
-    public void setExpire(int expire) {
-        this.expire = expire;
-    }
-
-    public int getLockTime() {
-        return lockTime;
-    }
-
-    public void setLockTime(int lockTime) {
-        this.lockTime = lockTime;
     }
 
     public String getHours() {

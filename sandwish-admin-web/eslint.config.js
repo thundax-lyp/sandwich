@@ -51,6 +51,37 @@ const localRules = {
                 };
             }
         },
+        "hook-file-path": {
+            create(context) {
+                return {
+                    Program(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+                        const fileName = path.basename(filePath);
+                        const isHookFile = /^use-[a-z0-9]+(?:-[a-z0-9]+)*\.tsx?$/.test(fileName);
+
+                        if (normalizedFilePath.includes("/hooks/")) {
+                            if (!/^use-[a-z0-9]+(?:-[a-z0-9]+)*\.ts$/.test(fileName)) {
+                                context.report({
+                                    node,
+                                    message:
+                                        "ADMIN_WEB_PATH_HOOK_FILE: hook files must be named hooks/use-<name>.ts."
+                                });
+                            }
+                            return;
+                        }
+
+                        if (isHookFile) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_PATH_HOOK_FILE: use-*.ts hook files must live in a hooks/ directory."
+                            });
+                        }
+                    }
+                };
+            }
+        },
         "e2e-spec-file-path": {
             create(context) {
                 return {
@@ -459,6 +490,7 @@ export default tseslint.config(
             "local/page-style-file": "error",
             "local/post-helper-service-only": "error",
             "local/service-method-verb-prefix": "error",
+            "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [
                 "error",
                 {

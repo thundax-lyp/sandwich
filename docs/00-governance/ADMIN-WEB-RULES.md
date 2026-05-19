@@ -96,6 +96,7 @@
 - `ADMIN_WEB_PATH_AUTH`：token、权限和登录会话持久化固定放在 `sandwish-admin-web/src/auth/`。
 - `ADMIN_WEB_PATH_ROUTER`：路由表和路由保护固定放在 `sandwish-admin-web/src/router/`。
 - `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
+- `ADMIN_WEB_PATH_HOOK_FILE`：hook 文件固定放在 `sandwish-admin-web/src/**/hooks/use-<name>.ts`，文件名使用 `use-` 前缀和 kebab-case。
 - `ADMIN_WEB_PATH_GLOBAL_TYPES`：第三方库声明、环境声明和真正跨页面共享的全局前端类型固定放在 `sandwish-admin-web/src/types/`。
 - `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑固定放在 `sandwish-admin-web/src/test/`。
 - `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 测试固定放在 `sandwish-admin-web/e2e/<module>/<domain>/<domain>.spec.ts`，对应 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-page.tsx`。
@@ -139,6 +140,7 @@
 - 页面专属 service 不被其他页面域直接导入；如果出现跨页面复用，应先提升到 `src/service/`。
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
 - 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
+- hook 文件固定放在对应边界的 `hooks/` 目录；跨页面复用放在 `src/hooks/`，页面域内复用放在页面域目录下的 `hooks/`。
 - 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
 - 多个页面域复用的组件放在 `src/components/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
@@ -606,7 +608,7 @@ test("delete requires confirmation", async ({ page }) => {
 - 不把后端 Java 分层术语机械套进前端目录，例如 `controller`、`dao`、`mapper`、`repository`。
 - 不新增 CSS module、styled-components、Tailwind 或其他样式体系，除非先形成明确前端治理决策。
 - 不为了“目录统一”进行大规模机械迁移；优先在新增页面或正在修改的页面执行本规则。
-- 不为了提前复用抽象出空 `hooks/`、`utils/`、`models/`、`stores/` 等目录。
+- 不为了提前复用抽象出空 `utils/`、`models/`、`stores/` 等目录。
 
 ## Open Items
 
@@ -627,4 +629,3 @@ test("delete requires confirmation", async ({ page }) => {
 - 是否把导出默认范围固定为当前筛选结果。
 - 是否为大数据量导出引入任务中心或等价异步任务反馈机制。
 - Playwright 默认覆盖重点是否包含上传、导入 / 导出和核心业务流程。
-- 是否为复杂页面固定引入 `<domain>-hooks.ts`，待出现重复且稳定的页面逻辑后再决策。

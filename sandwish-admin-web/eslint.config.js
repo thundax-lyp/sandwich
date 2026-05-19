@@ -629,6 +629,36 @@ const localRules = {
                     }
                 };
             }
+        },
+        "service-input-type-location": {
+            create(context) {
+                const isServiceInputName = (name) => /(?:Query|Command)$/.test(name);
+
+                const isAllowedFile = () => {
+                    return context.physicalFilename.endsWith("-service.ts");
+                };
+
+                const reportInvalidServiceInputType = (node, name) => {
+                    if (!isServiceInputName(name) || isAllowedFile()) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION: XxxQuery/XxxCommand types may only be defined in *-service.ts."
+                    });
+                };
+
+                return {
+                    TSInterfaceDeclaration(node) {
+                        reportInvalidServiceInputType(node.id, node.id.name);
+                    },
+                    TSTypeAliasDeclaration(node) {
+                        reportInvalidServiceInputType(node.id, node.id.name);
+                    }
+                };
+            }
         }
     }
 };
@@ -732,6 +762,7 @@ export default tseslint.config(
             "local/post-helper-service-only": "error",
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
+            "local/service-input-type-location": "error",
             "local/shared-component-css-local": "error",
             "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [

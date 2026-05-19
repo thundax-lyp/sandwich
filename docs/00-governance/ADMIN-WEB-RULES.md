@@ -87,6 +87,7 @@
 - `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 类型定义只允许出现在 `*-service.ts` 或 `src/api/` 中。
+- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 类型定义只允许出现在 `*-service.ts` 中。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。

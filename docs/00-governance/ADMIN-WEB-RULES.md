@@ -120,7 +120,6 @@
 - `auth` 负责 token、权限和登录会话持久化，不承载页面 UI。
 - `router` 负责路由表和路由保护，不承载页面业务交互。
 - `query` 负责 TanStack Query client 基线，不承载业务 query key 拼装策略之外的页面逻辑。
-- 页面 service 可以调用 `src/api/http.ts`，但不直接处理 token、base URL 或响应包装通用规则。
 - 业务请求文件固定使用 `*-service.ts` 命名；`*-api.ts` 不作为新增业务请求文件命名。
 - `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`，同目录或父级目录内引用可以使用 `./` 或 `../`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。

@@ -131,7 +131,6 @@
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 ### Placement
 
-- 页面专属 service 不被其他页面域直接导入；如果出现跨页面复用，应先提升到 `src/service/`。
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
 - 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。

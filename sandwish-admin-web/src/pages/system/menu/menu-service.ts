@@ -1,11 +1,12 @@
 import { postJson } from "@/api/http";
+import type { MenuNode } from "./menu-types";
 
-export interface MenuListRequest {
+export interface MenuListQuery {
     parentId?: string | null;
     display?: boolean | null;
 }
 
-export interface MenuSaveRequest {
+export interface MenuSaveCommand {
     id?: string | null;
     parentId?: string | null;
     name?: string | null;
@@ -17,38 +18,26 @@ export interface MenuSaveRequest {
     remarks?: string | null;
 }
 
-export interface MenuMoveRequest {
+export interface MenuMoveCommand {
     fromNodeId: string;
     toNodeId: string;
     type?: "after" | "before" | "inside" | "insideLast";
 }
 
-export interface MenuResponse {
-    id: string;
-    parentId?: string | null;
-    name: string;
-    perms?: string | null;
-    ranks?: number | null;
-    display?: boolean | null;
-    displayParams?: string | null;
-    url?: string | null;
-    remarks?: string | null;
-}
-
-export const listMenus = (request: MenuListRequest = {}) => {
-    return postJson<MenuResponse[], MenuListRequest>("/sys/menu/list", {
+export const listMenus = (request: MenuListQuery = {}) => {
+    return postJson<MenuNode[], MenuListQuery>("/sys/menu/list", {
         body: request
     });
 };
 
-export const addMenu = (request: MenuSaveRequest) => {
-    return postJson<MenuResponse, MenuSaveRequest>("/sys/menu/create", {
+export const addMenu = (request: MenuSaveCommand) => {
+    return postJson<MenuNode, MenuSaveCommand>("/sys/menu/create", {
         body: request
     });
 };
 
-export const changeMenuInfo = (request: MenuSaveRequest) => {
-    return postJson<MenuResponse, MenuSaveRequest>("/sys/menu/update", {
+export const changeMenuInfo = (request: MenuSaveCommand) => {
+    return postJson<MenuNode, MenuSaveCommand>("/sys/menu/update", {
         body: request
     });
 };
@@ -59,8 +48,8 @@ export const removeMenus = (ids: string[]) => {
     });
 };
 
-export const moveMenu = (request: MenuMoveRequest) => {
-    return postJson<boolean, MenuMoveRequest>("/sys/menu/move", {
+export const moveMenu = (request: MenuMoveCommand) => {
+    return postJson<boolean, MenuMoveCommand>("/sys/menu/move", {
         body: request
     });
 };

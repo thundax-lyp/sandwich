@@ -27,8 +27,8 @@ import {
     changeRoleInfo,
     changeRoleStatus
 } from "./role-service";
-import type { RoleMenuResponse, RoleResponse, RoleSaveRequest } from "./role-service";
-import type { RoleMenuTreeNode } from "./role-types";
+import type { RoleSaveCommand } from "./role-service";
+import type { RoleMenuNode, RoleMenuTreeNode, RoleRecord } from "./role-types";
 import "./role-page.css";
 
 const { Text } = Typography;
@@ -50,7 +50,7 @@ const DEFAULT_ROLE_FILTERS: RoleFilters = {
     enable: "ALL"
 };
 
-const buildMenuTree = (menus: RoleMenuResponse[]) => {
+const buildMenuTree = (menus: RoleMenuNode[]) => {
     const nodeMap = new Map<string, RoleMenuTreeNode>();
     const roots: RoleMenuTreeNode[] = [];
 
@@ -94,9 +94,9 @@ const toTreeData = (menus: RoleMenuTreeNode[]): DataNode[] => {
 };
 
 const sortByMove = (
-    roles: RoleResponse[],
-    sourceRole: RoleResponse,
-    targetRole: RoleResponse,
+    roles: RoleRecord[],
+    sourceRole: RoleRecord,
+    targetRole: RoleRecord,
     position: SandwishTableSortPosition
 ) => {
     const sourceIndex = roles.findIndex((role) => role.id === sourceRole.id);
@@ -121,8 +121,8 @@ export const RolePage = () => {
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<RoleFilters>(DEFAULT_ROLE_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-    const [editingRole, setEditingRole] = useState<RoleResponse | null>(null);
-    const [deletingRole, setDeletingRole] = useState<RoleResponse | null>(null);
+    const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
+    const [deletingRole, setDeletingRole] = useState<RoleRecord | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const hasSelectedRoles = selectedRowKeys.length > 0;
     const hasActiveFilters = filters.enable !== "ALL";
@@ -157,7 +157,7 @@ export const RolePage = () => {
     const expandedMenuIds = useMemo(() => collectMenuIds(menuTree), [menuTree]);
 
     const saveMutation = useMutation({
-        mutationFn: (values: RoleSaveRequest) =>
+        mutationFn: (values: RoleSaveCommand) =>
             values.id ? changeRoleInfo(values) : addRole(values),
         onSuccess: async () => {
             setEditorOpen(false);
@@ -224,7 +224,7 @@ export const RolePage = () => {
         setEditorOpen(true);
     };
 
-    const openEditEditor = (role: RoleResponse) => {
+    const openEditEditor = (role: RoleRecord) => {
         setEditingRole(role);
         setEditorOpen(true);
     };
@@ -237,11 +237,11 @@ export const RolePage = () => {
         setEditingRole(null);
     };
 
-    const saveRole = (request: RoleSaveRequest) => {
+    const saveRole = (request: RoleSaveCommand) => {
         saveMutation.mutate(request);
     };
 
-    const updateSingleStatus = (role: RoleResponse, enable: boolean) => {
+    const updateSingleStatus = (role: RoleRecord, enable: boolean) => {
         if (!canEditRole) {
             return;
         }
@@ -264,8 +264,8 @@ export const RolePage = () => {
     };
 
     const sortRole = (
-        sourceRole: RoleResponse,
-        targetRole: RoleResponse,
+        sourceRole: RoleRecord,
+        targetRole: RoleRecord,
         position: SandwishTableSortPosition
     ) => {
         if (!canEditRole || sourceRole.id === targetRole.id) {
@@ -277,7 +277,7 @@ export const RolePage = () => {
         });
     };
 
-    const columns: SandwishTableProps<RoleResponse>["columns"] = [
+    const columns: SandwishTableProps<RoleRecord>["columns"] = [
         {
             title: "角色名称",
             dataIndex: "name",
@@ -401,7 +401,7 @@ export const RolePage = () => {
 
     return (
         <>
-            <ListPage<RoleResponse>
+            <ListPage<RoleRecord>
                 pageClassName="role-page"
                 title="角色管理"
                 description="维护后台角色、角色状态和菜单权限。"

@@ -1,12 +1,13 @@
 import { postJson } from "@/api/http";
+import type { DepartmentNode } from "./department-types";
 
-export interface DepartmentListRequest {
+export interface DepartmentListQuery {
     parentId?: string | null;
     name?: string | null;
     remarks?: string | null;
 }
 
-export interface DepartmentSaveRequest {
+export interface DepartmentSaveCommand {
     id?: string | null;
     parentId?: string | null;
     name?: string | null;
@@ -14,35 +15,26 @@ export interface DepartmentSaveRequest {
     remarks?: string | null;
 }
 
-export interface DepartmentMoveRequest {
+export interface DepartmentMoveCommand {
     fromNodeId: string;
     toNodeId: string;
     type?: "after" | "before" | "inside" | "insideLast";
 }
 
-export interface DepartmentResponse {
-    id: string;
-    parentId?: string | null;
-    name: string;
-    shortName?: string | null;
-    namePath?: string | null;
-    remarks?: string | null;
-}
-
-export const listDepartments = (request: DepartmentListRequest = {}) => {
-    return postJson<DepartmentResponse[], DepartmentListRequest>("/sys/department/list", {
+export const listDepartments = (request: DepartmentListQuery = {}) => {
+    return postJson<DepartmentNode[], DepartmentListQuery>("/sys/department/list", {
         body: request
     });
 };
 
-export const addDepartment = (request: DepartmentSaveRequest) => {
-    return postJson<DepartmentResponse, DepartmentSaveRequest>("/sys/department/create", {
+export const addDepartment = (request: DepartmentSaveCommand) => {
+    return postJson<DepartmentNode, DepartmentSaveCommand>("/sys/department/create", {
         body: request
     });
 };
 
-export const changeDepartmentInfo = (request: DepartmentSaveRequest) => {
-    return postJson<DepartmentResponse, DepartmentSaveRequest>("/sys/department/update", {
+export const changeDepartmentInfo = (request: DepartmentSaveCommand) => {
+    return postJson<DepartmentNode, DepartmentSaveCommand>("/sys/department/update", {
         body: request
     });
 };
@@ -53,8 +45,8 @@ export const removeDepartments = (ids: string[]) => {
     });
 };
 
-export const moveDepartment = (request: DepartmentMoveRequest) => {
-    return postJson<boolean, DepartmentMoveRequest>("/sys/department/move", {
+export const moveDepartment = (request: DepartmentMoveCommand) => {
+    return postJson<boolean, DepartmentMoveCommand>("/sys/department/move", {
         body: request
     });
 };

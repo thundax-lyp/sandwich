@@ -1,7 +1,8 @@
 import { postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { DictRecord } from "./dictionary-types";
 
-export interface DictPageRequest {
+export interface DictPageQuery {
     pageNo?: number;
     pageSize?: number;
     type?: string | null;
@@ -9,7 +10,7 @@ export interface DictPageRequest {
     remarks?: string | null;
 }
 
-export interface DictSaveRequest {
+export interface DictSaveCommand {
     id?: string | null;
     type?: string | null;
     label?: string | null;
@@ -17,28 +18,20 @@ export interface DictSaveRequest {
     remarks?: string | null;
 }
 
-export interface DictResponse {
-    id: string;
-    type: string;
-    label: string;
-    value: string;
-    remarks?: string | null;
-}
-
-export const page = (request: DictPageRequest = {}) => {
-    return postJson<Page<DictResponse>, DictPageRequest>("/sys/dict/page", {
+export const page = (request: DictPageQuery = {}) => {
+    return postJson<Page<DictRecord>, DictPageQuery>("/sys/dict/page", {
         body: request
     });
 };
 
-export const addDictionary = (request: DictSaveRequest) => {
-    return postJson<DictResponse, DictSaveRequest>("/sys/dict/create", {
+export const addDictionary = (request: DictSaveCommand) => {
+    return postJson<DictRecord, DictSaveCommand>("/sys/dict/create", {
         body: request
     });
 };
 
-export const changeDictionaryInfo = (request: DictSaveRequest) => {
-    return postJson<DictResponse, DictSaveRequest>("/sys/dict/update", {
+export const changeDictionaryInfo = (request: DictSaveCommand) => {
+    return postJson<DictRecord, DictSaveCommand>("/sys/dict/update", {
         body: request
     });
 };

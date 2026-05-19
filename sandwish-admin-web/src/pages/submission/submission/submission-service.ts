@@ -1,10 +1,11 @@
 import { postFormData, postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { StorageUploadRecord, SubmissionRecord } from "./submission-types";
 
 export type SubmissionStatus = "SUBMITTED" | "APPROVED" | "REJECTED" | "CLOSED";
 export type SubmissionSortDirection = "ASC" | "DESC";
 
-export interface SubmissionPageRequest {
+export interface SubmissionPageQuery {
     pageNo?: number;
     pageSize?: number;
     status?: SubmissionStatus | null;
@@ -13,57 +14,36 @@ export interface SubmissionPageRequest {
     sortDirection?: SubmissionSortDirection;
 }
 
-export interface SubmissionSaveRequest {
+export interface SubmissionSaveCommand {
     title: string;
     content: string;
     imageObjectIds?: string[];
 }
 
-export interface SubmissionResponse {
-    id: string;
-    title: string;
-    content: string;
-    status?: SubmissionStatus | string | null;
-    submittedAt?: string | null;
-    imageObjectIds?: string[] | null;
-}
-
-export interface SubmissionStatusRequest {
+export interface SubmissionStatusCommand {
     id: string;
     status: SubmissionStatus;
 }
 
-export interface SubmissionSortRequest {
+export interface SubmissionSortCommand {
     orderedIds: string[];
     sortDirection?: SubmissionSortDirection;
 }
 
-export interface StorageUploadResponse {
-    id?: string | null;
-    originalFilename?: string | null;
-    extendName?: string | null;
-    contentType?: string | null;
-    contentUrl?: string | null;
-    error?: string | null;
-}
-
-export const pageSubmissions = (request: SubmissionPageRequest = {}) => {
-    return postJson<Page<SubmissionResponse>, SubmissionPageRequest>(
-        "/submission/submission/page",
-        {
-            body: request
-        }
-    );
-};
-
-export const createSubmission = (request: SubmissionSaveRequest) => {
-    return postJson<SubmissionResponse, SubmissionSaveRequest>("/submission/submission/create", {
+export const pageSubmissions = (request: SubmissionPageQuery = {}) => {
+    return postJson<Page<SubmissionRecord>, SubmissionPageQuery>("/submission/submission/page", {
         body: request
     });
 };
 
-export const changeSubmissionStatus = (request: SubmissionStatusRequest) => {
-    return postJson<boolean, SubmissionStatusRequest>("/submission/submission/change-status", {
+export const createSubmission = (request: SubmissionSaveCommand) => {
+    return postJson<SubmissionRecord, SubmissionSaveCommand>("/submission/submission/create", {
+        body: request
+    });
+};
+
+export const changeSubmissionStatus = (request: SubmissionStatusCommand) => {
+    return postJson<boolean, SubmissionStatusCommand>("/submission/submission/change-status", {
         body: request
     });
 };
@@ -74,8 +54,8 @@ export const removeSubmissions = (ids: string[]) => {
     });
 };
 
-export const sortSubmissions = (request: SubmissionSortRequest) => {
-    return postJson<boolean, SubmissionSortRequest>("/submission/submission/sort", {
+export const sortSubmissions = (request: SubmissionSortCommand) => {
+    return postJson<boolean, SubmissionSortCommand>("/submission/submission/sort", {
         body: request
     });
 };
@@ -83,5 +63,5 @@ export const sortSubmissions = (request: SubmissionSortRequest) => {
 export const uploadSubmissionImage = (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    return postFormData<StorageUploadResponse>("/submission/submission/image/upload", formData);
+    return postFormData<StorageUploadRecord>("/submission/submission/image/upload", formData);
 };

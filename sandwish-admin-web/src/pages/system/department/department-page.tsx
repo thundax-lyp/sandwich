@@ -25,12 +25,8 @@ import {
     moveDepartment,
     changeDepartmentInfo
 } from "./department-service";
-import type {
-    DepartmentMoveRequest,
-    DepartmentResponse,
-    DepartmentSaveRequest
-} from "./department-service";
-import type { DepartmentTableNode } from "./department-types";
+import type { DepartmentMoveCommand, DepartmentSaveCommand } from "./department-service";
+import type { DepartmentNode, DepartmentTableNode } from "./department-types";
 import "./department-page.css";
 
 const { Text } = Typography;
@@ -42,7 +38,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     actions: 208
 };
 
-const buildDepartmentTree = (departments: DepartmentResponse[]) => {
+const buildDepartmentTree = (departments: DepartmentNode[]) => {
     const nodeMap = new Map<string, DepartmentTableNode>();
     const roots: DepartmentTableNode[] = [];
 
@@ -88,7 +84,7 @@ const collectDescendantIds = (department?: DepartmentTableNode | null): Set<stri
     return new Set(collectDepartmentIds(department.children));
 };
 
-const toMoveType = (position: SandwishTableSortPosition): DepartmentMoveRequest["type"] => {
+const toMoveType = (position: SandwishTableSortPosition): DepartmentMoveCommand["type"] => {
     return position === "before" ? "before" : "after";
 };
 
@@ -132,7 +128,7 @@ export const DepartmentPage = () => {
     );
 
     const saveMutation = useMutation({
-        mutationFn: (values: DepartmentSaveRequest) =>
+        mutationFn: (values: DepartmentSaveCommand) =>
             values.id ? changeDepartmentInfo(values) : addDepartment(values),
         onSuccess: async () => {
             setEditorOpen(false);
@@ -186,7 +182,7 @@ export const DepartmentPage = () => {
         setEditingDepartment(null);
     };
 
-    const saveDepartment = (request: DepartmentSaveRequest) => {
+    const saveDepartment = (request: DepartmentSaveCommand) => {
         saveMutation.mutate(request);
     };
 

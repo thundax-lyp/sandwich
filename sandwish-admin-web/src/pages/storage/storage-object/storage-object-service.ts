@@ -1,7 +1,8 @@
 import { postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { StorageRecord } from "./storage-object-types";
 
-export interface StoragePageRequest {
+export interface StoragePageQuery {
     pageNo?: number;
     pageSize?: number;
     contentType?: string | null;
@@ -11,26 +12,13 @@ export interface StoragePageRequest {
     remarks?: string | null;
 }
 
-export interface StorageResponse {
-    id: string;
-    originalFilename?: string | null;
-    extendName?: string | null;
-    contentType?: string | null;
-    ownerId?: string | null;
-    ownerType?: string | null;
-    objectStatus?: string | null;
-    referenceStatus?: string | null;
-    remarks?: string | null;
-    contentUrl?: string | null;
-}
-
-export interface StorageSortRequest {
+export interface StorageSortCommand {
     orderedIds: string[];
     sortDirection?: "ASC" | "DESC";
 }
 
-export const pageStorageObjects = (request: StoragePageRequest = {}) => {
-    return postJson<Page<StorageResponse>, StoragePageRequest>("/storage/object/page", {
+export const pageStorageObjects = (request: StoragePageQuery = {}) => {
+    return postJson<Page<StorageRecord>, StoragePageQuery>("/storage/object/page", {
         body: request
     });
 };
@@ -41,8 +29,8 @@ export const removeStorageObjects = (ids: string[]) => {
     });
 };
 
-export const sortStorageObjects = (request: StorageSortRequest) => {
-    return postJson<boolean, StorageSortRequest>("/storage/object/sort", {
+export const sortStorageObjects = (request: StorageSortCommand) => {
+    return postJson<boolean, StorageSortCommand>("/storage/object/sort", {
         body: request
     });
 };

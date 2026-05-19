@@ -20,7 +20,7 @@ import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
-import type { CurrentUserInfoResponse } from "@/service/current-user-service";
+import type { CurrentUserRecord } from "@/service/current-user-types";
 import { UserAvatar } from "./components/user-avatar";
 import { UserEdit } from "./components/user-edit";
 import {
@@ -32,13 +32,8 @@ import {
     uploadUserAvatar,
     changeUserStatus
 } from "./user-service";
-import type {
-    UserDepartmentResponse,
-    UserPageRequest,
-    UserResponse,
-    UserSaveRequest
-} from "./user-service";
-import type { UserFormValues } from "./user-types";
+import type { UserPageQuery, UserSaveCommand } from "./user-service";
+import type { UserDepartmentNode, UserFormValues, UserRecord } from "./user-types";
 import "./user-page.css";
 
 const { Text } = Typography;
@@ -70,53 +65,53 @@ const DEFAULT_USER_FILTERS: UserFilters = {
     enable: "ALL"
 };
 
-const EMPTY_USERS: UserResponse[] = [];
-const EMPTY_DEPARTMENTS: UserDepartmentResponse[] = [];
+const EMPTY_USERS: UserRecord[] = [];
+const EMPTY_DEPARTMENTS: UserDepartmentNode[] = [];
 
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
     return normalizedValue || undefined;
 };
 
-const readUserName = (user: UserResponse) => {
+const readUserName = (user: UserRecord) => {
     return normalizeSearch(user.name) || normalizeSearch(user.loginName) || `用户 ${user.id}`;
 };
 
-const readDepartmentName = (user: UserResponse) => {
+const readDepartmentName = (user: UserRecord) => {
     return user.department?.namePath || user.department?.name || "";
 };
 
-const readRoleNames = (user: UserResponse) => {
+const readRoleNames = (user: UserRecord) => {
     return (user.roles || []).map((role) => role.name).filter(Boolean);
 };
 
-const statusLabel = (user: UserResponse) => {
+const statusLabel = (user: UserRecord) => {
     return user.enable === false ? "禁用" : "启用";
 };
 
-const statusClassName = (user: UserResponse) => {
+const statusClassName = (user: UserRecord) => {
     return user.enable === false ? "user-status-inactive" : "user-status-active";
 };
 
-const rankLabel = (user: UserResponse) => {
+const rankLabel = (user: UserRecord) => {
     if (user.superAdmin || user.ranks === 9) {
         return "超级管理员";
     }
     return `等级 ${user.ranks ?? 0}`;
 };
 
-const rankClassName = (user: UserResponse) => {
+const rankClassName = (user: UserRecord) => {
     return user.superAdmin || user.ranks === 9 ? "user-rank-super-admin" : "user-rank-badge";
 };
 
-const roleClassName = (user: UserResponse, index: number) => {
+const roleClassName = (user: UserRecord, index: number) => {
     if (user.admin || user.superAdmin) {
         return "user-role-admin";
     }
     return index === 0 ? "user-role-editor" : "user-role-viewer";
 };
 
-const readRankValue = (user?: Pick<UserResponse, "ranks" | "superAdmin"> | null) => {
+const readRankValue = (user?: Pick<UserRecord, "ranks" | "superAdmin"> | null) => {
     if (!user) {
         return -1;
     }
@@ -127,8 +122,8 @@ const readRankValue = (user?: Pick<UserResponse, "ranks" | "superAdmin"> | null)
 };
 
 const canManageUserByRank = (
-    currentUser: CurrentUserInfoResponse | undefined,
-    targetUser: UserResponse
+    currentUser: CurrentUserRecord | undefined,
+    targetUser: UserRecord
 ) => {
     if (currentUser?.superAdmin) {
         return true;
@@ -136,15 +131,15 @@ const canManageUserByRank = (
     return readRankValue(targetUser) < readRankValue(currentUser);
 };
 
-const buildDepartmentTree = (departments: UserDepartmentResponse[]): DataNode[] => {
-    const rootDepartment: UserDepartmentResponse = {
+const buildDepartmentTree = (departments: UserDepartmentNode[]): DataNode[] => {
+    const rootDepartment: UserDepartmentNode = {
         id: ALL_DEPARTMENT_ID,
         parentId: null,
         name: "全部部门",
         shortName: "全部"
     };
     const allDepartments = [rootDepartment, ...departments];
-    const childrenByParentId = new Map<string | null | undefined, UserDepartmentResponse[]>();
+    const childrenByParentId = new Map<string | null | undefined, UserDepartmentNode[]>();
     allDepartments.forEach((department) => {
         const parentId =
             department.parentId || (department.id === ALL_DEPARTMENT_ID ? null : ALL_DEPARTMENT_ID);
@@ -153,7 +148,7 @@ const buildDepartmentTree = (departments: UserDepartmentResponse[]): DataNode[] 
         childrenByParentId.set(parentId, children);
     });
 
-    const toNode = (department: UserDepartmentResponse): DataNode => ({
+    const toNode = (department: UserDepartmentNode): DataNode => ({
         key: department.id,
         title: (
             <span className="user-department-node">
@@ -187,16 +182,16 @@ export const UserPage = () => {
     const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const departmentPanelRef = useRef<HTMLDivElement | null>(null);
-    const [query, setQuery] = useState<UserPageRequest>({
+    const [query, setQuery] = useState<UserPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<UserFilters>(DEFAULT_USER_FILTERS);
     const [selectedDepartmentId, setSelectedDepartmentId] = useState(ALL_DEPARTMENT_ID);
-    const [activeUser, setActiveUser] = useState<UserResponse | null>(null);
+    const [activeUser, setActiveUser] = useState<UserRecord | null>(null);
     const [userEditorOpen, setUserEditorOpen] = useState(false);
-    const [deletingUser, setDeletingUser] = useState<UserResponse | null>(null);
+    const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.loginName.trim()) || filters.enable !== "ALL";
@@ -366,7 +361,7 @@ export const UserPage = () => {
             const loginForm = await createLoginForm();
             const encryptedPassword = sm2.doEncrypt(form.loginPass, loginForm.publicKey, 0);
             return createUser(
-                toCreateUserSaveRequest(form, encryptedPassword, loginForm.loginToken)
+                toCreateUserSaveCommand(form, encryptedPassword, loginForm.loginToken)
             );
         },
         onSuccess: async () => {
@@ -379,7 +374,7 @@ export const UserPage = () => {
         }
     });
 
-    const updateQuery = (nextQuery: Partial<UserPageRequest>) => {
+    const updateQuery = (nextQuery: Partial<UserPageQuery>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => ({
             ...currentQuery,
@@ -461,7 +456,7 @@ export const UserPage = () => {
         setUserEditorOpen(true);
     };
 
-    const toUserSaveRequest = (user: UserResponse, form: UserFormValues): UserSaveRequest => ({
+    const toUserSaveCommand = (user: UserRecord, form: UserFormValues): UserSaveCommand => ({
         id: user.id,
         remarks: user.remarks,
         loginName: normalizeSearch(form.loginName),
@@ -475,11 +470,11 @@ export const UserPage = () => {
         roles: form.roleIds.map((roleId) => ({ id: roleId }))
     });
 
-    const toCreateUserSaveRequest = (
+    const toCreateUserSaveCommand = (
         form: UserFormValues,
         encryptedPassword: string,
         token: string
-    ): UserSaveRequest => ({
+    ): UserSaveCommand => ({
         loginName: normalizeSearch(form.loginName),
         loginPass: encryptedPassword,
         token,
@@ -529,10 +524,10 @@ export const UserPage = () => {
             messageApi.error("请选择部门");
             return;
         }
-        updateMutation.mutate(toUserSaveRequest(activeUser, form));
+        updateMutation.mutate(toUserSaveCommand(activeUser, form));
     };
 
-    const columns: SandwishTableProps<UserResponse>["columns"] = [
+    const columns: SandwishTableProps<UserRecord>["columns"] = [
         {
             title: "用户",
             dataIndex: "name",
@@ -675,7 +670,7 @@ export const UserPage = () => {
 
     return (
         <>
-            <ListPage<UserResponse>
+            <ListPage<UserRecord>
                 pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"

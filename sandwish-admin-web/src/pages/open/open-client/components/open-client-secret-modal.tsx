@@ -1,11 +1,11 @@
 import { Modal, Typography } from "antd";
-import type { OpenClientSecretResponse } from "../open-client-service";
+import type { OpenClientSecretRecord } from "../open-client-types";
 import { OpenClientSecretField } from "./open-client-secret-field";
 
 const { Text } = Typography;
 
 interface OpenClientSecretModalProps {
-    secret?: OpenClientSecretResponse | null;
+    secret?: OpenClientSecretRecord | null;
     onClose: () => void;
     onCopySecret: (label: string, value?: string | null) => void;
 }

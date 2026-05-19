@@ -23,7 +23,7 @@ interface RequestOptions<TBody> {
     body?: TBody;
 }
 
-interface AccessTokenResponse {
+interface AccessTokenPayload {
     token: string;
     refreshToken?: string;
     expireAt?: number;
@@ -56,7 +56,7 @@ const shouldRefreshBeforeRequest = () => {
     );
 };
 
-let refreshPromise: Promise<AccessTokenResponse | null> | null = null;
+let refreshPromise: Promise<AccessTokenPayload | null> | null = null;
 
 const requestTokenRefresh = async () => {
     const refreshToken = getRefreshToken();
@@ -75,7 +75,7 @@ const requestTokenRefresh = async () => {
         })
     });
 
-    const payload = (await response.json()) as ApiResponse<AccessTokenResponse>;
+    const payload = (await response.json()) as ApiResponse<AccessTokenPayload>;
     if (!response.ok || !isSuccessCode(payload.code) || !payload.data?.token) {
         clearAccessToken();
         return null;

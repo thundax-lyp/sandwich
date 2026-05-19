@@ -22,7 +22,8 @@ import {
     pageStorageObjects,
     sortStorageObjects
 } from "./storage-object-service";
-import type { StoragePageRequest, StorageResponse } from "./storage-object-service";
+import type { StoragePageQuery } from "./storage-object-service";
+import type { StorageRecord } from "./storage-object-types";
 import "./storage-object-page.css";
 
 const { Text } = Typography;
@@ -83,7 +84,7 @@ const normalizeSearch = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFilename = (storage: StorageResponse) => {
+const readFilename = (storage: StorageRecord) => {
     return normalizeSearch(storage.originalFilename) || `对象 ${storage.id}`;
 };
 
@@ -102,9 +103,9 @@ const referenceStatusClassName = (status?: string | null) => {
 };
 
 const sortByMove = (
-    storages: StorageResponse[],
-    sourceStorage: StorageResponse,
-    targetStorage: StorageResponse,
+    storages: StorageRecord[],
+    sourceStorage: StorageRecord,
+    targetStorage: StorageRecord,
     position: SandwishTableSortPosition
 ) => {
     const sourceIndex = storages.findIndex((storage) => storage.id === sourceStorage.id);
@@ -129,7 +130,7 @@ export const StorageObjectPage = () => {
     const queryClient = useQueryClient();
     const canEditStorage = hasPermission("storage:storage:edit");
     const accessToken = useCurrentAccessToken();
-    const [query, setQuery] = useState<StoragePageRequest>({
+    const [query, setQuery] = useState<StoragePageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
@@ -184,7 +185,7 @@ export const StorageObjectPage = () => {
         }
     });
 
-    const updateQuery = (values: Partial<StoragePageRequest>) => {
+    const updateQuery = (values: Partial<StoragePageQuery>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
@@ -225,7 +226,7 @@ export const StorageObjectPage = () => {
         });
     };
 
-    const openDeleteConfirm = (storage: StorageResponse) => {
+    const openDeleteConfirm = (storage: StorageRecord) => {
         setDeleteTarget({
             ids: [storage.id],
             title: readFilename(storage)
@@ -250,8 +251,8 @@ export const StorageObjectPage = () => {
     };
 
     const moveStorage = (
-        sourceStorage: StorageResponse,
-        targetStorage: StorageResponse,
+        sourceStorage: StorageRecord,
+        targetStorage: StorageRecord,
         position: SandwishTableSortPosition
     ) => {
         if (!canEditStorage || sourceStorage.id === targetStorage.id) {
@@ -263,7 +264,7 @@ export const StorageObjectPage = () => {
         });
     };
 
-    const columns: SandwishTableProps<StorageResponse>["columns"] = [
+    const columns: SandwishTableProps<StorageRecord>["columns"] = [
         {
             title: "文件",
             dataIndex: "originalFilename",
@@ -428,7 +429,7 @@ export const StorageObjectPage = () => {
 
     return (
         <>
-            <ListPage<StorageResponse>
+            <ListPage<StorageRecord>
                 pageClassName="storage-object-page"
                 title="存储对象"
                 description="管理上传后的对象文件、存储状态和业务引用入口。"

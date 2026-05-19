@@ -1,7 +1,8 @@
 import { postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { AuditLogDetailRecord, AuditLogRecord, AuditOptionsRecord } from "./audit-log-types";
 
-export interface AuditLogPageRequest {
+export interface AuditLogPageQuery {
     pageNo?: number;
     pageSize?: number;
     objectType?: string | null;
@@ -15,82 +16,20 @@ export interface AuditLogPageRequest {
     endDate?: string | null;
 }
 
-export interface AuditOptionResponse {
-    value: string;
-    label: string;
-}
-
-export interface AuditOptionsResponse {
-    objectTypes?: AuditOptionResponse[];
-    actions?: AuditOptionResponse[];
-    operatorTypes?: AuditOptionResponse[];
-}
-
-export interface AuditFieldResponse {
-    fieldName?: string | null;
-    fieldLabel?: string | null;
-    beforeDisplayValue?: string | null;
-    afterDisplayValue?: string | null;
-}
-
-export interface AuditSnapshotFieldResponse {
-    fieldName?: string | null;
-    fieldLabel?: string | null;
-    displayValue?: string | null;
-    valueType?: string | null;
-    sensitive?: boolean | null;
-}
-
-export interface AuditSnapshotResponse {
-    objectType?: string | null;
-    objectId?: string | null;
-    displayName?: string | null;
-    fields?: AuditSnapshotFieldResponse[] | null;
-}
-
-export interface AuditLogResponse {
-    id: string;
-    objectType?: string | null;
-    objectId?: string | null;
-    objectDisplayName?: string | null;
-    objectTypeLabel?: string | null;
-    version?: number | null;
-    action?: string | null;
-    actionLabel?: string | null;
-    operatorType?: string | null;
-    operatorTypeLabel?: string | null;
-    operatorId?: string | null;
-    operatorName?: string | null;
-    source?: string | null;
-    requestId?: string | null;
-    traceId?: string | null;
-    remoteAddr?: string | null;
-    summary?: string | null;
-    occurredAt?: string | null;
-    changedFields?: AuditFieldResponse[] | null;
-}
-
-export interface AuditLogDetailResponse extends AuditLogResponse {
-    idempotencyKey?: string | null;
-    previousVersion?: number | null;
-    beforeSnapshot?: AuditSnapshotResponse | null;
-    afterSnapshot?: AuditSnapshotResponse | null;
-}
-
-export const pageAuditLogs = (request: AuditLogPageRequest = {}) => {
-    return postJson<Page<AuditLogResponse>, AuditLogPageRequest>("/audit/log/page", {
+export const pageAuditLogs = (request: AuditLogPageQuery = {}) => {
+    return postJson<Page<AuditLogRecord>, AuditLogPageQuery>("/audit/log/page", {
         body: request
     });
 };
 
 export const getAuditLogDetail = (id: string) => {
-    return postJson<AuditLogDetailResponse, { id: string }>("/audit/log/detail", {
+    return postJson<AuditLogDetailRecord, { id: string }>("/audit/log/detail", {
         body: { id }
     });
 };
 
 export const getAuditOptions = () => {
-    return postJson<AuditOptionsResponse, Record<string, never>>("/audit/log/options", {
+    return postJson<AuditOptionsRecord, Record<string, never>>("/audit/log/options", {
         body: {}
     });
 };

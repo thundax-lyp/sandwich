@@ -1,10 +1,10 @@
 import { Avatar } from "antd";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
-import type { UserResponse } from "../user-service";
+import type { UserRecord } from "../user-types";
 
 interface UserAvatarProps {
-    user: UserResponse;
+    user: UserRecord;
     size?: number;
 }
 
@@ -18,7 +18,7 @@ const getInitials = (name?: string | null) => {
     return Array.from(normalizedName.replace(/\s+/g, "")).slice(0, 2).join("");
 };
 
-const readUserName = (user: UserResponse) => {
+const readUserName = (user: UserRecord) => {
     return normalizeSearch(user.name) || normalizeSearch(user.loginName) || `用户 ${user.id}`;
 };
 

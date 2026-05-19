@@ -2,24 +2,19 @@ import { CameraOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select, Switch, Upload } from "antd";
 import { useMemo, useState } from "react";
-import {
-    listUserRoles,
-    type UserDepartmentResponse,
-    type UserRoleResponse,
-    type UserResponse
-} from "../user-service";
-import type { UserFormValues } from "../user-types";
+import { listUserRoles } from "../user-service";
+import type { UserDepartmentNode, UserFormValues, UserRecord, UserRoleRecord } from "../user-types";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { CurrentUserInfoResponse } from "@/service/current-user-service";
+import type { CurrentUserRecord } from "@/service/current-user-types";
 import { UserAvatar } from "./user-avatar";
 
 interface UserEditProps {
     open?: boolean;
     title: string;
     saveText: string;
-    user?: UserResponse | null;
-    currentUser?: CurrentUserInfoResponse | null;
-    departments?: UserDepartmentResponse[];
+    user?: UserRecord | null;
+    currentUser?: CurrentUserRecord | null;
+    departments?: UserDepartmentNode[];
     saving?: boolean;
     onClose: () => void;
     onSave?: (form: UserFormValues) => void;
@@ -27,11 +22,11 @@ interface UserEditProps {
     onAvatarUpload?: (file: File) => Promise<unknown> | void;
 }
 
-const readRoleIds = (roles?: UserRoleResponse[] | null) => {
+const readRoleIds = (roles?: UserRoleRecord[] | null) => {
     return (roles || []).map((role) => role.id);
 };
 
-const readUserForm = (user: UserResponse): UserFormValues => ({
+const readUserForm = (user: UserRecord): UserFormValues => ({
     loginName: user.loginName || "",
     loginPass: "",
     name: user.name || "",
@@ -44,7 +39,7 @@ const readUserForm = (user: UserResponse): UserFormValues => ({
     enable: Boolean(user.enable)
 });
 
-const readRankValue = (user?: Pick<CurrentUserInfoResponse, "ranks" | "superAdmin"> | null) => {
+const readRankValue = (user?: Pick<CurrentUserRecord, "ranks" | "superAdmin"> | null) => {
     if (!user) {
         return -1;
     }
@@ -54,7 +49,7 @@ const readRankValue = (user?: Pick<CurrentUserInfoResponse, "ranks" | "superAdmi
     return user.ranks ?? 0;
 };
 
-const maxCreatableRank = (user?: Pick<CurrentUserInfoResponse, "ranks" | "superAdmin"> | null) => {
+const maxCreatableRank = (user?: Pick<CurrentUserRecord, "ranks" | "superAdmin"> | null) => {
     return Math.max(readRankValue(user) - 1, 0);
 };
 
@@ -65,14 +60,14 @@ const rankOptions = (maxRank: number) => {
     }));
 };
 
-const departmentOptions = (departments: UserDepartmentResponse[]) => {
+const departmentOptions = (departments: UserDepartmentNode[]) => {
     return departments.map((department) => ({
         value: department.id,
         label: department.namePath || department.name
     }));
 };
 
-const EMPTY_USER_ROLES: UserRoleResponse[] = [];
+const EMPTY_USER_ROLES: UserRoleRecord[] = [];
 
 const DEFAULT_CREATE_USER_FORM: UserFormValues = {
     loginName: "",
@@ -128,7 +123,7 @@ export const UserEdit = ({
         retry: false
     });
     const roleById = useMemo(() => {
-        const roleById = new Map<string, UserRoleResponse>();
+        const roleById = new Map<string, UserRoleRecord>();
         [...(userRoleQuery.data ?? EMPTY_USER_ROLES), ...(user?.roles ?? [])].forEach((role) => {
             if (role?.id) {
                 roleById.set(role.id, role);

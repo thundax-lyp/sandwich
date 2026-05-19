@@ -1,17 +1,18 @@
 import { Button, Form, Input, Select } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { DepartmentResponse, DepartmentSaveRequest } from "../department-service";
+import type { DepartmentSaveCommand } from "../department-service";
+import type { DepartmentNode } from "../department-types";
 
 const { TextArea } = Input;
 
 interface DepartmentEditProps {
     open?: boolean;
-    department?: DepartmentResponse | null;
+    department?: DepartmentNode | null;
     parentOptions: Array<{ label: string; value: string }>;
     saving?: boolean;
     onClose: () => void;
-    onSave: (request: DepartmentSaveRequest) => void;
+    onSave: (request: DepartmentSaveCommand) => void;
 }
 
 interface DepartmentFormValues {
@@ -27,7 +28,7 @@ const normalizeSearch = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFormRequest = (values: DepartmentFormValues): DepartmentSaveRequest => {
+const readFormRequest = (values: DepartmentFormValues): DepartmentSaveCommand => {
     return {
         id: values.id,
         parentId: values.parentId || null,
@@ -37,7 +38,7 @@ const readFormRequest = (values: DepartmentFormValues): DepartmentSaveRequest =>
     };
 };
 
-const toFormValues = (department: DepartmentResponse): DepartmentFormValues => {
+const toFormValues = (department: DepartmentNode): DepartmentFormValues => {
     return {
         id: department.id,
         parentId: department.parentId || null,

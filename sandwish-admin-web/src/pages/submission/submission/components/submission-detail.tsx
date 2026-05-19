@@ -1,11 +1,12 @@
 import { Space, Tag, Typography } from "antd";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { SubmissionResponse, SubmissionStatus } from "../submission-service";
+import type { SubmissionStatus } from "../submission-service";
+import type { SubmissionRecord } from "../submission-types";
 
 const { Text, Paragraph } = Typography;
 
 interface SubmissionDetailProps {
-    submission?: SubmissionResponse | null;
+    submission?: SubmissionRecord | null;
     statusLabels: Record<SubmissionStatus, string>;
     onClose: () => void;
 }

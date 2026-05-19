@@ -1,36 +1,24 @@
 import { ADMIN_API_BASE_URL, postJson } from "@/api/http";
+import type { AccessTokenRecord, LoginFormRecord } from "./auth-types";
 
-export interface LoginFormResponse {
-    loginToken: string;
-    refreshToken: string;
-    expiredAt: number;
-    publicKey: string;
-}
-
-export interface LoginRequest {
+export interface LoginCommand {
     loginToken: string;
     userName: string;
     password: string;
     captcha?: string;
 }
 
-export interface AccessTokenResponse {
-    token: string;
-    refreshToken?: string;
-    expireAt?: number;
-}
-
-export interface LogoutRequest {
+export interface LogoutCommand {
     token: string;
 }
 
-export interface TokenRefreshRequest {
+export interface TokenRefreshCommand {
     clientId?: string;
     refreshToken: string;
 }
 
 export const createLoginForm = () => {
-    return postJson<LoginFormResponse>("/auth/session/pre-auth-session");
+    return postJson<LoginFormRecord>("/auth/session/pre-auth-session");
 };
 
 export const refreshCaptcha = (loginToken: string) => {
@@ -39,20 +27,20 @@ export const refreshCaptcha = (loginToken: string) => {
     });
 };
 
-export const login = (request: LoginRequest) => {
-    return postJson<AccessTokenResponse, LoginRequest>("/auth/session/login", {
+export const login = (request: LoginCommand) => {
+    return postJson<AccessTokenRecord, LoginCommand>("/auth/session/login", {
         body: request
     });
 };
 
-export const refreshAccessToken = (request: TokenRefreshRequest) => {
-    return postJson<AccessTokenResponse, TokenRefreshRequest>("/auth/session/token/refresh", {
+export const refreshAccessToken = (request: TokenRefreshCommand) => {
+    return postJson<AccessTokenRecord, TokenRefreshCommand>("/auth/session/token/refresh", {
         body: request
     });
 };
 
-export const logout = (request: LogoutRequest) => {
-    return postJson<boolean, LogoutRequest>("/auth/session/logout", {
+export const logout = (request: LogoutCommand) => {
+    return postJson<boolean, LogoutCommand>("/auth/session/logout", {
         body: request
     });
 };

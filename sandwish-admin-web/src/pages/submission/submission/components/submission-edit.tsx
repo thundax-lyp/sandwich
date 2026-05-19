@@ -3,11 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { App, Button, Form, Input, Space, Typography, Upload } from "antd";
 import { useEffect, useState } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import {
-    type StorageUploadResponse,
-    type SubmissionSaveRequest,
-    uploadSubmissionImage
-} from "../submission-service";
+import { type SubmissionSaveCommand, uploadSubmissionImage } from "../submission-service";
+import type { StorageUploadRecord } from "../submission-types";
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -16,7 +13,7 @@ interface SubmissionEditProps {
     open?: boolean;
     saving?: boolean;
     onClose: () => void;
-    onSave: (request: SubmissionSaveRequest) => void;
+    onSave: (request: SubmissionSaveCommand) => void;
 }
 
 interface SubmissionFormValues {
@@ -30,7 +27,7 @@ interface UploadedSubmissionImage {
     name: string;
 }
 
-const readFormRequest = (values: SubmissionFormValues): SubmissionSaveRequest => {
+const readFormRequest = (values: SubmissionFormValues): SubmissionSaveCommand => {
     return {
         title: values.title.trim(),
         content: values.content.trim(),
@@ -38,7 +35,7 @@ const readFormRequest = (values: SubmissionFormValues): SubmissionSaveRequest =>
     };
 };
 
-const readUploadedImageName = (response: StorageUploadResponse, fallbackName: string) => {
+const readUploadedImageName = (response: StorageUploadRecord, fallbackName: string) => {
     return response.originalFilename || fallbackName || response.id || "图片";
 };
 

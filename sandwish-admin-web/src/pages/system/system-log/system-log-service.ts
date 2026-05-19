@@ -1,7 +1,8 @@
 import { postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { LogRecord } from "./system-log-types";
 
-export interface LogPageRequest {
+export interface LogPageQuery {
     pageNo?: number;
     pageSize?: number;
     title?: string | null;
@@ -13,35 +14,8 @@ export interface LogPageRequest {
     endDate?: string | null;
 }
 
-export interface LogDepartmentResponse {
-    id?: string | null;
-    name?: string | null;
-    namePath?: string | null;
-}
-
-export interface LogUserResponse {
-    id?: string | null;
-    loginName?: string | null;
-    name?: string | null;
-    department?: LogDepartmentResponse | null;
-}
-
-export interface LogResponse {
-    id: string;
-    remarks?: string | null;
-    createDate?: string | null;
-    type?: string | null;
-    title?: string | null;
-    remoteAddr?: string | null;
-    userAgent?: string | null;
-    method?: string | null;
-    requestUri?: string | null;
-    requestParams?: string | null;
-    createUser?: LogUserResponse | null;
-}
-
-export const pageLogs = (request: LogPageRequest = {}) => {
-    return postJson<Page<LogResponse>, LogPageRequest>("/sys/log/page", {
+export const pageLogs = (request: LogPageQuery = {}) => {
+    return postJson<Page<LogRecord>, LogPageQuery>("/sys/log/page", {
         body: request
     });
 };

@@ -12,7 +12,8 @@ import { useMemo, useState } from "react";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { pageLogs } from "./system-log-service";
-import type { LogPageRequest, LogResponse } from "./system-log-service";
+import type { LogPageQuery } from "./system-log-service";
+import type { LogRecord } from "./system-log-types";
 import "./system-log-page.css";
 
 const { Text } = Typography;
@@ -53,7 +54,7 @@ const normalizeSearch = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readUserDisplay = (log: LogResponse) => {
+const readUserDisplay = (log: LogRecord) => {
     const name = log.createUser?.name;
     const loginName = log.createUser?.loginName;
     if (name && loginName) {
@@ -68,7 +69,7 @@ const methodClassName = (method?: string | null) => {
 };
 
 export const SystemLogPage = () => {
-    const [query, setQuery] = useState<LogPageRequest>({
+    const [query, setQuery] = useState<LogPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
@@ -94,7 +95,7 @@ export const SystemLogPage = () => {
     const currentPageNo = logPage?.pageNo || query.pageNo || DEFAULT_PAGE_NO;
     const currentPageSize = logPage?.pageSize || query.pageSize || DEFAULT_PAGE_SIZE;
 
-    const updateQuery = (values: Partial<LogPageRequest>) => {
+    const updateQuery = (values: Partial<LogPageQuery>) => {
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
             return {
@@ -139,7 +140,7 @@ export const SystemLogPage = () => {
         });
     };
 
-    const columns: SandwishTableProps<LogResponse>["columns"] = [
+    const columns: SandwishTableProps<LogRecord>["columns"] = [
         {
             title: "时间",
             dataIndex: "createDate",
@@ -202,7 +203,7 @@ export const SystemLogPage = () => {
     ];
 
     return (
-        <ListPage<LogResponse>
+        <ListPage<LogRecord>
             pageClassName="system-log-page"
             title="系统日志"
             description="查看后台操作日志、请求记录和审计线索。"

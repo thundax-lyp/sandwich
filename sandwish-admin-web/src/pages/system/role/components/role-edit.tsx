@@ -3,19 +3,20 @@ import type { DataNode } from "antd/es/tree";
 import { useEffect, useState } from "react";
 import type { Key } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { RoleResponse, RoleSaveRequest } from "../role-service";
+import type { RoleSaveCommand } from "../role-service";
+import type { RoleRecord } from "../role-types";
 
 const { Text } = Typography;
 const { TextArea } = Input;
 
 interface RoleEditProps {
     open?: boolean;
-    role?: RoleResponse | null;
+    role?: RoleRecord | null;
     treeData: DataNode[];
     expandedMenuIds: Key[];
     saving?: boolean;
     onClose: () => void;
-    onSave: (request: RoleSaveRequest) => void;
+    onSave: (request: RoleSaveCommand) => void;
 }
 
 interface RoleFormValues {
@@ -31,7 +32,7 @@ const normalizeText = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFormRequest = (values: RoleFormValues, checkedMenuKeys: Key[]): RoleSaveRequest => {
+const readFormRequest = (values: RoleFormValues, checkedMenuKeys: Key[]): RoleSaveCommand => {
     return {
         id: values.id,
         name: values.name.trim(),
@@ -42,7 +43,7 @@ const readFormRequest = (values: RoleFormValues, checkedMenuKeys: Key[]): RoleSa
     };
 };
 
-const toFormValues = (role: RoleResponse): RoleFormValues => {
+const toFormValues = (role: RoleRecord): RoleFormValues => {
     return {
         id: role.id,
         name: role.name,

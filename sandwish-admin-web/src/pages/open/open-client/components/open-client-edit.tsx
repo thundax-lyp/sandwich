@@ -2,7 +2,8 @@ import { KeyOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, Space, Typography } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { OpenClientResponse, OpenClientSaveRequest } from "../open-client-service";
+import type { OpenClientSaveCommand } from "../open-client-service";
+import type { OpenClientRecord } from "../open-client-types";
 import { OpenClientSecretField } from "./open-client-secret-field";
 
 const { Text } = Typography;
@@ -10,13 +11,13 @@ const { TextArea } = Input;
 
 interface OpenClientEditProps {
     open?: boolean;
-    client?: OpenClientResponse | null;
+    client?: OpenClientRecord | null;
     saving?: boolean;
     canEdit?: boolean;
     resetSecretLoading?: boolean;
     onClose: () => void;
-    onSave: (request: OpenClientSaveRequest) => void;
-    onGenerateSecret: (client: OpenClientResponse) => void;
+    onSave: (request: OpenClientSaveCommand) => void;
+    onGenerateSecret: (client: OpenClientRecord) => void;
     onCopySecret: (label: string, value?: string | null) => void;
 }
 
@@ -84,7 +85,7 @@ const toIpWhitelistJson = (value?: string | null) => {
     return items.length > 0 ? JSON.stringify(items) : undefined;
 };
 
-const readFormRequest = (values: OpenClientFormValues): OpenClientSaveRequest => {
+const readFormRequest = (values: OpenClientFormValues): OpenClientSaveCommand => {
     return {
         id: values.id,
         name: values.name.trim(),
@@ -97,7 +98,7 @@ const readFormRequest = (values: OpenClientFormValues): OpenClientSaveRequest =>
     };
 };
 
-const toFormValues = (client: OpenClientResponse): OpenClientFormValues => {
+const toFormValues = (client: OpenClientRecord): OpenClientFormValues => {
     return {
         id: client.id,
         name: client.name,

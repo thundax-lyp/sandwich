@@ -1,78 +1,63 @@
 import { postJson } from "@/api/http";
+import type { RoleMenuNode, RoleRecord } from "./role-types";
 
-export interface RoleQueryRequest {
+export interface RoleQuery {
     enable?: boolean | null;
 }
 
-export interface RoleMenuRequest {
+export interface RoleMenuCommand {
     id: string;
 }
 
-export interface RoleSaveRequest {
+export interface RoleSaveCommand {
     id?: string | null;
     name?: string | null;
     admin?: boolean | null;
     enable?: boolean | null;
     remarks?: string | null;
-    menus?: RoleMenuRequest[] | null;
+    menus?: RoleMenuCommand[] | null;
 }
 
-export interface RoleStatusRequest {
+export interface RoleStatusCommand {
     id: string;
     enable?: boolean | null;
 }
 
-export interface RoleSortRequest {
+export interface RoleSortCommand {
     orderedIds: string[];
     sortDirection?: "ASC" | "DESC";
 }
 
-export interface RoleMenuResponse {
-    id: string;
-    parentId?: string | null;
-    name: string;
-    perms?: string | null;
-}
-
-export interface RoleResponse {
-    id: string;
-    name: string;
-    admin?: boolean | null;
-    enable?: boolean | null;
-    remarks?: string | null;
-    menus?: RoleMenuResponse[] | null;
-}
-
-export const listRoles = (request: RoleQueryRequest = {}) => {
-    return postJson<RoleResponse[], RoleQueryRequest>("/sys/role/list", {
+export const listRoles = (request: RoleQuery = {}) => {
+    return postJson<RoleRecord[], RoleQuery>("/sys/role/list", {
         body: request
     });
 };
 
 export const listRoleMenus = () => {
-    return postJson<RoleMenuResponse[]>("/sys/role/menu/tree");
+    return postJson<RoleMenuNode[]>("/sys/role/menu/tree");
 };
 
-export const addRole = (request: RoleSaveRequest) => {
-    return postJson<RoleResponse, RoleSaveRequest>("/sys/role/create", {
+export const addRole = (request: RoleSaveCommand) => {
+    return postJson<RoleRecord, RoleSaveCommand>("/sys/role/create", {
         body: request
     });
 };
 
-export const changeRoleInfo = (request: RoleSaveRequest) => {
-    return postJson<RoleResponse, RoleSaveRequest>("/sys/role/update", {
+export const changeRoleInfo = (request: RoleSaveCommand) => {
+    return postJson<RoleRecord, RoleSaveCommand>("/sys/role/update", {
         body: request
     });
 };
 
-export const changeRoleStatus = (request: RoleStatusRequest[]) => {
-    return postJson<boolean, RoleStatusRequest[]>("/sys/role/enable", {
+export const changeRoleStatus = (request: RoleStatusCommand[]) => {
+    return postJson<boolean, RoleStatusCommand[]>("/sys/role/enable", {
         body: request
     });
 };
 
-export const sortRoles = (request: RoleSortRequest) => {
-    return postJson<boolean, RoleSortRequest>("/sys/role/sort", {
+export const sortRoles = (request: RoleSortCommand) => {
+    return postJson<boolean, RoleSortCommand>("/sys/role/sort", {
         body: request
     });
 };

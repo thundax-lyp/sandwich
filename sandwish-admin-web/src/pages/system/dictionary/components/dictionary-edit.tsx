@@ -1,16 +1,17 @@
 import { Button, Form, Input } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { DictResponse, DictSaveRequest } from "../dictionary-service";
+import type { DictSaveCommand } from "../dictionary-service";
+import type { DictRecord } from "../dictionary-types";
 
 const { TextArea } = Input;
 
 interface DictionaryEditProps {
     open?: boolean;
-    dictionary?: DictResponse | null;
+    dictionary?: DictRecord | null;
     saving?: boolean;
     onClose: () => void;
-    onSave: (request: DictSaveRequest) => void;
+    onSave: (request: DictSaveCommand) => void;
 }
 
 interface DictFormValues {
@@ -26,7 +27,7 @@ const normalizeSearch = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFormRequest = (values: DictFormValues): DictSaveRequest => {
+const readFormRequest = (values: DictFormValues): DictSaveCommand => {
     return {
         id: values.id,
         type: values.type.trim(),
@@ -36,7 +37,7 @@ const readFormRequest = (values: DictFormValues): DictSaveRequest => {
     };
 };
 
-const toFormValues = (dictionary: DictResponse): DictFormValues => {
+const toFormValues = (dictionary: DictRecord): DictFormValues => {
     return {
         id: dictionary.id,
         type: dictionary.type,

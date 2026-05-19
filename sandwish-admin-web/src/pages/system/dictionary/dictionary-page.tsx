@@ -15,7 +15,8 @@ import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DictionaryEdit } from "./components/dictionary-edit";
 import * as dictionaryService from "./dictionary-service";
-import type { DictPageRequest, DictResponse, DictSaveRequest } from "./dictionary-service";
+import type { DictPageQuery, DictSaveCommand } from "./dictionary-service";
+import type { DictRecord } from "./dictionary-types";
 import "./dictionary-page.css";
 
 const { Text } = Typography;
@@ -50,14 +51,14 @@ export const DictionaryPage = () => {
     const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const canEditDictionary = hasPermission("sys:dict:edit");
-    const [query, setQuery] = useState<DictPageRequest>({
+    const [query, setQuery] = useState<DictPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<DictionaryFilters>(DEFAULT_DICTIONARY_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-    const [editingDictionary, setEditingDictionary] = useState<DictResponse | null>(null);
+    const [editingDictionary, setEditingDictionary] = useState<DictRecord | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const hasSelectedDictionaries = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.type.trim()) || Boolean(filters.remarks.trim());
@@ -74,7 +75,7 @@ export const DictionaryPage = () => {
     const currentPageSize = dictionaryPage?.pageSize || query.pageSize || DEFAULT_PAGE_SIZE;
 
     const saveMutation = useMutation({
-        mutationFn: (values: DictSaveRequest) =>
+        mutationFn: (values: DictSaveCommand) =>
             values.id
                 ? dictionaryService.changeDictionaryInfo(values)
                 : dictionaryService.addDictionary(values),
@@ -101,7 +102,7 @@ export const DictionaryPage = () => {
         }
     });
 
-    const updateQuery = (values: Partial<DictPageRequest>) => {
+    const updateQuery = (values: Partial<DictPageQuery>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
@@ -140,7 +141,7 @@ export const DictionaryPage = () => {
         setEditorOpen(true);
     };
 
-    const openEditEditor = (dictionary: DictResponse) => {
+    const openEditEditor = (dictionary: DictRecord) => {
         setEditingDictionary(dictionary);
         setEditorOpen(true);
     };
@@ -153,7 +154,7 @@ export const DictionaryPage = () => {
         setEditingDictionary(null);
     };
 
-    const saveDictionary = (request: DictSaveRequest) => {
+    const saveDictionary = (request: DictSaveCommand) => {
         saveMutation.mutate(request);
     };
 
@@ -171,7 +172,7 @@ export const DictionaryPage = () => {
         });
     };
 
-    const columns: SandwishTableProps<DictResponse>["columns"] = [
+    const columns: SandwishTableProps<DictRecord>["columns"] = [
         {
             title: "字典类型",
             dataIndex: "type",
@@ -268,7 +269,7 @@ export const DictionaryPage = () => {
 
     return (
         <>
-            <ListPage<DictResponse>
+            <ListPage<DictRecord>
                 pageClassName="dictionary-page"
                 title="字典管理"
                 description="维护系统字典类型、展示标签、业务值和备注说明。"

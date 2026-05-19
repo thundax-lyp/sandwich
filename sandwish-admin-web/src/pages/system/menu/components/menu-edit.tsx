@@ -1,17 +1,18 @@
 import { Button, Form, Input, InputNumber, Select } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import type { MenuResponse, MenuSaveRequest } from "../menu-service";
+import type { MenuSaveCommand } from "../menu-service";
+import type { MenuNode } from "../menu-types";
 
 const { TextArea } = Input;
 
 interface MenuEditProps {
     open?: boolean;
-    menu?: MenuResponse | null;
+    menu?: MenuNode | null;
     parentOptions: Array<{ label: string; value: string }>;
     saving?: boolean;
     onClose: () => void;
-    onSave: (request: MenuSaveRequest) => void;
+    onSave: (request: MenuSaveCommand) => void;
 }
 
 interface MenuFormValues {
@@ -31,7 +32,7 @@ const normalizeText = (value?: string | null) => {
     return normalizedValue || undefined;
 };
 
-const readFormRequest = (values: MenuFormValues): MenuSaveRequest => {
+const readFormRequest = (values: MenuFormValues): MenuSaveCommand => {
     return {
         id: values.id,
         parentId: values.parentId || null,
@@ -45,7 +46,7 @@ const readFormRequest = (values: MenuFormValues): MenuSaveRequest => {
     };
 };
 
-const toFormValues = (menu: MenuResponse): MenuFormValues => {
+const toFormValues = (menu: MenuNode): MenuFormValues => {
     return {
         id: menu.id,
         parentId: menu.parentId || null,

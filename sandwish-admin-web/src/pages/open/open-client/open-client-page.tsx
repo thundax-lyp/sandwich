@@ -24,12 +24,11 @@ import {
     changeOpenClientInfo
 } from "./open-client-service";
 import type {
-    OpenClientPageRequest,
-    OpenClientResponse,
-    OpenClientSaveRequest,
-    OpenClientSecretResponse,
+    OpenClientPageQuery,
+    OpenClientSaveCommand,
     OpenClientStatus
 } from "./open-client-service";
+import type { OpenClientRecord, OpenClientSecretRecord } from "./open-client-types";
 import "./open-client-page.css";
 
 const { Text } = Typography;
@@ -103,16 +102,16 @@ export const OpenClientPage = () => {
     const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const canEditOpenClient = hasPermission("open:client:edit");
-    const [query, setQuery] = useState<OpenClientPageRequest>({
+    const [query, setQuery] = useState<OpenClientPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<OpenClientFilters>(DEFAULT_OPEN_CLIENT_FILTERS);
-    const [editingClient, setEditingClient] = useState<OpenClientResponse | null>(null);
+    const [editingClient, setEditingClient] = useState<OpenClientRecord | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
-    const [secretResponse, setSecretResponse] = useState<OpenClientSecretResponse | null>(null);
-    const [resettingClient, setResettingClient] = useState<OpenClientResponse | null>(null);
+    const [secretResponse, setSecretResponse] = useState<OpenClientSecretRecord | null>(null);
+    const [resettingClient, setResettingClient] = useState<OpenClientRecord | null>(null);
     const hasActiveFilters = filters.status !== "ALL";
 
     const openClientQuery = useQuery({
@@ -131,18 +130,18 @@ export const OpenClientPage = () => {
     };
 
     const saveMutation = useMutation<
-        OpenClientResponse | OpenClientSecretResponse,
+        OpenClientRecord | OpenClientSecretRecord,
         Error,
-        OpenClientSaveRequest
+        OpenClientSaveCommand
     >({
-        mutationFn: (request: OpenClientSaveRequest) =>
+        mutationFn: (request: OpenClientSaveCommand) =>
             request.id ? changeOpenClientInfo(request) : createOpenClient(request),
         onSuccess: async (response, variables) => {
             setEditorOpen(false);
             setEditingClient(null);
             await invalidateOpenClientPage();
             if (!variables.id) {
-                setSecretResponse(response as OpenClientSecretResponse);
+                setSecretResponse(response as OpenClientSecretRecord);
             }
             messageApi.success(variables.id ? "开放客户端已更新" : "开放客户端已创建");
         },
@@ -191,7 +190,7 @@ export const OpenClientPage = () => {
         }
     });
 
-    const updateQuery = (values: Partial<OpenClientPageRequest>) => {
+    const updateQuery = (values: Partial<OpenClientPageQuery>) => {
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
             return {
@@ -220,7 +219,7 @@ export const OpenClientPage = () => {
         setEditorOpen(true);
     };
 
-    const openUpdateEditor = (client: OpenClientResponse) => {
+    const openUpdateEditor = (client: OpenClientRecord) => {
         detailMutation.mutate({ id: client.id });
     };
 
@@ -232,11 +231,11 @@ export const OpenClientPage = () => {
         setEditingClient(null);
     };
 
-    const saveOpenClient = (request: OpenClientSaveRequest) => {
+    const saveOpenClient = (request: OpenClientSaveCommand) => {
         saveMutation.mutate(request);
     };
 
-    const toggleStatus = (client: OpenClientResponse) => {
+    const toggleStatus = (client: OpenClientRecord) => {
         statusMutation.mutate({
             id: client.id,
             status: client.status === "ENABLED" ? "DISABLED" : "ENABLED"
@@ -262,7 +261,7 @@ export const OpenClientPage = () => {
         }
     };
 
-    const columns: SandwishTableProps<OpenClientResponse>["columns"] = [
+    const columns: SandwishTableProps<OpenClientRecord>["columns"] = [
         {
             key: "name",
             title: "客户端",
@@ -358,7 +357,7 @@ export const OpenClientPage = () => {
 
     return (
         <>
-            <ListPage<OpenClientResponse>
+            <ListPage<OpenClientRecord>
                 pageClassName="open-client-page"
                 title="开放客户端"
                 description="管理第三方系统访问 Open API 使用的 API KEY、IP 白名单、有效期和最小权限集合。"

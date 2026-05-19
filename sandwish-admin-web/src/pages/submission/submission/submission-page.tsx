@@ -23,11 +23,11 @@ import {
     sortSubmissions
 } from "./submission-service";
 import type {
-    SubmissionPageRequest,
-    SubmissionResponse,
-    SubmissionSaveRequest,
+    SubmissionPageQuery,
+    SubmissionSaveCommand,
     SubmissionStatus
 } from "./submission-service";
+import type { SubmissionRecord } from "./submission-types";
 import "./submission-page.css";
 
 const { Text } = Typography;
@@ -99,9 +99,9 @@ const formatDateTime = (value?: string | null) => {
 };
 
 const sortByMove = (
-    submissions: SubmissionResponse[],
-    sourceSubmission: SubmissionResponse,
-    targetSubmission: SubmissionResponse,
+    submissions: SubmissionRecord[],
+    sourceSubmission: SubmissionRecord,
+    targetSubmission: SubmissionRecord,
     position: SandwishTableSortPosition
 ) => {
     const sourceIndex = submissions.findIndex(
@@ -131,7 +131,7 @@ export const SubmissionPage = () => {
     const { message: messageApi } = App.useApp();
     const queryClient = useQueryClient();
     const canEditSubmission = hasPermission("submission:submission:edit");
-    const [query, setQuery] = useState<SubmissionPageRequest>({
+    const [query, setQuery] = useState<SubmissionPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE,
         sortDirection: "ASC"
@@ -139,7 +139,7 @@ export const SubmissionPage = () => {
     const [filters, setFilters] = useState<SubmissionFilters>(DEFAULT_SUBMISSION_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [editorOpen, setEditorOpen] = useState(false);
-    const [detailSubmission, setDetailSubmission] = useState<SubmissionResponse | null>(null);
+    const [detailSubmission, setDetailSubmission] = useState<SubmissionRecord | null>(null);
     const hasSelectedSubmissions = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.status !== "ALL");
 
@@ -204,7 +204,7 @@ export const SubmissionPage = () => {
         }
     });
 
-    const updateQuery = (values: Partial<SubmissionPageRequest>) => {
+    const updateQuery = (values: Partial<SubmissionPageQuery>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
@@ -244,7 +244,7 @@ export const SubmissionPage = () => {
         setEditorOpen(false);
     };
 
-    const saveSubmission = (request: SubmissionSaveRequest) => {
+    const saveSubmission = (request: SubmissionSaveCommand) => {
         createMutation.mutate(request);
     };
 
@@ -263,8 +263,8 @@ export const SubmissionPage = () => {
     };
 
     const moveSubmission = (
-        sourceSubmission: SubmissionResponse,
-        targetSubmission: SubmissionResponse,
+        sourceSubmission: SubmissionRecord,
+        targetSubmission: SubmissionRecord,
         position: SandwishTableSortPosition
     ) => {
         if (!canEditSubmission || sourceSubmission.id === targetSubmission.id) {
@@ -282,7 +282,7 @@ export const SubmissionPage = () => {
         });
     };
 
-    const changeStatus = (submission: SubmissionResponse, status: SubmissionStatus) => {
+    const changeStatus = (submission: SubmissionRecord, status: SubmissionStatus) => {
         if (!canEditSubmission || submission.status === status) {
             return;
         }
@@ -292,7 +292,7 @@ export const SubmissionPage = () => {
         });
     };
 
-    const columns: SandwishTableProps<SubmissionResponse>["columns"] = [
+    const columns: SandwishTableProps<SubmissionRecord>["columns"] = [
         {
             title: "内容",
             dataIndex: "title",
@@ -431,7 +431,7 @@ export const SubmissionPage = () => {
 
     return (
         <>
-            <ListPage<SubmissionResponse>
+            <ListPage<SubmissionRecord>
                 pageClassName="submission-page"
                 title="提交内容"
                 description="管理第三方通过开放接口提交的标题、正文和图片资料。"

@@ -1,7 +1,8 @@
 import { postFormData, postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { UserDepartmentNode, UserRecord, UserRoleRecord } from "./user-types";
 
-export interface UserPageRequest {
+export interface UserPageQuery {
     pageNo?: number;
     pageSize?: number;
     departmentId?: string | null;
@@ -11,41 +12,12 @@ export interface UserPageRequest {
     orderBy?: string | null;
 }
 
-export interface UserDepartmentResponse {
-    id: string;
-    parentId?: string | null;
-    name: string;
-    shortName?: string | null;
-    namePath?: string | null;
-}
-
-export interface UserRoleResponse {
-    id: string;
-    name: string;
-}
-
-export interface UserResponse {
-    id: string;
-    remarks?: string | null;
-    loginName?: string | null;
-    ranks?: number | null;
-    name: string;
-    email?: string | null;
-    mobile?: string | null;
-    avatar?: string | null;
-    superAdmin?: boolean | null;
-    admin?: boolean | null;
-    enable?: boolean | null;
-    department?: UserDepartmentResponse | null;
-    roles?: UserRoleResponse[] | null;
-}
-
-export interface UserStatusRequest {
+export interface UserStatusCommand {
     id: string;
     enable?: boolean | null;
 }
 
-export interface UserSaveRequest {
+export interface UserSaveCommand {
     id?: string | null;
     remarks?: string | null;
     loginName?: string | null;
@@ -61,22 +33,22 @@ export interface UserSaveRequest {
     roles?: Array<{ id: string }> | null;
 }
 
-export const pageUsers = (request: UserPageRequest = {}) => {
-    return postJson<Page<UserResponse>, UserPageRequest>("/sys/user/page", {
+export const pageUsers = (request: UserPageQuery = {}) => {
+    return postJson<Page<UserRecord>, UserPageQuery>("/sys/user/page", {
         body: request
     });
 };
 
 export const listUserDepartments = () => {
-    return postJson<UserDepartmentResponse[]>("/sys/user/department/tree");
+    return postJson<UserDepartmentNode[]>("/sys/user/department/tree");
 };
 
 export const listUserRoles = () => {
-    return postJson<UserRoleResponse[]>("/sys/user/role/list");
+    return postJson<UserRoleRecord[]>("/sys/user/role/list");
 };
 
-export const changeUserStatus = (request: UserStatusRequest[]) => {
-    return postJson<boolean, UserStatusRequest[]>("/sys/user/enable", {
+export const changeUserStatus = (request: UserStatusCommand[]) => {
+    return postJson<boolean, UserStatusCommand[]>("/sys/user/enable", {
         body: request
     });
 };
@@ -87,14 +59,14 @@ export const removeUsers = (ids: string[]) => {
     });
 };
 
-export const createUser = (request: UserSaveRequest) => {
-    return postJson<UserResponse, UserSaveRequest>("/sys/user/create", {
+export const createUser = (request: UserSaveCommand) => {
+    return postJson<UserRecord, UserSaveCommand>("/sys/user/create", {
         body: request
     });
 };
 
-export const changeUserInfo = (request: UserSaveRequest) => {
-    return postJson<UserResponse, UserSaveRequest>("/sys/user/update", {
+export const changeUserInfo = (request: UserSaveCommand) => {
+    return postJson<UserRecord, UserSaveCommand>("/sys/user/update", {
         body: request
     });
 };

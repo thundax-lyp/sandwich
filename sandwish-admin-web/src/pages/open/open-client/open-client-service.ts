@@ -1,16 +1,17 @@
 import { postJson } from "@/api/http";
 import type { Page } from "@/types/page";
+import type { OpenClientRecord, OpenClientSecretRecord } from "./open-client-types";
 
 export type OpenClientStatus = "ENABLED" | "DISABLED";
 
-export interface OpenClientPageRequest {
+export interface OpenClientPageQuery {
     pageNo?: number;
     pageSize?: number;
     name?: string | null;
     status?: OpenClientStatus | null;
 }
 
-export interface OpenClientSaveRequest {
+export interface OpenClientSaveCommand {
     id?: string | null;
     name: string;
     ipWhitelist?: string | null;
@@ -19,68 +20,51 @@ export interface OpenClientSaveRequest {
     permissions?: string[] | null;
 }
 
-export interface OpenClientStatusRequest {
+export interface OpenClientStatusCommand {
     id: string;
     status: OpenClientStatus;
 }
 
-export interface OpenClientSecretResetRequest {
+export interface OpenClientSecretResetCommand {
     id: string;
 }
 
-export interface OpenClientIdRequest {
+export interface OpenClientIdCommand {
     id: string;
 }
 
-export interface OpenClientResponse {
-    id: string;
-    name: string;
-    status?: OpenClientStatus | string | null;
-    apiKey?: string | null;
-    ipWhitelist?: string | null;
-    expiredAt?: string | null;
-    remarks?: string | null;
-    permissions?: string[] | null;
-}
-
-export interface OpenClientSecretResponse {
-    id: string;
-    apiKey?: string | null;
-    apiSecret?: string | null;
-}
-
-export const pageOpenClients = (request: OpenClientPageRequest = {}) => {
-    return postJson<Page<OpenClientResponse>, OpenClientPageRequest>("/open/client/page", {
+export const pageOpenClients = (request: OpenClientPageQuery = {}) => {
+    return postJson<Page<OpenClientRecord>, OpenClientPageQuery>("/open/client/page", {
         body: request
     });
 };
 
-export const getOpenClient = (request: OpenClientIdRequest) => {
-    return postJson<OpenClientResponse, OpenClientIdRequest>("/open/client/get", {
+export const getOpenClient = (request: OpenClientIdCommand) => {
+    return postJson<OpenClientRecord, OpenClientIdCommand>("/open/client/get", {
         body: request
     });
 };
 
-export const createOpenClient = (request: OpenClientSaveRequest) => {
-    return postJson<OpenClientSecretResponse, OpenClientSaveRequest>("/open/client/create", {
+export const createOpenClient = (request: OpenClientSaveCommand) => {
+    return postJson<OpenClientSecretRecord, OpenClientSaveCommand>("/open/client/create", {
         body: request
     });
 };
 
-export const changeOpenClientInfo = (request: OpenClientSaveRequest) => {
-    return postJson<OpenClientResponse, OpenClientSaveRequest>("/open/client/update", {
+export const changeOpenClientInfo = (request: OpenClientSaveCommand) => {
+    return postJson<OpenClientRecord, OpenClientSaveCommand>("/open/client/update", {
         body: request
     });
 };
 
-export const changeOpenClientStatus = (request: OpenClientStatusRequest) => {
-    return postJson<boolean, OpenClientStatusRequest>("/open/client/change-status", {
+export const changeOpenClientStatus = (request: OpenClientStatusCommand) => {
+    return postJson<boolean, OpenClientStatusCommand>("/open/client/change-status", {
         body: request
     });
 };
 
-export const resetOpenClientSecret = (request: OpenClientSecretResetRequest) => {
-    return postJson<OpenClientSecretResponse, OpenClientSecretResetRequest>(
+export const resetOpenClientSecret = (request: OpenClientSecretResetCommand) => {
+    return postJson<OpenClientSecretRecord, OpenClientSecretResetCommand>(
         "/open/client/secret/reset",
         {
             body: request

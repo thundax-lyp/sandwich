@@ -17,13 +17,13 @@ import { ListPage } from "@/components/list-page";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getAuditLogDetail, getAuditOptions, pageAuditLogs } from "./audit-log-service";
+import type { AuditLogPageQuery } from "./audit-log-service";
 import type {
-    AuditFieldResponse,
-    AuditLogPageRequest,
-    AuditLogResponse,
-    AuditSnapshotFieldResponse,
-    AuditSnapshotResponse
-} from "./audit-log-service";
+    AuditFieldRecord,
+    AuditLogRecord,
+    AuditSnapshotFieldRecord,
+    AuditSnapshotRecord
+} from "./audit-log-types";
 import "./audit-log-page.css";
 
 const { Paragraph, Text } = Typography;
@@ -95,11 +95,11 @@ const formatDateTime = (value?: string | null) => {
     });
 };
 
-const readObjectDisplay = (log: AuditLogResponse) => {
+const readObjectDisplay = (log: AuditLogRecord) => {
     return log.objectDisplayName || log.objectId || "-";
 };
 
-const readObjectTypeLabel = (log: AuditLogResponse) => {
+const readObjectTypeLabel = (log: AuditLogRecord) => {
     return log.objectTypeLabel || log.objectType || "未知对象";
 };
 
@@ -108,11 +108,11 @@ const getInitials = (value?: string | null) => {
     return Array.from(normalizedValue.replace(/\s+/g, "")).slice(0, 2).join("");
 };
 
-const readOperatorName = (log: AuditLogResponse) => {
+const readOperatorName = (log: AuditLogRecord) => {
     return log.operatorName || log.operatorId || "-";
 };
 
-const readOperatorUser = (log: AuditLogResponse) => {
+const readOperatorUser = (log: AuditLogRecord) => {
     const name = readOperatorName(log);
     const avatarUrl =
         log.operatorType === ADMIN_OPERATOR_TYPE && log.operatorId
@@ -129,7 +129,7 @@ const optionItems = (options?: Array<{ value: string; label: string }>) => [
     }))
 ];
 
-const renderChangedFields = (fields?: AuditFieldResponse[] | null) => {
+const renderChangedFields = (fields?: AuditFieldRecord[] | null) => {
     if (!fields?.length) {
         return <Text type="secondary">无字段变更</Text>;
     }
@@ -150,15 +150,15 @@ const renderChangedFields = (fields?: AuditFieldResponse[] | null) => {
     );
 };
 
-const snapshotFieldKey = (field: Pick<AuditSnapshotFieldResponse, "fieldName" | "fieldLabel">) => {
+const snapshotFieldKey = (field: Pick<AuditSnapshotFieldRecord, "fieldName" | "fieldLabel">) => {
     return field.fieldName || field.fieldLabel || "";
 };
 
-const snapshotFieldValue = (field?: AuditSnapshotFieldResponse | null) => {
+const snapshotFieldValue = (field?: AuditSnapshotFieldRecord | null) => {
     return field?.displayValue || "-";
 };
 
-const changedFieldKeys = (fields?: AuditFieldResponse[] | null) => {
+const changedFieldKeys = (fields?: AuditFieldRecord[] | null) => {
     const keys = new Set<string>();
     (fields || []).forEach((field) => {
         if (field.fieldName) {
@@ -171,8 +171,8 @@ const changedFieldKeys = (fields?: AuditFieldResponse[] | null) => {
     return keys;
 };
 
-const snapshotFieldMap = (snapshot?: AuditSnapshotResponse | null) => {
-    const fields = new Map<string, AuditSnapshotFieldResponse>();
+const snapshotFieldMap = (snapshot?: AuditSnapshotRecord | null) => {
+    const fields = new Map<string, AuditSnapshotFieldRecord>();
     (snapshot?.fields || []).forEach((field) => {
         const key = snapshotFieldKey(field);
         if (key) {
@@ -183,8 +183,8 @@ const snapshotFieldMap = (snapshot?: AuditSnapshotResponse | null) => {
 };
 
 const snapshotFieldKeys = (
-    beforeSnapshot?: AuditSnapshotResponse | null,
-    afterSnapshot?: AuditSnapshotResponse | null
+    beforeSnapshot?: AuditSnapshotRecord | null,
+    afterSnapshot?: AuditSnapshotRecord | null
 ) => {
     const keys: string[] = [];
     [...(beforeSnapshot?.fields || []), ...(afterSnapshot?.fields || [])].forEach((field) => {
@@ -197,9 +197,9 @@ const snapshotFieldKeys = (
 };
 
 const renderSnapshotCompare = (
-    beforeSnapshot?: AuditSnapshotResponse | null,
-    afterSnapshot?: AuditSnapshotResponse | null,
-    fields?: AuditFieldResponse[] | null
+    beforeSnapshot?: AuditSnapshotRecord | null,
+    afterSnapshot?: AuditSnapshotRecord | null,
+    fields?: AuditFieldRecord[] | null
 ) => {
     const keys = snapshotFieldKeys(beforeSnapshot, afterSnapshot);
     if (!keys.length) {
@@ -246,11 +246,7 @@ const renderSnapshotCompare = (
     );
 };
 
-const renderOperator = (
-    log: AuditLogResponse,
-    accessToken: string | null,
-    nameNode?: ReactNode
-) => {
+const renderOperator = (log: AuditLogRecord, accessToken: string | null, nameNode?: ReactNode) => {
     const user = readOperatorUser(log);
     const avatarUrl = toAuthenticatedResourceUrl(user.avatarUrl, accessToken);
     return (
@@ -265,7 +261,7 @@ const renderOperator = (
 
 export const AuditLogPage = () => {
     const accessToken = useCurrentAccessToken();
-    const [query, setQuery] = useState<AuditLogPageRequest>({
+    const [query, setQuery] = useState<AuditLogPageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
@@ -308,7 +304,7 @@ export const AuditLogPage = () => {
     const currentPageSize = auditLogPage?.pageSize || query.pageSize || DEFAULT_PAGE_SIZE;
     const auditOptions = auditOptionsQuery.data;
 
-    const updateQuery = (values: Partial<AuditLogPageRequest>) => {
+    const updateQuery = (values: Partial<AuditLogPageQuery>) => {
         setQuery((currentQuery) => {
             const nextQuery = { ...currentQuery, ...values };
             return {
@@ -363,7 +359,7 @@ export const AuditLogPage = () => {
         });
     };
 
-    const columns: SandwishTableProps<AuditLogResponse>["columns"] = [
+    const columns: SandwishTableProps<AuditLogRecord>["columns"] = [
         {
             title: "时间",
             dataIndex: "occurredAt",
@@ -442,7 +438,7 @@ export const AuditLogPage = () => {
 
     return (
         <>
-            <ListPage<AuditLogResponse>
+            <ListPage<AuditLogRecord>
                 pageClassName="audit-log-page"
                 title="审计日志"
                 description="查看关键业务对象的变更记录、操作者和字段差异。"

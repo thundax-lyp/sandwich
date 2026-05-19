@@ -18,8 +18,8 @@ import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
 import { addMenu, changeMenuInfo, listMenus, moveMenu, removeMenus } from "./menu-service";
-import type { MenuMoveRequest, MenuResponse, MenuSaveRequest } from "./menu-service";
-import type { MenuTableNode } from "./menu-types";
+import type { MenuMoveCommand, MenuSaveCommand } from "./menu-service";
+import type { MenuNode, MenuTableNode } from "./menu-types";
 import "./menu-page.css";
 
 const { Text } = Typography;
@@ -32,7 +32,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     actions: 208
 };
 
-const buildMenuTree = (menus: MenuResponse[]) => {
+const buildMenuTree = (menus: MenuNode[]) => {
     const nodeMap = new Map<string, MenuTableNode>();
     const roots: MenuTableNode[] = [];
 
@@ -73,7 +73,7 @@ const collectDescendantIds = (menu?: MenuTableNode | null): Set<string> => {
     return new Set(collectMenuIds(menu.children));
 };
 
-const toMoveType = (position: SandwishTableSortPosition): MenuMoveRequest["type"] => {
+const toMoveType = (position: SandwishTableSortPosition): MenuMoveCommand["type"] => {
     return position === "before" ? "before" : "after";
 };
 
@@ -114,7 +114,7 @@ export const MenuPage = () => {
     );
 
     const saveMutation = useMutation({
-        mutationFn: (values: MenuSaveRequest) =>
+        mutationFn: (values: MenuSaveCommand) =>
             values.id ? changeMenuInfo(values) : addMenu(values),
         onSuccess: async () => {
             setEditorOpen(false);
@@ -168,7 +168,7 @@ export const MenuPage = () => {
         setEditingMenu(null);
     };
 
-    const saveMenu = (request: MenuSaveRequest) => {
+    const saveMenu = (request: MenuSaveCommand) => {
         saveMutation.mutate(request);
     };
 

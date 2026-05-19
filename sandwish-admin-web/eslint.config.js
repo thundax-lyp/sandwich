@@ -202,6 +202,35 @@ const localRules = {
                 };
             }
         },
+        "no-dto-type-name": {
+            create(context) {
+                const reportDtoName = (node, name) => {
+                    if (!/(?:DTO|Dto)$/.test(name)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_NO_DTO: DTO type names are forbidden; use XxxRecord/XxxNode for service output objects."
+                    });
+                };
+
+                return {
+                    TSInterfaceDeclaration(node) {
+                        reportDtoName(node.id, node.id.name);
+                    },
+                    TSTypeAliasDeclaration(node) {
+                        reportDtoName(node.id, node.id.name);
+                    },
+                    ClassDeclaration(node) {
+                        if (node.id) {
+                            reportDtoName(node.id, node.id.name);
+                        }
+                    }
+                };
+            }
+        },
         "shared-component-css-local": {
             create(context) {
                 return {
@@ -822,7 +851,8 @@ const localRules = {
                     const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
                     return (
                         /\/src\/pages\/[^/]+\/([^/]+)\/\1-types\.ts$/.test(normalizedFilePath) ||
-                        /\/src\/service\/[^/]+-types\.ts$/.test(normalizedFilePath)
+                        /\/src\/service\/[^/]+-types\.ts$/.test(normalizedFilePath) ||
+                        /\/src\/auth\/[^/]+-types\.ts$/.test(normalizedFilePath)
                     );
                 };
 
@@ -844,6 +874,267 @@ const localRules = {
                     },
                     TSTypeAliasDeclaration(node) {
                         reportInvalidBusinessDataType(node.id, node.id.name);
+                    }
+                };
+            }
+        },
+        "service-type-exposure": {
+            create(context) {
+                const isApiContractName = (name) => /(?:Request|Response)$/.test(name);
+                const isBusinessDataName = (name) => /(?:Record|Node)$/.test(name);
+
+                const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                const isServiceFile = normalizedFilePath.endsWith("-service.ts");
+
+                const resolveImportPath = (importPath) => {
+                    if (importPath.startsWith("@/")) {
+                        return `/src/${importPath.slice(2)}`;
+                    }
+                    if (!importPath.startsWith(".")) {
+                        return importPath;
+                    }
+                    return path
+                        .resolve(path.dirname(context.physicalFilename), importPath)
+                        .split(path.sep)
+                        .join("/");
+                };
+
+                const isServiceImport = (importPath) => {
+                    const resolvedImportPath = resolveImportPath(importPath);
+                    return /(?:^|\/)[^/]+-service(?:\.ts)?$/.test(resolvedImportPath);
+                };
+
+                const readExportName = (specifier) => {
+                    if (specifier.exported?.type === "Identifier") {
+                        return specifier.exported.name;
+                    }
+                    if (specifier.local?.type === "Identifier") {
+                        return specifier.local.name;
+                    }
+                    return "";
+                };
+
+                const readImportedName = (specifier) => {
+                    if (specifier.imported?.type === "Identifier") {
+                        return specifier.imported.name;
+                    }
+                    if (specifier.local?.type === "Identifier") {
+                        return specifier.local.name;
+                    }
+                    return "";
+                };
+
+                const reportApiContractExposure = (node, name) => {
+                    if (!isApiContractName(name)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_API_CONTRACT_TYPE_EXPOSURE: XxxRequest/XxxResponse are private API contract types and must not be exported from service."
+                    });
+                };
+
+                return {
+                    ExportNamedDeclaration(node) {
+                        if (!isServiceFile) {
+                            return;
+                        }
+
+                        if (
+                            (node.declaration?.type === "TSInterfaceDeclaration" ||
+                                node.declaration?.type === "TSTypeAliasDeclaration") &&
+                            node.declaration.id
+                        ) {
+                            reportApiContractExposure(
+                                node.declaration.id,
+                                node.declaration.id.name
+                            );
+                        }
+
+                        node.specifiers.forEach((specifier) => {
+                            const name = readExportName(specifier);
+                            reportApiContractExposure(specifier, name);
+                        });
+                    },
+                    ImportDeclaration(node) {
+                        const importPath = node.source.value;
+                        if (typeof importPath !== "string" || !isServiceImport(importPath)) {
+                            return;
+                        }
+
+                        node.specifiers.forEach((specifier) => {
+                            const name = readImportedName(specifier);
+                            if (!isApiContractName(name) && !isBusinessDataName(name)) {
+                                return;
+                            }
+
+                            context.report({
+                                node: specifier,
+                                message:
+                                    "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service imports may expose only Query/Command input types; Record/Node must come from *-types.ts and Request/Response are private."
+                            });
+                        });
+                    }
+                };
+            }
+        },
+        "service-helper-contract-types": {
+            create(context) {
+                const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                const isServiceFile = normalizedFilePath.endsWith("-service.ts");
+                const isApiContractName = (name) => /(?:Request|Response)$/.test(name);
+                const isServiceInputName = (name) => /(?:Query|Command)$/.test(name);
+                const isBusinessDataName = (name) => /(?:Record|Node)$/.test(name);
+                const transparentTypeNames = ["Array", "ReadonlyArray", "Page", "Promise"];
+                const scalarTypeNames = [
+                    "boolean",
+                    "string",
+                    "number",
+                    "void",
+                    "unknown",
+                    "never",
+                    "Blob",
+                    "File"
+                ];
+
+                const readTypeName = (typeNode) => {
+                    if (!typeNode || typeNode.type !== "TSTypeReference") {
+                        return "";
+                    }
+                    if (typeNode.typeName.type === "Identifier") {
+                        return typeNode.typeName.name;
+                    }
+                    return "";
+                };
+
+                const readTypeArguments = (typeNode) => {
+                    return (
+                        typeNode?.typeArguments?.params ?? typeNode?.typeParameters?.params ?? []
+                    );
+                };
+
+                const checkNoApiContractType = (node, typeNode) => {
+                    const name = readTypeName(typeNode);
+                    if (isApiContractName(name)) {
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service helper generic types must not expose XxxRequest/XxxResponse."
+                        });
+                    }
+
+                    readTypeArguments(typeNode).forEach((param) => {
+                        checkNoApiContractType(node, param);
+                    });
+                };
+
+                const isInlineOrScalarType = (typeNode) => {
+                    return [
+                        "TSBooleanKeyword",
+                        "TSStringKeyword",
+                        "TSNumberKeyword",
+                        "TSVoidKeyword",
+                        "TSUnknownKeyword",
+                        "TSNeverKeyword",
+                        "TSTypeLiteral"
+                    ].includes(typeNode.type);
+                };
+
+                const checkReturnTypeShape = (node, typeNode) => {
+                    checkNoApiContractType(node, typeNode);
+
+                    if (!typeNode || isInlineOrScalarType(typeNode)) {
+                        return;
+                    }
+
+                    if (typeNode.type === "TSArrayType") {
+                        checkReturnTypeShape(node, typeNode.elementType);
+                        return;
+                    }
+
+                    const name = readTypeName(typeNode);
+                    if (!name || scalarTypeNames.includes(name)) {
+                        return;
+                    }
+
+                    if (transparentTypeNames.includes(name)) {
+                        readTypeArguments(typeNode).forEach((param) => {
+                            checkReturnTypeShape(node, param);
+                        });
+                        return;
+                    }
+
+                    if (isBusinessDataName(name)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service return object types must be XxxRecord/XxxNode or Page<XxxRecord/XxxNode>."
+                    });
+                };
+
+                const checkInputTypeShape = (node, typeNode) => {
+                    checkNoApiContractType(node, typeNode);
+
+                    if (!typeNode || isInlineOrScalarType(typeNode)) {
+                        return;
+                    }
+
+                    if (typeNode.type === "TSArrayType") {
+                        checkInputTypeShape(node, typeNode.elementType);
+                        return;
+                    }
+
+                    const name = readTypeName(typeNode);
+                    if (!name || scalarTypeNames.includes(name)) {
+                        return;
+                    }
+
+                    if (name === "Record") {
+                        return;
+                    }
+
+                    if (name === "Array" || name === "ReadonlyArray") {
+                        readTypeArguments(typeNode).forEach((param) => {
+                            checkInputTypeShape(node, param);
+                        });
+                        return;
+                    }
+
+                    if (isServiceInputName(name)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service request object types must be XxxQuery/XxxCommand or inline payload types."
+                    });
+                };
+
+                return {
+                    CallExpression(node) {
+                        if (
+                            !isServiceFile ||
+                            node.callee.type !== "Identifier" ||
+                            (node.callee.name !== "postJson" && node.callee.name !== "postFormData")
+                        ) {
+                            return;
+                        }
+
+                        const typeArguments =
+                            node.typeArguments?.params ?? node.typeParameters?.params ?? [];
+                        const [returnType, requestType] = typeArguments;
+                        if (returnType) {
+                            checkReturnTypeShape(node, returnType);
+                        }
+                        if (requestType) {
+                            checkInputTypeShape(node, requestType);
+                        }
                     }
                 };
             }
@@ -944,6 +1235,7 @@ export default tseslint.config(
             "local/api-contract-type-location": "error",
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
+            "local/no-dto-type-name": "error",
             "local/page-component-no-external-page": "error",
             "local/page-component-single-export": "error",
             "local/page-class-name-prefix": "error",
@@ -954,6 +1246,8 @@ export default tseslint.config(
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
             "local/service-input-type-location": "error",
+            "local/service-helper-contract-types": "error",
+            "local/service-type-exposure": "error",
             "local/shared-service-types-only": "error",
             "local/shared-component-css-local": "error",
             "local/hook-file-path": "error",

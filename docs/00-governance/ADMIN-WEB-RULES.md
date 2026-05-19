@@ -121,7 +121,6 @@
 
 ### Naming
 
-- Hook 使用 `useXxx`。
 - 状态动作文案使用明确业务动词，例如 `启用`、`禁用`、`发布`、`下线`、`归档`、`恢复`。
 - 避免使用泛化动作文案，例如 `操作`、`变更状态`、`处理`。
 - TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。

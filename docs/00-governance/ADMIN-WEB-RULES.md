@@ -87,7 +87,8 @@
 - `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 类型定义只允许出现在 `*-service.ts` 或 `src/api/` 中。
-- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 类型定义只允许出现在 `*-service.ts` 中。
+- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 类型定义只允许出现在 `*-service.ts` 中；通用 `PageQuery<T>` 固定在 `src/types/page.ts`。
+- `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 类型定义只允许出现在明确边界的 `*-types.ts` 中，例如页面域 `<domain>-types.ts` 或 `src/service/<domain>-types.ts`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。
@@ -140,16 +141,16 @@
 - `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
 - 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
 - hook 文件固定放在对应边界的 `hooks/` 目录；跨页面复用放在 `src/hooks/`，页面域内复用放在页面域目录下的 `hooks/`。
-- 通用请求能力、API 协议类型、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
+- 通用请求能力、响应包装解析、token header、base URL 和 API error 放在 `src/api/`。
 - 多个页面域复用的组件放在 `src/components/`。
 - 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
 - `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
 - 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
 - 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
 - service 公开参数类型 `XxxQuery` / `XxxCommand` 属于 service 入参协议，固定放在 `*-service.ts`。
-- service 返回给页面的业务数据类型 `XxxRecord` / `XxxNode` 属于页面业务类型，固定放在 `<domain>-types.ts`。
+- service 返回给页面的业务数据类型 `XxxRecord` / `XxxNode` 属于业务类型，固定放在对应 `*-types.ts`。
 - 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
-- API 响应包装、分页响应等后端 API 协议类型放在 `src/api/`，例如 `PageResponse<T>` 放在 `src/api/page-response.ts`。
+- 跨页面通用数据形态放在 `src/types/`，例如分页查询和分页返回固定使用 `src/types/page.ts` 中的 `PageQuery<T>` / `Page<T>`。
 - `src/types/` 不承载页面专属 request / response / form values / table record 类型。
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。

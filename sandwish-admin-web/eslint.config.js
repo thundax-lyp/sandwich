@@ -635,7 +635,11 @@ const localRules = {
                 const isServiceInputName = (name) => /(?:Query|Command)$/.test(name);
 
                 const isAllowedFile = () => {
-                    return context.physicalFilename.endsWith("-service.ts");
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    return (
+                        normalizedFilePath.endsWith("-service.ts") ||
+                        normalizedFilePath.endsWith("/src/types/page.ts")
+                    );
                 };
 
                 const reportInvalidServiceInputType = (node, name) => {
@@ -656,6 +660,40 @@ const localRules = {
                     },
                     TSTypeAliasDeclaration(node) {
                         reportInvalidServiceInputType(node.id, node.id.name);
+                    }
+                };
+            }
+        },
+        "business-data-type-location": {
+            create(context) {
+                const isBusinessDataName = (name) => /(?:Record|Node)$/.test(name);
+
+                const isAllowedFile = () => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    return (
+                        /\/src\/pages\/[^/]+\/([^/]+)\/\1-types\.ts$/.test(normalizedFilePath) ||
+                        /\/src\/service\/[^/]+-types\.ts$/.test(normalizedFilePath)
+                    );
+                };
+
+                const reportInvalidBusinessDataType = (node, name) => {
+                    if (!isBusinessDataName(name) || isAllowedFile()) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION: XxxRecord/XxxNode types may only be defined in a clear *-types.ts boundary."
+                    });
+                };
+
+                return {
+                    TSInterfaceDeclaration(node) {
+                        reportInvalidBusinessDataType(node.id, node.id.name);
+                    },
+                    TSTypeAliasDeclaration(node) {
+                        reportInvalidBusinessDataType(node.id, node.id.name);
                     }
                 };
             }
@@ -751,6 +789,7 @@ export default tseslint.config(
                     ]
                 }
             ],
+            "local/business-data-type-location": "error",
             "local/api-contract-type-location": "error",
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",

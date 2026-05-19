@@ -1,5 +1,5 @@
 import { postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export type OpenClientStatus = "ENABLED" | "DISABLED";
 
@@ -50,7 +50,7 @@ export interface OpenClientSecretResponse {
 }
 
 export const pageOpenClients = (request: OpenClientPageRequest = {}) => {
-    return postJson<PageResponse<OpenClientResponse>, OpenClientPageRequest>("/open/client/page", {
+    return postJson<Page<OpenClientResponse>, OpenClientPageRequest>("/open/client/page", {
         body: request
     });
 };

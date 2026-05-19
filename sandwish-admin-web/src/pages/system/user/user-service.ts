@@ -1,5 +1,5 @@
 import { postFormData, postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export interface UserPageRequest {
     pageNo?: number;
@@ -62,7 +62,7 @@ export interface UserSaveRequest {
 }
 
 export const pageUsers = (request: UserPageRequest = {}) => {
-    return postJson<PageResponse<UserResponse>, UserPageRequest>("/sys/user/page", {
+    return postJson<Page<UserResponse>, UserPageRequest>("/sys/user/page", {
         body: request
     });
 };

@@ -1,5 +1,5 @@
 import { postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export interface AuditLogPageRequest {
     pageNo?: number;
@@ -78,7 +78,7 @@ export interface AuditLogDetailResponse extends AuditLogResponse {
 }
 
 export const pageAuditLogs = (request: AuditLogPageRequest = {}) => {
-    return postJson<PageResponse<AuditLogResponse>, AuditLogPageRequest>("/audit/log/page", {
+    return postJson<Page<AuditLogResponse>, AuditLogPageRequest>("/audit/log/page", {
         body: request
     });
 };

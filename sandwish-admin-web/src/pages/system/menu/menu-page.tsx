@@ -19,6 +19,7 @@ import type { SandwishTableProps, SandwishTableSortPosition } from "@/components
 import { MenuEdit } from "./components/menu-edit";
 import { addMenu, changeMenuInfo, listMenus, moveMenu, removeMenus } from "./menu-service";
 import type { MenuMoveRequest, MenuResponse, MenuSaveRequest } from "./menu-service";
+import type { MenuTableNode } from "./menu-types";
 import "./menu-page.css";
 
 const { Text } = Typography;
@@ -30,10 +31,6 @@ const DEFAULT_COLUMN_WIDTHS = {
     display: 96,
     actions: 208
 };
-
-interface MenuTableNode extends MenuResponse {
-    children?: MenuTableNode[];
-}
 
 const buildMenuTree = (menus: MenuResponse[]) => {
     const nodeMap = new Map<string, MenuTableNode>();

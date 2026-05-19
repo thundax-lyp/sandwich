@@ -1,5 +1,5 @@
 import { postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export interface DictPageRequest {
     pageNo?: number;
@@ -26,7 +26,7 @@ export interface DictResponse {
 }
 
 export const page = (request: DictPageRequest = {}) => {
-    return postJson<PageResponse<DictResponse>, DictPageRequest>("/sys/dict/page", {
+    return postJson<Page<DictResponse>, DictPageRequest>("/sys/dict/page", {
         body: request
     });
 };

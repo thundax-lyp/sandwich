@@ -28,6 +28,7 @@ import {
     changeRoleStatus
 } from "./role-service";
 import type { RoleMenuResponse, RoleResponse, RoleSaveRequest } from "./role-service";
+import type { RoleMenuTreeNode } from "./role-types";
 import "./role-page.css";
 
 const { Text } = Typography;
@@ -43,10 +44,6 @@ const DEFAULT_COLUMN_WIDTHS = {
 
 interface RoleFilters {
     enable: "ALL" | "ENABLED" | "DISABLED";
-}
-
-interface RoleMenuTreeNode extends RoleMenuResponse {
-    children?: RoleMenuTreeNode[];
 }
 
 const DEFAULT_ROLE_FILTERS: RoleFilters = {

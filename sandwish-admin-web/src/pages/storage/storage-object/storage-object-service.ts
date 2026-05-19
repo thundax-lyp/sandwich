@@ -1,5 +1,5 @@
 import { postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export interface StoragePageRequest {
     pageNo?: number;
@@ -30,7 +30,7 @@ export interface StorageSortRequest {
 }
 
 export const pageStorageObjects = (request: StoragePageRequest = {}) => {
-    return postJson<PageResponse<StorageResponse>, StoragePageRequest>("/storage/object/page", {
+    return postJson<Page<StorageResponse>, StoragePageRequest>("/storage/object/page", {
         body: request
     });
 };

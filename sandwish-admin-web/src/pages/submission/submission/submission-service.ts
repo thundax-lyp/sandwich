@@ -1,5 +1,5 @@
 import { postFormData, postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export type SubmissionStatus = "SUBMITTED" | "APPROVED" | "REJECTED" | "CLOSED";
 export type SubmissionSortDirection = "ASC" | "DESC";
@@ -48,7 +48,7 @@ export interface StorageUploadResponse {
 }
 
 export const pageSubmissions = (request: SubmissionPageRequest = {}) => {
-    return postJson<PageResponse<SubmissionResponse>, SubmissionPageRequest>(
+    return postJson<Page<SubmissionResponse>, SubmissionPageRequest>(
         "/submission/submission/page",
         {
             body: request

@@ -1,5 +1,5 @@
 import { postJson } from "@/api/http";
-import type { PageResponse } from "@/api/page-response";
+import type { Page } from "@/types/page";
 
 export interface LogPageRequest {
     pageNo?: number;
@@ -41,7 +41,7 @@ export interface LogResponse {
 }
 
 export const pageLogs = (request: LogPageRequest = {}) => {
-    return postJson<PageResponse<LogResponse>, LogPageRequest>("/sys/log/page", {
+    return postJson<Page<LogResponse>, LogPageRequest>("/sys/log/page", {
         body: request
     });
 };

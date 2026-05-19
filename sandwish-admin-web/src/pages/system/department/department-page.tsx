@@ -30,6 +30,7 @@ import type {
     DepartmentResponse,
     DepartmentSaveRequest
 } from "./department-service";
+import type { DepartmentTableNode } from "./department-types";
 import "./department-page.css";
 
 const { Text } = Typography;
@@ -40,10 +41,6 @@ const DEFAULT_COLUMN_WIDTHS = {
     remarks: 320,
     actions: 208
 };
-
-interface DepartmentTableNode extends DepartmentResponse {
-    children?: DepartmentTableNode[];
-}
 
 const buildDepartmentTree = (departments: DepartmentResponse[]) => {
     const nodeMap = new Map<string, DepartmentTableNode>();

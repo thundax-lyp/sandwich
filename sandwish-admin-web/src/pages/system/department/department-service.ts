@@ -47,7 +47,7 @@ export const updateDepartment = (request: DepartmentSaveRequest) => {
     });
 };
 
-export const deleteDepartments = (ids: string[]) => {
+export const removeDepartments = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/department/delete", {
         body: ids.map((id) => ({ id }))
     });

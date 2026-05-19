@@ -17,7 +17,7 @@ import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
-import { addMenu, deleteMenus, listMenus, moveMenu, updateMenu } from "./menu-service";
+import { addMenu, listMenus, moveMenu, removeMenus, updateMenu } from "./menu-service";
 import type { MenuMoveRequest, MenuResponse, MenuSaveRequest } from "./menu-service";
 import "./menu-page.css";
 
@@ -130,7 +130,7 @@ export const MenuPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteMenus,
+        mutationFn: removeMenus,
         onSuccess: async () => {
             setDeletingMenu(null);
             await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });

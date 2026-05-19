@@ -94,7 +94,7 @@ export const updateUserStatus = (request: UserStatusRequest[]) => {
     });
 };
 
-export const deleteUsers = (ids: string[]) => {
+export const removeUsers = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/user/delete", {
         body: ids.map((id) => ({ id }))
     });

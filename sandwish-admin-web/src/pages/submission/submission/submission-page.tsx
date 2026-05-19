@@ -18,7 +18,7 @@ import { SubmissionEdit } from "./components/submission-edit";
 import {
     changeSubmissionStatus,
     createSubmission,
-    deleteSubmissions,
+    removeSubmissions,
     pageSubmissions,
     sortSubmissions
 } from "./submission-service";
@@ -171,7 +171,7 @@ export const SubmissionPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteSubmissions,
+        mutationFn: removeSubmissions,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await invalidateSubmissionPage();

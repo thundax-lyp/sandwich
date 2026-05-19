@@ -53,7 +53,7 @@ export const updateMenu = (request: MenuSaveRequest) => {
     });
 };
 
-export const deleteMenus = (ids: string[]) => {
+export const removeMenus = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/menu/delete", {
         body: ids.map((id) => ({ id }))
     });

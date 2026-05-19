@@ -25,7 +25,7 @@ import { UserAvatar } from "./components/user-avatar";
 import { UserEdit } from "./components/user-edit";
 import {
     createUser,
-    deleteUsers,
+    removeUsers,
     listUserDepartments,
     pageUsers,
     updateUser,
@@ -320,7 +320,7 @@ export const UserPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteUsers,
+        mutationFn: removeUsers,
         onSuccess: async () => {
             setDeletingUser(null);
             setSelectedRowKeys([]);

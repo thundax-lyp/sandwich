@@ -20,7 +20,7 @@ import type { SandwishTableProps, SandwishTableSortPosition } from "@/components
 import { RoleEdit } from "./components/role-edit";
 import {
     addRole,
-    deleteRoles,
+    removeRoles,
     listRoleMenus,
     listRoles,
     sortRoles,
@@ -185,7 +185,7 @@ export const RolePage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteRoles,
+        mutationFn: removeRoles,
         onSuccess: async () => {
             setDeletingRole(null);
             setSelectedRowKeys([]);

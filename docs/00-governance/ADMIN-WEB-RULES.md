@@ -79,7 +79,7 @@
 - `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：`src/pages/<module>/<domain>/components/*.tsx` 每个文件最多导出一个 PascalCase React 组件；私有子组件不导出，可以留在同文件。
 - `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
 - `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
-- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为，例如 `pageDictionaries`、`addDictionary`、`updateDictionary`、`deleteDictionaries`。
+- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`update`、`remove`、`change`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`update`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 

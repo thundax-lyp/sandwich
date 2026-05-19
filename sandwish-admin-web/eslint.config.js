@@ -8,6 +8,27 @@ import fs from "node:fs";
 import path from "node:path";
 import tseslint from "typescript-eslint";
 
+const SERVICE_METHOD_VERBS = [
+    "page",
+    "list",
+    "get",
+    "add",
+    "create",
+    "update",
+    "remove",
+    "change",
+    "sort",
+    "move",
+    "upload",
+    "download",
+    "reset",
+    "login",
+    "logout",
+    "refresh",
+    "load",
+    "save"
+];
+
 const localRules = {
     rules: {
         "kebab-case-file-name": {
@@ -143,6 +164,55 @@ const localRules = {
                     }
                 };
             }
+        },
+        "service-method-verb-prefix": {
+            create(context) {
+                const startsWithServiceVerb = (name) => {
+                    return SERVICE_METHOD_VERBS.some((verb) => {
+                        return (
+                            name === verb ||
+                            name.startsWith(`${verb}${name.charAt(verb.length).toUpperCase()}`)
+                        );
+                    });
+                };
+
+                const reportInvalidServiceMethod = (node, name) => {
+                    if (startsWithServiceVerb(name)) {
+                        return;
+                    }
+
+                    context.report({
+                        node,
+                        message: `ADMIN_WEB_NAME_SERVICE_METHOD: service method "${name}" must start with one of ${SERVICE_METHOD_VERBS.join(", ")}.`
+                    });
+                };
+
+                return {
+                    ExportNamedDeclaration(node) {
+                        const filePath = context.physicalFilename;
+                        if (!filePath.endsWith("-service.ts")) {
+                            return;
+                        }
+
+                        if (node.declaration?.type === "VariableDeclaration") {
+                            node.declaration.declarations.forEach((declaration) => {
+                                if (declaration.id.type === "Identifier") {
+                                    reportInvalidServiceMethod(declaration.id, declaration.id.name);
+                                }
+                            });
+                        }
+
+                        node.specifiers.forEach((specifier) => {
+                            if (specifier.exported?.type === "Identifier") {
+                                reportInvalidServiceMethod(
+                                    specifier.exported,
+                                    specifier.exported.name
+                                );
+                            }
+                        });
+                    }
+                };
+            }
         }
     }
 };
@@ -234,6 +304,7 @@ export default tseslint.config(
             "local/kebab-case-file-name": "error",
             "local/page-component-single-export": "error",
             "local/page-style-file": "error",
+            "local/service-method-verb-prefix": "error",
             "no-restricted-imports": [
                 "error",
                 {

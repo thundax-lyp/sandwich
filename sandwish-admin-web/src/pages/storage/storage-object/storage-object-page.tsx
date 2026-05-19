@@ -18,7 +18,7 @@ import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import {
-    deleteStorageObjects,
+    removeStorageObjects,
     pageStorageObjects,
     sortStorageObjects
 } from "./storage-object-service";
@@ -161,7 +161,7 @@ export const StorageObjectPage = () => {
     };
 
     const deleteMutation = useMutation({
-        mutationFn: deleteStorageObjects,
+        mutationFn: removeStorageObjects,
         onSuccess: async () => {
             setDeleteTarget(null);
             setSelectedRowKeys([]);

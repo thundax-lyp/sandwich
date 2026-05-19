@@ -20,7 +20,7 @@ import type { SandwishTableProps, SandwishTableSortPosition } from "@/components
 import { DepartmentEdit } from "./components/department-edit";
 import {
     addDepartment,
-    deleteDepartments,
+    removeDepartments,
     listDepartments,
     moveDepartment,
     updateDepartment
@@ -149,7 +149,7 @@ export const DepartmentPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteDepartments,
+        mutationFn: removeDepartments,
         onSuccess: async () => {
             setDeletingDepartment(null);
             await queryClient.invalidateQueries({ queryKey: ["department", "list"] });

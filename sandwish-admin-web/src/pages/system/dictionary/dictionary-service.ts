@@ -25,7 +25,7 @@ export interface DictResponse {
     remarks?: string | null;
 }
 
-export const pageDictionaries = (request: DictPageRequest = {}) => {
+export const page = (request: DictPageRequest = {}) => {
     return postJson<PageResponse<DictResponse>, DictPageRequest>("/sys/dict/page", {
         body: request
     });
@@ -43,7 +43,7 @@ export const updateDictionary = (request: DictSaveRequest) => {
     });
 };
 
-export const deleteDictionaries = (ids: string[]) => {
+export const removeDictionaries = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/dict/delete", {
         body: ids.map((id) => ({ id }))
     });

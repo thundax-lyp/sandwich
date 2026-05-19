@@ -14,12 +14,7 @@ import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DictionaryEdit } from "./components/dictionary-edit";
-import {
-    addDictionary,
-    deleteDictionaries,
-    pageDictionaries,
-    updateDictionary
-} from "./dictionary-service";
+import * as dictionaryService from "./dictionary-service";
 import type { DictPageRequest, DictResponse, DictSaveRequest } from "./dictionary-service";
 import "./dictionary-page.css";
 
@@ -69,7 +64,7 @@ export const DictionaryPage = () => {
 
     const dictionaryQuery = useQuery({
         queryKey: ["dictionary", "page", query],
-        queryFn: () => pageDictionaries(query),
+        queryFn: () => dictionaryService.page(query),
         retry: false
     });
     const dictionaryPage = dictionaryQuery.data;
@@ -80,7 +75,9 @@ export const DictionaryPage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: DictSaveRequest) =>
-            values.id ? updateDictionary(values) : addDictionary(values),
+            values.id
+                ? dictionaryService.updateDictionary(values)
+                : dictionaryService.addDictionary(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingDictionary(null);
@@ -93,7 +90,7 @@ export const DictionaryPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: deleteDictionaries,
+        mutationFn: dictionaryService.removeDictionaries,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["dictionary", "page"] });

@@ -68,7 +68,7 @@ export const changeSubmissionStatus = (request: SubmissionStatusRequest) => {
     });
 };
 
-export const deleteSubmissions = (ids: string[]) => {
+export const removeSubmissions = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/submission/submission/delete", {
         body: ids.map((id) => ({ id }))
     });

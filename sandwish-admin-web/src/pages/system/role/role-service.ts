@@ -77,7 +77,7 @@ export const sortRoles = (request: RoleSortRequest) => {
     });
 };
 
-export const deleteRoles = (ids: string[]) => {
+export const removeRoles = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/role/delete", {
         body: ids.map((id) => ({ id }))
     });

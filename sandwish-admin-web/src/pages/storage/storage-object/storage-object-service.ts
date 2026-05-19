@@ -35,7 +35,7 @@ export const pageStorageObjects = (request: StoragePageRequest = {}) => {
     });
 };
 
-export const deleteStorageObjects = (ids: string[]) => {
+export const removeStorageObjects = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/storage/object/delete", {
         body: ids.map((id) => ({ id }))
     });

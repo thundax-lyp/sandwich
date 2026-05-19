@@ -15,9 +15,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "sandwish.auth.captcha")
 public class CaptchaWhitelistProperties {
 
-    public static final String ENABLED_PROPERTY = "sandwish.auth.captcha.whitelist-enabled";
-    public static final String WHITELIST_VALUES_PROPERTY = "sandwish.auth.captcha.whitelist-values";
-
     private boolean whitelistEnabled;
     private Collection<String> whitelistValues = Collections.emptyList();
 

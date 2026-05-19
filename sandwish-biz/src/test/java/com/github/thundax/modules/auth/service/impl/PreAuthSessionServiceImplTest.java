@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.mock.env.MockEnvironment;
 
 public class PreAuthSessionServiceImplTest {
     private static final String CAPTCHA_ITEM = "CAPTCHA";
@@ -109,6 +111,20 @@ public class PreAuthSessionServiceImplTest {
 
         properties.setWhitelistEnabled(true);
         properties.setWhitelistValues("6666,8888");
+
+        assertTrue(properties.matches("6666"));
+        assertTrue(properties.matches("8888"));
+    }
+
+    @Test
+    public void shouldBindCaptchaWhitelistFromIntegrationTestPropertyNames() {
+        MockEnvironment environment = new MockEnvironment()
+                .withProperty("sandwish.auth.captcha.whitelist-enabled", "true")
+                .withProperty("sandwish.auth.captcha.whitelist-values", "6666,8888");
+
+        CaptchaWhitelistProperties properties = Binder.get(environment)
+                .bind("sandwish.auth.captcha", CaptchaWhitelistProperties.class)
+                .get();
 
         assertTrue(properties.matches("6666"));
         assertTrue(properties.matches("8888"));

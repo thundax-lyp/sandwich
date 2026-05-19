@@ -251,7 +251,8 @@ export default tseslint.config(
         }
     },
     {
-        files: ["src/pages/**/*.{ts,tsx}", "src/layouts/**/*.{ts,tsx}"],
+        files: ["src/**/*.{ts,tsx}"],
+        ignores: ["src/api/http.ts"],
         rules: {
             "no-restricted-syntax": [
                 "error",
@@ -259,7 +260,7 @@ export default tseslint.config(
                 {
                     selector: "CallExpression[callee.name='fetch']",
                     message:
-                        "ADMIN_WEB_LAYER_PAGE_NO_FETCH / ADMIN_WEB_LAYER_LAYOUT_NO_FETCH: pages and layouts must call API through service/api helpers."
+                        "ADMIN_WEB_LAYER_FETCH_ONLY_HTTP: only src/api/http.ts may call fetch directly."
                 }
             ]
         }

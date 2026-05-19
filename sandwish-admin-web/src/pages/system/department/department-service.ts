@@ -41,7 +41,7 @@ export const addDepartment = (request: DepartmentSaveRequest) => {
     });
 };
 
-export const updateDepartment = (request: DepartmentSaveRequest) => {
+export const changeDepartmentInfo = (request: DepartmentSaveRequest) => {
     return postJson<DepartmentResponse, DepartmentSaveRequest>("/sys/department/update", {
         body: request
     });

@@ -17,7 +17,7 @@ import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
-import { addMenu, listMenus, moveMenu, removeMenus, updateMenu } from "./menu-service";
+import { addMenu, changeMenuInfo, listMenus, moveMenu, removeMenus } from "./menu-service";
 import type { MenuMoveRequest, MenuResponse, MenuSaveRequest } from "./menu-service";
 import "./menu-page.css";
 
@@ -117,7 +117,8 @@ export const MenuPage = () => {
     );
 
     const saveMutation = useMutation({
-        mutationFn: (values: MenuSaveRequest) => (values.id ? updateMenu(values) : addMenu(values)),
+        mutationFn: (values: MenuSaveRequest) =>
+            values.id ? changeMenuInfo(values) : addMenu(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingMenu(null);

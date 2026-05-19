@@ -223,13 +223,10 @@ export const AdminLayout = () => {
     const currentUser = currentUserInfoQuery.data;
     const currentUserAvatar = toAuthenticatedResourceUrl(currentUser?.avatar, accessToken);
     const currentUserName = currentUser?.name || currentUser?.loginName || "当前用户";
-    const sidebarState = isMobileLayout
-        ? sidebarCollapsed
-            ? "closed"
-            : "open"
-        : sidebarCollapsed
-          ? "collapsed"
-          : "expanded";
+    let sidebarState = sidebarCollapsed ? "collapsed" : "expanded";
+    if (isMobileLayout) {
+        sidebarState = sidebarCollapsed ? "closed" : "open";
+    }
 
     useEffect(() => {
         if (currentUserPermsQuery.data) {

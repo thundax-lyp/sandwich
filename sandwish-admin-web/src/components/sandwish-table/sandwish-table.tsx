@@ -189,11 +189,10 @@ export const SandwishTable = <RecordType extends object = object>({
                 const columnKey = readColumnKey(column);
                 const isActionColumn = columnKey === actionColumnKey;
                 const widthKey = columnKey === undefined ? undefined : String(columnKey);
-                const baseWidth = isActionColumn
-                    ? isMobile
-                        ? actionColumnMobileWidth
-                        : (readNumericWidth(column.width) ?? actionColumnWidth)
-                    : readNumericWidth(column.width);
+                const actionWidth = isMobile
+                    ? actionColumnMobileWidth
+                    : (readNumericWidth(column.width) ?? actionColumnWidth);
+                const baseWidth = isActionColumn ? actionWidth : readNumericWidth(column.width);
                 const currentWidth =
                     widthKey && columnWidths[widthKey] !== undefined
                         ? columnWidths[widthKey]

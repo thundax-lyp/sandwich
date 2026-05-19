@@ -694,7 +694,8 @@ export const AuditLogPage = () => {
                             )}
                         </section>
                     </div>
-                ) : detailQuery.isError ? (
+                ) : null}
+                {!detailLog && detailQuery.isError ? (
                     <Empty description="审计详情加载失败" />
                 ) : null}
             </SandwishDrawer>

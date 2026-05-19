@@ -21,7 +21,7 @@ import {
     getOpenClient,
     pageOpenClients,
     resetOpenClientSecret,
-    updateOpenClient
+    changeOpenClientInfo
 } from "./open-client-service";
 import type {
     OpenClientPageRequest,
@@ -136,7 +136,7 @@ export const OpenClientPage = () => {
         OpenClientSaveRequest
     >({
         mutationFn: (request: OpenClientSaveRequest) =>
-            request.id ? updateOpenClient(request) : createOpenClient(request),
+            request.id ? changeOpenClientInfo(request) : createOpenClient(request),
         onSuccess: async (response, variables) => {
             setEditorOpen(false);
             setEditingClient(null);

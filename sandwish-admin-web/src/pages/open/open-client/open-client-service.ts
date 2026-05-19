@@ -67,7 +67,7 @@ export const createOpenClient = (request: OpenClientSaveRequest) => {
     });
 };
 
-export const updateOpenClient = (request: OpenClientSaveRequest) => {
+export const changeOpenClientInfo = (request: OpenClientSaveRequest) => {
     return postJson<OpenClientResponse, OpenClientSaveRequest>("/open/client/update", {
         body: request
     });

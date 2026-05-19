@@ -88,7 +88,7 @@ export const listUserRoles = () => {
     return postJson<UserRoleResponse[]>("/sys/user/role/list");
 };
 
-export const updateUserStatus = (request: UserStatusRequest[]) => {
+export const changeUserStatus = (request: UserStatusRequest[]) => {
     return postJson<boolean, UserStatusRequest[]>("/sys/user/enable", {
         body: request
     });
@@ -106,7 +106,7 @@ export const createUser = (request: UserSaveRequest) => {
     });
 };
 
-export const updateUser = (request: UserSaveRequest) => {
+export const changeUserInfo = (request: UserSaveRequest) => {
     return postJson<UserResponse, UserSaveRequest>("/sys/user/update", {
         body: request
     });

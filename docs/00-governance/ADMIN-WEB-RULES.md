@@ -79,7 +79,8 @@
 - `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：`src/pages/<module>/<domain>/components/*.tsx` 每个文件最多导出一个 PascalCase React 组件；私有子组件不导出，可以留在同文件。
 - `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件固定使用 `export const XxxPage = () => {}` 形态。
 - `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数，不使用 function declaration。
-- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`update`、`remove`、`change`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`update`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`uploadAvatar`。
+- `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：前端代码禁止使用嵌套三元表达式。
+- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 
@@ -93,6 +94,8 @@
 - `ADMIN_WEB_PATH_QUERY`：TanStack Query client 基线固定放在 `sandwish-admin-web/src/query/`。
 - `ADMIN_WEB_PATH_GLOBAL_TYPES`：第三方库声明、环境声明和真正跨页面共享的全局前端类型固定放在 `sandwish-admin-web/src/types/`。
 - `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑固定放在 `sandwish-admin-web/src/test/`。
+- `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 测试固定放在 `sandwish-admin-web/e2e/<module>/<domain>/<domain>.spec.ts`，对应 `sandwish-admin-web/src/pages/<module>/<domain>/<domain>-page.tsx`。
+- `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：不归属单个页面的后台壳层、布局和跨页面导航 E2E 测试固定放在 `sandwish-admin-web/e2e/layout/*.spec.ts`。
 
 ### UI
 
@@ -109,7 +112,6 @@
 ### Architecture
 
 - 复杂业务逻辑不得直接写在 JSX 中。
-- 避免嵌套三元表达式。
 - 组件不得直接发起 `fetch` 请求。
 - 页面应优先复用项目已有共享组件和页面骨架。
 - `page` 负责页面状态、用户交互、表格/表单组装和调用 service。
@@ -180,8 +182,6 @@
 - `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。
-- E2E 测试目录跟随目标页面目录到页面域层级，固定使用 `sandwish-admin-web/e2e/<module>/<domain>/<domain>.spec.ts`，对应 `src/pages/<module>/<domain>/<domain>-page.tsx`。
-- 不归属单个页面的后台壳层、布局和跨页面导航 E2E 测试放在 `sandwish-admin-web/e2e/layout/`。
 
 ### UI
 

@@ -23,7 +23,7 @@ import {
     removeDepartments,
     listDepartments,
     moveDepartment,
-    updateDepartment
+    changeDepartmentInfo
 } from "./department-service";
 import type {
     DepartmentMoveRequest,
@@ -136,7 +136,7 @@ export const DepartmentPage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: DepartmentSaveRequest) =>
-            values.id ? updateDepartment(values) : addDepartment(values),
+            values.id ? changeDepartmentInfo(values) : addDepartment(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingDepartment(null);

@@ -76,7 +76,7 @@ export const DictionaryPage = () => {
     const saveMutation = useMutation({
         mutationFn: (values: DictSaveRequest) =>
             values.id
-                ? dictionaryService.updateDictionary(values)
+                ? dictionaryService.changeDictionaryInfo(values)
                 : dictionaryService.addDictionary(values),
         onSuccess: async () => {
             setEditorOpen(false);

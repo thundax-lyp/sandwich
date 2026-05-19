@@ -47,7 +47,7 @@ export const addMenu = (request: MenuSaveRequest) => {
     });
 };
 
-export const updateMenu = (request: MenuSaveRequest) => {
+export const changeMenuInfo = (request: MenuSaveRequest) => {
     return postJson<MenuResponse, MenuSaveRequest>("/sys/menu/update", {
         body: request
     });

@@ -24,8 +24,8 @@ import {
     listRoleMenus,
     listRoles,
     sortRoles,
-    updateRole,
-    updateRoleStatus
+    changeRoleInfo,
+    changeRoleStatus
 } from "./role-service";
 import type { RoleMenuResponse, RoleResponse, RoleSaveRequest } from "./role-service";
 import "./role-page.css";
@@ -160,7 +160,8 @@ export const RolePage = () => {
     const expandedMenuIds = useMemo(() => collectMenuIds(menuTree), [menuTree]);
 
     const saveMutation = useMutation({
-        mutationFn: (values: RoleSaveRequest) => (values.id ? updateRole(values) : addRole(values)),
+        mutationFn: (values: RoleSaveRequest) =>
+            values.id ? changeRoleInfo(values) : addRole(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingRole(null);
@@ -173,7 +174,7 @@ export const RolePage = () => {
     });
 
     const statusMutation = useMutation({
-        mutationFn: updateRoleStatus,
+        mutationFn: changeRoleStatus,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });

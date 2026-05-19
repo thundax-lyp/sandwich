@@ -28,9 +28,9 @@ import {
     removeUsers,
     listUserDepartments,
     pageUsers,
-    updateUser,
+    changeUserInfo,
     uploadUserAvatar,
-    updateUserStatus
+    changeUserStatus
 } from "./user-service";
 import type {
     CreateUserForm,
@@ -308,7 +308,7 @@ export const UserPage = () => {
     };
 
     const statusMutation = useMutation({
-        mutationFn: updateUserStatus,
+        mutationFn: changeUserStatus,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await invalidateUserPage();
@@ -349,7 +349,7 @@ export const UserPage = () => {
         }
     });
     const updateMutation = useMutation({
-        mutationFn: updateUser,
+        mutationFn: changeUserInfo,
         onSuccess: async (savedUser) => {
             setActiveUser(savedUser);
             await invalidateUserPage();

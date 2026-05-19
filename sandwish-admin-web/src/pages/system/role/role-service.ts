@@ -59,13 +59,13 @@ export const addRole = (request: RoleSaveRequest) => {
     });
 };
 
-export const updateRole = (request: RoleSaveRequest) => {
+export const changeRoleInfo = (request: RoleSaveRequest) => {
     return postJson<RoleResponse, RoleSaveRequest>("/sys/role/update", {
         body: request
     });
 };
 
-export const updateRoleStatus = (request: RoleStatusRequest[]) => {
+export const changeRoleStatus = (request: RoleStatusRequest[]) => {
     return postJson<boolean, RoleStatusRequest[]>("/sys/role/enable", {
         body: request
     });

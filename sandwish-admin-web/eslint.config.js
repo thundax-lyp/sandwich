@@ -14,7 +14,6 @@ const SERVICE_METHOD_VERBS = [
     "get",
     "add",
     "create",
-    "update",
     "remove",
     "change",
     "sort",
@@ -46,6 +45,38 @@ const localRules = {
                                 node,
                                 message:
                                     "ADMIN_WEB_NAME_FILE_KEBAB_CASE: frontend source file names must use kebab-case."
+                            });
+                        }
+                    }
+                };
+            }
+        },
+        "e2e-spec-file-path": {
+            create(context) {
+                return {
+                    Program(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+
+                        if (
+                            !normalizedFilePath.includes("/e2e/") ||
+                            !normalizedFilePath.endsWith(".spec.ts")
+                        ) {
+                            return;
+                        }
+
+                        const isLayoutSpec = /\/e2e\/layout\/[^/]+\.spec\.ts$/.test(
+                            normalizedFilePath
+                        );
+                        const isPageSpec = /\/e2e\/[^/]+\/([^/]+)\/\1\.spec\.ts$/.test(
+                            normalizedFilePath
+                        );
+
+                        if (!isLayoutSpec && !isPageSpec) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_PATH_E2E_PAGE_SPEC / ADMIN_WEB_PATH_E2E_LAYOUT_SPEC: e2e specs must live in e2e/<module>/<domain>/<domain>.spec.ts or e2e/layout/*.spec.ts."
                             });
                         }
                     }
@@ -222,6 +253,10 @@ const frontendRestrictedSyntax = [
         selector: "FunctionDeclaration",
         message:
             "ADMIN_WEB_NAME_FUNCTION_ARROW: use arrow functions by default for frontend methods."
+    },
+    {
+        selector: "ConditionalExpression > ConditionalExpression",
+        message: "ADMIN_WEB_NAME_NO_NESTED_TERNARY: nested ternary expressions are forbidden."
     }
 ];
 
@@ -301,6 +336,7 @@ export default tseslint.config(
                     ]
                 }
             ],
+            "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
             "local/page-component-single-export": "error",
             "local/page-style-file": "error",

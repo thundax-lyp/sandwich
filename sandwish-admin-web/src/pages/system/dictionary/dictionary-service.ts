@@ -37,7 +37,7 @@ export const addDictionary = (request: DictSaveRequest) => {
     });
 };
 
-export const updateDictionary = (request: DictSaveRequest) => {
+export const changeDictionaryInfo = (request: DictSaveRequest) => {
     return postJson<DictResponse, DictSaveRequest>("/sys/dict/update", {
         body: request
     });

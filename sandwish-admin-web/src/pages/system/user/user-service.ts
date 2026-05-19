@@ -45,19 +45,6 @@ export interface UserStatusRequest {
     enable?: boolean | null;
 }
 
-export interface CreateUserForm {
-    loginName: string;
-    loginPass: string;
-    name: string;
-    email?: string | null;
-    mobile?: string | null;
-    departmentId?: string | null;
-    roleIds: string[];
-    ranks: number;
-    admin: boolean;
-    enable: boolean;
-}
-
 export interface UserSaveRequest {
     id?: string | null;
     remarks?: string | null;

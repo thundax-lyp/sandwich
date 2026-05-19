@@ -33,12 +33,12 @@ import {
     changeUserStatus
 } from "./user-service";
 import type {
-    CreateUserForm,
     UserDepartmentResponse,
     UserPageRequest,
     UserResponse,
     UserSaveRequest
 } from "./user-service";
+import type { UserFormValues } from "./user-types";
 import "./user-page.css";
 
 const { Text } = Typography;
@@ -362,7 +362,7 @@ export const UserPage = () => {
         }
     });
     const createMutation = useMutation({
-        mutationFn: async (form: CreateUserForm) => {
+        mutationFn: async (form: UserFormValues) => {
             const loginForm = await createLoginForm();
             const encryptedPassword = sm2.doEncrypt(form.loginPass, loginForm.publicKey, 0);
             return createUser(
@@ -461,7 +461,7 @@ export const UserPage = () => {
         setUserEditorOpen(true);
     };
 
-    const toUserSaveRequest = (user: UserResponse, form: CreateUserForm): UserSaveRequest => ({
+    const toUserSaveRequest = (user: UserResponse, form: UserFormValues): UserSaveRequest => ({
         id: user.id,
         remarks: user.remarks,
         loginName: normalizeSearch(form.loginName),
@@ -476,7 +476,7 @@ export const UserPage = () => {
     });
 
     const toCreateUserSaveRequest = (
-        form: CreateUserForm,
+        form: UserFormValues,
         encryptedPassword: string,
         token: string
     ): UserSaveRequest => ({
@@ -493,7 +493,7 @@ export const UserPage = () => {
         roles: form.roleIds.map((roleId) => ({ id: roleId }))
     });
 
-    const saveCreatingUser = (form: CreateUserForm) => {
+    const saveCreatingUser = (form: UserFormValues) => {
         if (!normalizeSearch(form.loginName)) {
             messageApi.error("请填写登录名");
             return;
@@ -513,7 +513,7 @@ export const UserPage = () => {
         createMutation.mutate(form);
     };
 
-    const saveEditingUser = (form: CreateUserForm) => {
+    const saveEditingUser = (form: UserFormValues) => {
         if (!activeUser) {
             return;
         }

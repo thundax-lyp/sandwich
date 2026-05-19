@@ -86,6 +86,7 @@
 - `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：前端代码禁止使用嵌套三元表达式。
 - `ADMIN_WEB_NAME_CAMEL_CASE`：普通方法和变量使用 camelCase；React 组件使用 PascalCase；常量使用 UPPER_SNAKE_CASE。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法使用动词开头，表达 API 行为；允许的动词前缀固定为 `page`、`list`、`get`、`add`、`create`、`change`、`remove`、`sort`、`move`、`upload`、`download`、`reset`、`login`、`logout`、`refresh`、`load`、`save`；页面域主资源方法可以省略领域名，例如 `page`、`add`、`changeInfo`、`removeBatch`；非主资源或补充资源方法必须带对象名，例如 `listTypes`、`changePassword`、`uploadAvatar`。
+- `ADMIN_WEB_NAME_SERVICE_API_TYPE`：`*-service.ts` 导出的 TypeScript interface 必须使用后端 API 契约语义命名，并以 `Request` 或 `Response` 结尾。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀，例如 `canEditDictionary`。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 命名只用于 `src/components/` 下的项目自有通用 UI 技术组件定义。
@@ -125,8 +126,6 @@
 ### Naming
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
-- TypeScript interface 请求类型命名优先沿用后端模型语义，例如 `DictPageRequest`、`DictSaveRequest`。
-- TypeScript interface 响应类型命名优先沿用后端模型语义，例如 `DictResponse`。
 - 页面内部展示用类型可使用 `XxxViewModel`、`XxxTableRecord` 或 `XxxFormValues`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 - 权限判断变量使用 `canXxx`。

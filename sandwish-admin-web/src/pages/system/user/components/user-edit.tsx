@@ -4,11 +4,11 @@ import { Button, Input, Select, Switch, Upload } from "antd";
 import { useMemo, useState } from "react";
 import {
     listUserRoles,
-    type CreateUserForm,
     type UserDepartmentResponse,
     type UserRoleResponse,
     type UserResponse
 } from "../user-service";
+import type { UserFormValues } from "../user-types";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { CurrentUserInfoResponse } from "@/service/current-user-service";
 import { UserAvatar } from "./user-avatar";
@@ -22,8 +22,8 @@ interface UserEditProps {
     departments?: UserDepartmentResponse[];
     saving?: boolean;
     onClose: () => void;
-    onSave?: (form: CreateUserForm) => void;
-    onCreate?: (form: CreateUserForm) => void;
+    onSave?: (form: UserFormValues) => void;
+    onCreate?: (form: UserFormValues) => void;
     onAvatarUpload?: (file: File) => Promise<unknown> | void;
 }
 
@@ -31,7 +31,7 @@ const readRoleIds = (roles?: UserRoleResponse[] | null) => {
     return (roles || []).map((role) => role.id);
 };
 
-const readUserForm = (user: UserResponse): CreateUserForm => ({
+const readUserForm = (user: UserResponse): UserFormValues => ({
     loginName: user.loginName || "",
     loginPass: "",
     name: user.name || "",
@@ -74,7 +74,7 @@ const departmentOptions = (departments: UserDepartmentResponse[]) => {
 
 const EMPTY_USER_ROLES: UserRoleResponse[] = [];
 
-const DEFAULT_CREATE_USER_FORM: CreateUserForm = {
+const DEFAULT_CREATE_USER_FORM: UserFormValues = {
     loginName: "",
     loginPass: "",
     name: "",
@@ -105,7 +105,7 @@ export const UserEdit = ({
     const visible = Boolean(open);
     const creating = visible && !editing;
     const editableMaxRank = currentUser ? maxCreatableRank(currentUser) : (user?.ranks ?? 0);
-    const [createForm, setCreateForm] = useState<CreateUserForm>(() => {
+    const [createForm, setCreateForm] = useState<UserFormValues>(() => {
         const initialForm =
             user && editing
                 ? readUserForm(user)
@@ -118,7 +118,7 @@ export const UserEdit = ({
             ? { ...initialForm, ranks: editableMaxRank }
             : initialForm;
     });
-    const updateForm = (values: Partial<CreateUserForm>) => {
+    const updateForm = (values: Partial<UserFormValues>) => {
         setCreateForm((currentForm) => ({ ...currentForm, ...values }));
     };
     const userRoleQuery = useQuery({

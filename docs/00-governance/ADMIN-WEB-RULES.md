@@ -118,7 +118,6 @@
 - `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
 - `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
-- `ListPage` 只承载列表页通用编排，查询条件、表格数据、批量动作和弹窗状态由业务页面拥有。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。
 
 ### Naming

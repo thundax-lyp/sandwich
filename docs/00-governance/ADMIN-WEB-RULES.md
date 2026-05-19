@@ -63,7 +63,7 @@
 
 - `ADMIN_WEB_LAYER_FETCH_ONLY_HTTP`：`sandwish-admin-web/src` 下只有 `src/api/http.ts` 可以直接调用 `fetch`。
 - `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` 和 `postFormData` 只允许在 `*-service.ts` 中导入和调用。
-- `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE_SERVICE`：`src/components/` 下的共享组件不得导入页面目录中的 `*-service.ts`。
+- `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE`：`src/components/` 下的共享组件不得导入 `src/pages/`。
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不得导入 `src/pages/`、`src/layouts/` 或 `src/components/`。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不得导入 `src/pages/`、`src/layouts/` 或页面 service。
 - `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`sandwish-admin-web/src` 下不得使用 `../../` 或更深层级的相对 import；同目录和父级目录引用可以使用 `./` 或 `../`，跨越两层及以上目录时使用 `@/` alias。
@@ -117,7 +117,6 @@
 - 页面应优先复用项目已有共享组件和页面骨架。
 - `@/` alias 固定指向 `sandwish-admin-web/src/`；跨根目录引用使用 `@/`。
 - `src/router/` 不直接发起业务 API 请求；路由保护读取登录态和渲染路由组件。
-- 共享组件不得依赖具体页面 service、路由路径、权限字符串或业务页面状态。
 - `Sandwish*` 通用技术组件不承载业务语义，不引用业务 CSS token。
 - `ListPage` 只承载列表页通用编排，查询条件、表格数据、批量动作和弹窗状态由业务页面拥有。
 - 页面内部可以使用 `useQuery` / `useMutation` 编排请求，但请求函数应来自 service。

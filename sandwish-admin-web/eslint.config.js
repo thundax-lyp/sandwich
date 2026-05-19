@@ -388,9 +388,9 @@ export default tseslint.config(
                     rules: [
                         {
                             from: { type: "shared-component" },
-                            disallow: { to: { type: "page-service" } },
+                            disallow: { to: { type: ["page", "page-component", "page-service"] } },
                             message:
-                                "ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE_SERVICE: shared components must not import page services."
+                                "ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE: shared components must not import pages."
                         },
                         {
                             from: { type: "api" },

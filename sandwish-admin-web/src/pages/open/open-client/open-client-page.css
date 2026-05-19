@@ -1,7 +1,3 @@
-.open-client-page .sandwish-page-description {
-    max-width: 720px;
-}
-
 .open-client-filter-form {
     display: grid;
     grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) auto auto;

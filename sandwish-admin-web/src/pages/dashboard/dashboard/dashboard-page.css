@@ -4,6 +4,10 @@
     min-width: 0;
 }
 
+.dashboard-page {
+    --sandwish-page-header-margin-bottom: 22px;
+}
+
 .dashboard-brand {
     display: inline-flex;
     white-space: nowrap;
@@ -14,10 +18,6 @@
     background: linear-gradient(90deg, var(--accent-violet), #f06bbf 48%, var(--accent-orange));
     background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-.dashboard-page .sandwish-page-header {
-    margin-bottom: 22px;
 }
 
 .dashboard-metrics {
@@ -264,8 +264,8 @@
         gap: 18px;
     }
 
-    .dashboard-page .sandwish-page-header {
-        margin-bottom: 18px;
+    .dashboard-page {
+        --sandwish-page-header-margin-bottom: 18px;
     }
 
     .dashboard-brand {

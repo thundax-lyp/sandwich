@@ -65,11 +65,14 @@
 - `ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY`：`postJson` / `postFormData` 只在 `*-service.ts` 使用。
 - `ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE`：`queryFn` / `mutationFn` 只调用 service 方法。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_NO_PAGE`：`src/components/` 不导入 `src/pages/`。
+- `ADMIN_WEB_LAYER_SHARED_SERVICE_TYPES_ONLY`：`src/service/*-service.ts` 不导入页面目录；共享业务类型只从 `*-types.ts` 引用。
+- `ADMIN_WEB_LAYER_COMPONENT_INDEX_EXPORT_ONLY`：`src/components/**/index.ts` 只包含 export 声明。
 - `ADMIN_WEB_LAYER_API_NO_PAGE`：`src/api/` 不导入页面、布局或组件。
 - `ADMIN_WEB_LAYER_AUTH_NO_PAGE`：`src/auth/` 不导入页面、布局或页面 service。
 - `ADMIN_WEB_LAYER_NO_DEEP_RELATIVE_IMPORT`：`src` 下禁止 `../../` 及更深相对 import。
 - `ADMIN_WEB_LAYER_PAGE_NO_PARENT_RELATIVE_IMPORT`：页面文件禁止 `../` import。
 - `ADMIN_WEB_LAYER_PAGE_COMPONENT_NO_EXTERNAL_PAGE`：页面私有组件不引用其他页面域。
+- `ADMIN_WEB_LAYER_PAGE_NO_EXTERNAL_SERVICE`：页面域代码不导入其他页面域的 service。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL`：共享组件禁止 `../*.css` import。
 
 ### Naming
@@ -93,6 +96,7 @@
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。
 - `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面 `className` 使用页面域前缀；共享组件 class 使用 `sandwish-`。
+- `ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION`：组件域 CSS class 只定义在对应组件 CSS 文件中。
 
 ### Placement
 
@@ -122,14 +126,6 @@
 
 ### Placement
 
-- `src/service/` 中的共享 service 不依赖页面组件、页面状态或页面目录中的类型。
-- 跨页面、跨布局或跨路由共享的 service 放在 `src/service/`。
-- 项目自有通用 UI 技术组件放在 `src/components/<component-name>/index.ts` 目录入口下，目录名使用 `sandwish-*` 前缀，组件名和样式名使用 `Sandwish` / `sandwish` 前缀。
-- `index.ts` 只作为组件目录的 public API，负责导出允许外部使用的组件、类型和常量；包含 JSX 的实现放在同目录的 kebab-case `.tsx` 文件中。
-- 通用 UI 技术组件的样式与组件同目录放置，例如 `sandwish-table/sandwish-table.css`；组件样式不放入 `src/assets/main.css`。
-- 通用 UI 技术组件的内部子组件、私有 helper 和私有类型留在该组件目录下；只有跨组件复用时才提升到更高层级。
-- 类型被多个页面域复用时，提升到 `src/service/` 对应共享 service 或新增明确边界的共享 types 文件。
-- `src/assets/main.css` 只承载全局 token、布局基线和真正跨页面共享的样式，不承载具体业务页面样式。
 - 路由、登录态、权限、请求 hook、布局行为和关键页面加载行为优先覆盖在 `src/app.test.tsx`。
 - 页面交互复杂度明显上升时，可以新增同目录或测试目录下的聚焦测试。
 

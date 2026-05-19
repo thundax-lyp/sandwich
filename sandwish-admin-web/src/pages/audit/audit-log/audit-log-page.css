@@ -1,7 +1,3 @@
-.audit-log-page .sandwish-page-description {
-    max-width: 720px;
-}
-
 .audit-log-filter-form {
     display: grid;
     grid-template-columns: repeat(3, minmax(160px, 1fr)) auto auto;

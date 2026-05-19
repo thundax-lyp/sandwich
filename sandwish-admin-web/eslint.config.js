@@ -439,6 +439,61 @@ const localRules = {
                 };
             }
         },
+        "page-no-external-service": {
+            create(context) {
+                const readPageDomainRoot = (normalizedFilePath) => {
+                    const match = normalizedFilePath.match(/\/src\/pages\/[^/]+\/[^/]+\//);
+                    return match?.[0];
+                };
+
+                const resolveImportPath = (filePath, importPath) => {
+                    if (importPath.startsWith("@/")) {
+                        return `/src/${importPath.slice(2)}`;
+                    }
+                    if (!importPath.startsWith(".")) {
+                        return importPath;
+                    }
+                    return path
+                        .resolve(path.dirname(filePath), importPath)
+                        .split(path.sep)
+                        .join("/");
+                };
+
+                return {
+                    ImportDeclaration(node) {
+                        const filePath = context.physicalFilename;
+                        const normalizedFilePath = filePath.split(path.sep).join("/");
+                        const importPath = node.source.value;
+                        const pageDomainRoot = readPageDomainRoot(normalizedFilePath);
+
+                        if (
+                            !pageDomainRoot ||
+                            typeof importPath !== "string" ||
+                            !normalizedFilePath.includes("/src/pages/")
+                        ) {
+                            return;
+                        }
+
+                        const resolvedImportPath = resolveImportPath(filePath, importPath);
+                        const normalizedPageDomainRoot = readPageDomainRoot(resolvedImportPath);
+                        if (
+                            !resolvedImportPath.includes("/src/pages/") ||
+                            !resolvedImportPath.endsWith("-service")
+                        ) {
+                            return;
+                        }
+
+                        if (normalizedPageDomainRoot !== pageDomainRoot) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_LAYER_PAGE_NO_EXTERNAL_SERVICE: page domains must not import services from other page domains."
+                            });
+                        }
+                    }
+                };
+            }
+        },
         "page-component-single-export": {
             create(context) {
                 const isPascalCase = (name) => /^[A-Z][A-Za-z0-9]*$/.test(name);
@@ -542,6 +597,100 @@ const localRules = {
                             node,
                             message:
                                 "ADMIN_WEB_LAYER_POST_HELPER_SERVICE_ONLY / ADMIN_WEB_LAYER_QUERY_FN_FROM_SERVICE: postJson and postFormData may only be imported by *-service.ts files."
+                        });
+                    }
+                };
+            }
+        },
+        "shared-service-types-only": {
+            create(context) {
+                const isSharedServiceFile = () => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    return /\/src\/service\/[^/]+-service\.ts$/.test(normalizedFilePath);
+                };
+
+                const isAllowedSharedTypeImport = (importPath) => {
+                    return /(?:^|\/)[^/]+-types$/.test(importPath);
+                };
+
+                const isSharedServiceInternalImport = (resolvedImportPath) => {
+                    return resolvedImportPath.includes("/src/service/");
+                };
+
+                const resolveImportPath = (importPath) => {
+                    if (!importPath.startsWith(".")) {
+                        return importPath;
+                    }
+                    return path
+                        .resolve(path.dirname(context.physicalFilename), importPath)
+                        .split(path.sep)
+                        .join("/");
+                };
+
+                return {
+                    ImportDeclaration(node) {
+                        if (!isSharedServiceFile() || typeof node.source.value !== "string") {
+                            return;
+                        }
+
+                        const importPath = node.source.value;
+                        const resolvedImportPath = resolveImportPath(importPath);
+                        if (
+                            importPath.startsWith("@/pages/") ||
+                            resolvedImportPath.includes("/src/pages/")
+                        ) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_LAYER_SHARED_SERVICE_TYPES_ONLY: shared services must not import page files."
+                            });
+                            return;
+                        }
+
+                        if (
+                            (importPath.startsWith("@/service/") ||
+                                isSharedServiceInternalImport(resolvedImportPath)) &&
+                            !/(?:^|\/)[^/]+-service$/.test(importPath) &&
+                            !/(?:^|\/)[^/]+-service$/.test(resolvedImportPath) &&
+                            !isAllowedSharedTypeImport(importPath)
+                        ) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_LAYER_SHARED_SERVICE_TYPES_ONLY: shared service types must be imported from *-types.ts boundaries."
+                            });
+                        }
+                    }
+                };
+            }
+        },
+        "component-index-export-only": {
+            create(context) {
+                return {
+                    Program(node) {
+                        const normalizedFilePath = context.physicalFilename
+                            .split(path.sep)
+                            .join("/");
+                        if (
+                            !normalizedFilePath.includes("/src/components/") ||
+                            !normalizedFilePath.endsWith("/index.ts")
+                        ) {
+                            return;
+                        }
+
+                        node.body.forEach((statement) => {
+                            if (
+                                statement.type === "ExportNamedDeclaration" ||
+                                statement.type === "ExportAllDeclaration"
+                            ) {
+                                return;
+                            }
+
+                            context.report({
+                                node: statement,
+                                message:
+                                    "ADMIN_WEB_LAYER_COMPONENT_INDEX_EXPORT_ONLY: component index.ts files may contain export declarations only."
+                            });
                         });
                     }
                 };
@@ -789,6 +938,7 @@ export default tseslint.config(
                     ]
                 }
             ],
+            "local/component-index-export-only": "error",
             "local/business-data-type-location": "error",
             "local/api-contract-type-location": "error",
             "local/e2e-spec-file-path": "error",
@@ -796,12 +946,14 @@ export default tseslint.config(
             "local/page-component-no-external-page": "error",
             "local/page-component-single-export": "error",
             "local/page-class-name-prefix": "error",
+            "local/page-no-external-service": "error",
             "local/page-no-parent-relative-import": "error",
             "local/page-style-file": "error",
             "local/post-helper-service-only": "error",
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
             "local/service-input-type-location": "error",
+            "local/shared-service-types-only": "error",
             "local/shared-component-css-local": "error",
             "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [

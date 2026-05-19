@@ -79,9 +79,9 @@ html[data-theme="dark"] .user-page {
     color: var(--user-copy);
 }
 
-.user-page .sandwish-page-panel {
-    overflow: visible;
-    padding-bottom: 0;
+.user-page {
+    --sandwish-page-panel-overflow: visible;
+    --sandwish-page-panel-padding: 20px 22px 0;
 }
 
 .user-page .list-page-table-aside {

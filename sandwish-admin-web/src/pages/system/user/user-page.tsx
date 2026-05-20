@@ -1,10 +1,8 @@
 import {
     ApartmentOutlined,
     DeleteOutlined,
-    PlusOutlined,
     PoweroffOutlined,
-    ReloadOutlined,
-    SearchOutlined
+    ReloadOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Input, Select, Space, Tree, Typography } from "antd";
@@ -673,17 +671,20 @@ export const UserPage = () => {
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
                 subjectName="用户"
+                enableAdd={canEditUser}
+                addText="新增"
                 enableFilter
                 enableSearch
                 searchShortcut="⌘K"
                 searchValue={searchText}
                 onSearchChange={searchUsers}
+                onAdd={openCreateUser}
                 filterActive={hasActiveFilters}
-                filterClassName="user-filter-panel"
-                filter={() => (
-                    <div className="user-filter-form">
-                        <label>
-                            <span>登录名</span>
+                filterFields={[
+                    {
+                        name: "loginName",
+                        label: "登录名",
+                        render: () => (
                             <Input
                                 allowClear
                                 placeholder="developer"
@@ -695,9 +696,12 @@ export const UserPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <label>
-                            <span>状态</span>
+                        )
+                    },
+                    {
+                        name: "enable",
+                        label: "状态",
+                        render: () => (
                             <Select<UserFilterStatus>
                                 value={filters.enable}
                                 options={[
@@ -715,40 +719,22 @@ export const UserPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="user-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={applyFilters}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
-                    <Space wrap>
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            disabled={!canEditUser}
-                            onClick={openCreateUser}
-                        >
-                            新增用户
-                        </Button>
-                        <Button
-                            icon={<ReloadOutlined />}
-                            loading={userQuery.isFetching || departmentQuery.isFetching}
-                            onClick={() => {
-                                userQuery.refetch();
-                                departmentQuery.refetch();
-                            }}
-                        >
-                            刷新
-                        </Button>
-                    </Space>
+                    <Button
+                        icon={<ReloadOutlined />}
+                        loading={userQuery.isFetching || departmentQuery.isFetching}
+                        onClick={() => {
+                            userQuery.refetch();
+                            departmentQuery.refetch();
+                        }}
+                    >
+                        刷新
+                    </Button>
                 }
                 batchClassName="user-table-toolbar"
                 selectedCount={selectedRowKeys.length}

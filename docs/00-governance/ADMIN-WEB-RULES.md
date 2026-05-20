@@ -155,6 +155,7 @@
 ### Naming
 
 - 前端自有按钮、菜单项和确认弹窗文案应表达具体动作，例如 `重置密码`、`移除头像`、`刷新密钥`；避免只写 `操作`、`变更状态`、`处理`。
+- 搜索框 placeholder 应表达可搜索对象，避免只写 `搜索` 或 `请输入`。
 - 页面状态变量命名贴近 UI 含义，例如 `query`、`selectedRowKeys`、`editingDictionary`。
 
 ### Placement
@@ -171,10 +172,10 @@
 ```text
 Page
   PageHeader
-  FilterBar
+  SearchAndFilter
   Toolbar
   Content
-  Pagination
+  Footer
 ```
 
 禁止：
@@ -205,36 +206,6 @@ Right:
 - 更多操作收敛到下拉菜单。
 - 列表页优先使用 `SandwishListPage` 组织右侧操作；页面不要绕过骨架塞入多个主操作。
 
-#### FilterBar
-
-`FilterBar` 必须位于 `DataTable` 上方。
-
-列表页默认展示模糊搜索；筛选面板只承载结构化筛选，不重复展示模糊查询。
-
-页面通过 `SandwishListPage` 的 `filterFields` 声明结构化筛选字段；页面不自绘筛选面板布局和固定按钮。
-
-搜索框 placeholder 必须表达可搜索对象。
-
-禁止：
-
-```text
-搜索
-请输入
-```
-
-推荐：
-
-```text
-搜索用户名 / 手机号
-搜索订单号 / 客户名称
-```
-
-行为规则：
-
-- 回车触发搜索。
-- 重置恢复默认筛选状态。
-- 输入即搜索时必须 debounce `300-500ms`。
-
 #### Toolbar
 
 `Toolbar` 默认结构：
@@ -255,15 +226,6 @@ Right:
 - 批量删除必须放在最后。
 
 #### DataTable
-
-列表页默认结构：
-
-```text
-FilterBar
-Toolbar
-DataTable
-Pagination
-```
 
 表格列默认顺序：
 
@@ -300,17 +262,6 @@ Actions
 - 要求二次确认。
 
 页面只判断操作语义、顺序、危险级别和是否需要复杂 `render`；展示数量、分隔线、列宽、固定列、移动端下拉和排序拖动入口交给 `SandwishTable`。
-
-#### Pagination
-
-分页默认位于页面或表格区域右下角。
-
-分页默认页大小固定为 `20`，可选页大小固定为 `10 / 20 / 50 / 100`。
-
-以下场景页码必须重置为 `1`：
-
-- 筛选条件变化。
-- 每页条数变化。
 
 #### Form
 

@@ -42,6 +42,8 @@
 - `Hard Rules`：必须可由 ESLint、TypeScript、测试或架构脚本稳定门禁。
 - `Review Rules`：由 AI 或人工审阅执行，暂不强制门禁。
 
+同一条规则只归入一个层级。已由 `Hard Rules` 稳定门禁的内容不得在 `Review Rules` 中重复表述；当 `Review Rules` 被沉淀为门禁后，必须从 `Review Rules` 删除或改写为未被门禁覆盖的语义审阅点。
+
 新增规则应先归入以下主题之一：
 
 - `Architecture`
@@ -504,12 +506,8 @@ JPG / PNG
 
 ### Service
 
-- API 内部契约类型使用 `XxxRequest` / `XxxResponse` 命名，只存在于 `*-service.ts` 内部，不作为页面、布局或组件直接依赖的公开类型。
-- service 对页面暴露的业务数据类型使用 `XxxRecord`；树、层级、菜单、部门等结构使用 `XxxNode`。
-- 页面传给 service 的查询参数使用 `XxxQuery`，例如分页、筛选和搜索条件。
-- 页面传给 service 的业务动作参数使用 `XxxCommand`，例如创建、保存、变更、批量移除等动作。
-- service 简单动作可以使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
-- service 方法内部负责把 `XxxQuery` / `XxxCommand` 转成 `XxxRequest`，并把 `XxxResponse` 转成 `XxxRecord` / `XxxNode` 后返回。
+- service 方法内部固定完成 API 契约到页面业务类型的转换；页面、布局和组件不处理后端 `XxxRequest` / `XxxResponse` 字段兼容。
+- service 简单动作固定使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
 
 ### Permission
 
@@ -610,4 +608,3 @@ test("delete requires confirmation", async ({ page }) => {
 - 是否把导出默认范围固定为当前筛选结果。
 - 是否为大数据量导出引入任务中心或等价异步任务反馈机制。
 - Playwright 默认覆盖重点是否包含上传、导入 / 导出和核心业务流程。
-- 是否在完成 service 类型分层迁移后，将 `XxxRequest` / `XxxResponse` 不导出、页面不得导入 API 契约类型沉淀为 ESLint hard rule。

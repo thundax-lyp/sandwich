@@ -262,10 +262,6 @@ html[data-theme="dark"] .sandwish-table {
     margin-left: -1px;
 }
 
-.sandwish-table-row-action-more {
-    display: none;
-}
-
 .sandwish-table-row-drop-before > td,
 .sandwish-table-row-drop-after > td {
     background: color-mix(in srgb, var(--sandwish-table-primary) 4%, transparent) !important;
@@ -286,9 +282,5 @@ html[data-theme="dark"] .sandwish-table {
 @media (max-width: 760px) {
     .sandwish-table-row-actions-inline {
         display: none;
-    }
-
-    .sandwish-table-row-action-more {
-        display: inline-grid;
     }
 }

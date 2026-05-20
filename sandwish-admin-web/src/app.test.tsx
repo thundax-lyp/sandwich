@@ -596,7 +596,7 @@ describe("App", () => {
         expect(await screen.findByRole("heading", { name: "提交内容" })).toBeInTheDocument();
         expect(await screen.findByText("产品反馈")).toBeInTheDocument();
         expect(screen.getByText("希望支持图片列表")).toBeInTheDocument();
-        expect(screen.getByText("已提交")).toBeInTheDocument();
+        expect(screen.getAllByText("已提交").length).toBeGreaterThan(0);
         expect(screen.getByRole("button", { name: /新增提交/ })).toBeInTheDocument();
         expect(globalThis.fetch).toHaveBeenCalledWith(
             "/admin-api/api/submission/submission/page",

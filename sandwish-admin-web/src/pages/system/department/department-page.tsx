@@ -284,7 +284,6 @@ export const DepartmentPage = () => {
         },
         {
             key: "actions",
-            inlineLimit: 6,
             options: (department) => [
                 {
                     key: "promote",

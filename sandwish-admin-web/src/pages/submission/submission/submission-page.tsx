@@ -335,7 +335,6 @@ export const SubmissionPage = () => {
         },
         {
             key: "actions",
-            inlineLimit: 1,
             options: (submission) => [
                 {
                     key: "view",

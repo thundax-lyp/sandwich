@@ -15,11 +15,11 @@ const DEFAULT_ACTION_COLUMN_KEY = "actions";
 const DEFAULT_ACTION_COLUMN_WIDTH = 116;
 const DEFAULT_ACTION_COLUMN_MOBILE_WIDTH = 54;
 const DEFAULT_SORT_COLUMN_KEY = "__sandwish_sort";
-const DEFAULT_SORT_COLUMN_WIDTH = 36;
+const DEFAULT_SORT_COLUMN_WIDTH = 28;
 const ACTION_BUTTON_WIDTH = 24;
 const ACTION_CELL_PADDING = 28;
 const ACTION_DIVIDER_WIDTH = 5;
-const ACTION_INLINE_LIMIT = 2;
+const ACTION_INLINE_LIMIT = 4;
 const ACTION_TEXT_BASE_WIDTH = 10;
 const ACTION_TEXT_CHAR_WIDTH = 14;
 const DEFAULT_MIN_COLUMN_WIDTH = 96;
@@ -413,32 +413,32 @@ export const SandwishTable = <RecordType extends object = object>({
                                 </Button>
                             )
                         )}
-                        {overflowActions.length > 0 ? (
-                            <Dropdown
-                                menu={{
-                                    items: menuItems,
-                                    onClick: ({ key }) => {
-                                        const action = overflowActions.find(
-                                            (item) =>
-                                                !isActionDivider(item) &&
-                                                String(item.key) === String(key)
-                                        );
-                                        if (action && !isActionDivider(action)) {
-                                            action.onClick(record);
-                                        }
-                                    }
-                                }}
-                                trigger={["click"]}
-                            >
-                                <Button
-                                    aria-label="展开行操作"
-                                    className="sandwish-table-row-action"
-                                    icon={<MoreOutlined />}
-                                    type="text"
-                                />
-                            </Dropdown>
-                        ) : null}
                     </span>
+                    {overflowActions.length > 0 ? (
+                        <Dropdown
+                            menu={{
+                                items: menuItems,
+                                onClick: ({ key }) => {
+                                    const action = overflowActions.find(
+                                        (item) =>
+                                            !isActionDivider(item) &&
+                                            String(item.key) === String(key)
+                                    );
+                                    if (action && !isActionDivider(action)) {
+                                        action.onClick(record);
+                                    }
+                                }
+                            }}
+                            trigger={["click"]}
+                        >
+                            <Button
+                                aria-label="展开行操作"
+                                className="sandwish-table-row-action sandwish-table-row-action-more"
+                                icon={<MoreOutlined />}
+                                type="text"
+                            />
+                        </Dropdown>
+                    ) : null}
                 </div>
             );
         },

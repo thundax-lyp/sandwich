@@ -11,7 +11,7 @@
 }
 
 .sandwish-filter-panel-open {
-    max-height: 420px;
+    max-height: var(--sandwish-filter-panel-open-max-height, 720px);
     margin: var(--sandwish-filter-panel-open-margin, 0 0 10px);
     padding: 12px;
     background: color-mix(in srgb, var(--surface-panel) 82%, var(--surface-soft));
@@ -58,10 +58,6 @@
     gap: 10px;
     align-items: center;
     height: 32px;
-}
-
-.sandwish-filter-panel-action-field {
-    margin-left: auto;
 }
 
 .sandwish-filter-panel-actions .ant-btn {

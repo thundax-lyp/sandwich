@@ -150,12 +150,12 @@ export const SandwishListPage = <RecordType extends object = object>({
                     {filterText}
                 </Button>
             ) : null}
+            {resolvedPageActions}
             {enableAdd && resolvedAddText ? (
                 <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
                     {resolvedAddText}
                 </Button>
             ) : null}
-            {resolvedPageActions}
         </Space>
     );
 

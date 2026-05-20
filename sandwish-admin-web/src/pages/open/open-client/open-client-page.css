@@ -1,21 +1,3 @@
-.open-client-filter-form {
-    display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(150px, 180px) auto auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.open-client-filter-form label {
-    display: grid;
-    gap: 6px;
-    color: var(--sandwish-color-text-secondary);
-    font-size: 12px;
-}
-
-.open-client-filter-search {
-    min-width: 96px;
-}
-
 .open-client-name-cell,
 .open-client-secret-field {
     display: grid;
@@ -141,10 +123,4 @@
 .open-client-secret-copy.ant-btn:focus-visible {
     color: var(--accent-blue);
     background: var(--accent-blue-soft);
-}
-
-@media (max-width: 900px) {
-    .open-client-filter-form {
-        grid-template-columns: 1fr;
-    }
 }

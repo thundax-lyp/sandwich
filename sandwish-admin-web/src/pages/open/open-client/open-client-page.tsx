@@ -1,6 +1,6 @@
-import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Select, Space, Typography } from "antd";
+import { App, Button, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { SandwishListPage } from "@/components/sandwish-list-page";
@@ -203,6 +203,12 @@ export const OpenClientPage = () => {
         });
     };
 
+    const applyFilters = () => {
+        updateQuery({
+            status: readStatusFilterValue(filters.status)
+        });
+    };
+
     const openCreateEditor = () => {
         setEditingClient(null);
         setEditorOpen(true);
@@ -339,42 +345,21 @@ export const OpenClientPage = () => {
                 onSearchChange={searchOpenClients}
                 enableFilter
                 filterActive={hasActiveFilters}
-                filter={({ closeFilter }) => (
-                    <div className="open-client-filter-form">
-                        <label>
-                            客户端名称
-                            <Input
-                                allowClear
-                                placeholder="第三方主体"
-                                value={searchText}
-                                onChange={(event) => setSearchText(event.target.value)}
-                            />
-                        </label>
-                        <label>
-                            状态
+                filterFields={[
+                    {
+                        name: "status",
+                        label: "状态",
+                        render: () => (
                             <Select
                                 value={filters.status}
                                 options={[{ value: "ALL", label: "全部" }, ...statusOptions]}
                                 onChange={(status) => setFilters({ status })}
                             />
-                        </label>
-                        <Button
-                            className="open-client-filter-search"
-                            icon={<SearchOutlined />}
-                            type="primary"
-                            onClick={() => {
-                                updateQuery({
-                                    name: normalizeText(searchText),
-                                    status: readStatusFilterValue(filters.status)
-                                });
-                                closeFilter();
-                            }}
-                        >
-                            查询
-                        </Button>
-                        <Button onClick={resetFilters}>重置</Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 enableAdd={canEditOpenClient}
                 addText="新增客户端"
                 onAdd={openCreateEditor}

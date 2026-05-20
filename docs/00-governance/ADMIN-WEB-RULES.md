@@ -47,10 +47,11 @@
 新增规则应先归入以下主题之一：
 
 - `Architecture`
-- `Naming`
 - `Placement`
-- `UI`
+- `Naming`
 - `Service`
+- `Code Quality`
+- `UI`
 - `State`
 - `Permission`
 - `Testing`
@@ -78,42 +79,6 @@
 - `ADMIN_WEB_LAYER_PAGE_NO_EXTERNAL_SERVICE`：页面域代码不导入其他页面域的 service。
 - `ADMIN_WEB_LAYER_SHARED_COMPONENT_CSS_LOCAL`：共享组件禁止 `../*.css` import。
 
-### Naming
-
-- `ADMIN_WEB_NAME_FILE_KEBAB_CASE`：`src` 文件名使用 kebab-case。
-- `ADMIN_WEB_NAME_PAGE_FILE`：页面文件命名为 `<domain>-page.tsx`。
-- `ADMIN_WEB_NAME_PAGE_STYLE_FILE`：页面样式命名为 `<domain>-page.css`。
-- `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面 service 命名为 `<domain>-service.ts`。
-- `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面类型命名为 `<domain>-types.ts`。
-- `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件使用 PascalCase named export。
-- `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：页面私有组件文件最多导出一个 PascalCase 组件。
-- `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件使用 `export const XxxPage = () => {}`。
-- `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数。
-- `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：禁止嵌套三元表达式。
-- `ADMIN_WEB_NAME_CAMEL_CASE`：变量和方法使用 camelCase。
-- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法必须使用固定动词前缀。
-- `ADMIN_WEB_NAME_SERVICE_METHOD_INPUT`：service 方法入参固定为无入参、单个 `XxxQuery`、单个 `XxxCommand` 或最多 3 个 plain parameters。
-- `ADMIN_WEB_NAME_SERVICE_HELPER_TYPE`：service helper 泛型固定为 `XxxQuery`、`XxxCommand`、inline payload、plain value、`XxxRecord`、`XxxNode`、`OptionsRecord<...>`、`Page<XxxRecord/XxxNode>` 或数组。
-- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 只定义在 `*-service.ts` 或 `src/api/`。
-- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_EXPOSURE`：`XxxRequest` / `XxxResponse` 是 service 内部 API 契约，不从 service 导出。
-- `ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE`：页面和组件只从 service 引用 `XxxQuery` / `XxxCommand`；`XxxRecord` / `XxxNode` 从 `*-types.ts` 引用。
-- `ADMIN_WEB_NAME_SERVICE_NAMESPACE_IMPORT`：页面和组件运行时引用同域 service 固定使用 `import * as service from "./xx-service"`；`import type` 不受限制。
-- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 只定义在 `*-service.ts`；`PageQuery<T>` 只定义在 `src/types/page.ts`。
-- `ADMIN_WEB_NAME_OPTION_RECORD_LOCATION`：`*OptionRecord` / `*OptionsRecord` 只定义在 `src/types/options.ts`；领域选项接口使用 `OptionsRecord<"xxxOptions">` 表达。
-- `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 只定义在明确边界的 `*-types.ts`。
-- `ADMIN_WEB_NAME_NO_DTO`：admin-web 不使用 `DTO` 类型名；service 输出对象使用 `XxxRecord` / `XxxNode`。
-- `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀。
-- `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
-- `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。
-- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面根节点 class 使用页面域前缀；共享组件 class 使用 `sandwish-`。
-- `ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION`：组件域 CSS class 只定义在对应组件 CSS 文件中。
-- `ADMIN_WEB_STYLE_PAGE_CLASS_LOCATION`：页面域 CSS class 只定义在对应页面 CSS 文件中。
-
-### UI
-
-- `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
-- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口。
-
 ### Placement
 
 - `ADMIN_WEB_PATH_PAGE_SHAPE`：页面放在 `src/pages/<module>/<domain>/<domain>-page.tsx`。
@@ -127,6 +92,50 @@
 - `ADMIN_WEB_PATH_TEST_SUPPORT`：测试支撑放在 `src/test/`。
 - `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 放在 `e2e/<module>/<domain>/<domain>.spec.ts`。
 - `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：布局 E2E 放在 `e2e/layout/*.spec.ts`。
+
+### Naming
+
+- `ADMIN_WEB_NAME_FILE_KEBAB_CASE`：`src` 文件名使用 kebab-case。
+- `ADMIN_WEB_NAME_PAGE_FILE`：页面文件命名为 `<domain>-page.tsx`。
+- `ADMIN_WEB_NAME_PAGE_STYLE_FILE`：页面样式命名为 `<domain>-page.css`。
+- `ADMIN_WEB_NAME_PAGE_SERVICE_FILE`：页面 service 命名为 `<domain>-service.ts`。
+- `ADMIN_WEB_NAME_PAGE_TYPES_FILE`：页面类型命名为 `<domain>-types.ts`。
+- `ADMIN_WEB_NAME_COMPONENT_EXPORT`：React 组件使用 PascalCase named export。
+- `ADMIN_WEB_COMPONENT_SINGLE_EXPORT`：页面私有组件文件最多导出一个 PascalCase 组件。
+- `ADMIN_WEB_NAME_PAGE_EXPORT`：页面组件使用 `export const XxxPage = () => {}`。
+- `ADMIN_WEB_NAME_FUNCTION_ARROW`：前端方法默认使用箭头函数。
+- `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：禁止嵌套三元表达式。
+- `ADMIN_WEB_NAME_CAMEL_CASE`：变量和方法使用 camelCase。
+- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 只定义在 `*-service.ts` 或 `src/api/`。
+- `ADMIN_WEB_NAME_API_CONTRACT_TYPE_EXPOSURE`：`XxxRequest` / `XxxResponse` 是 service 内部 API 契约，不从 service 导出。
+- `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 只定义在 `*-service.ts`；`PageQuery<T>` 只定义在 `src/types/page.ts`。
+- `ADMIN_WEB_NAME_OPTION_RECORD_LOCATION`：`*OptionRecord` / `*OptionsRecord` 只定义在 `src/types/options.ts`；领域选项接口使用 `OptionsRecord<"xxxOptions">` 表达。
+- `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 只定义在明确边界的 `*-types.ts`。
+- `ADMIN_WEB_NAME_NO_DTO`：admin-web 不使用 `DTO` 类型名；service 输出对象使用 `XxxRecord` / `XxxNode`。
+- `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀。
+- `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
+- `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。
+- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面根节点 class 使用页面域前缀；共享组件 class 使用 `sandwish-`。
+- `ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION`：组件域 CSS class 只定义在对应组件 CSS 文件中。
+- `ADMIN_WEB_STYLE_PAGE_CLASS_LOCATION`：页面域 CSS class 只定义在对应页面 CSS 文件中。
+
+### Service
+
+- `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法必须使用固定动词前缀。
+- `ADMIN_WEB_NAME_SERVICE_METHOD_INPUT`：service 方法入参固定为无入参、单个 `XxxQuery`、单个 `XxxCommand` 或最多 3 个 plain parameters。
+- `ADMIN_WEB_NAME_SERVICE_HELPER_TYPE`：service helper 泛型固定为 `XxxQuery`、`XxxCommand`、inline payload、plain value、`XxxRecord`、`XxxNode`、`OptionsRecord<...>`、`Page<XxxRecord/XxxNode>` 或数组。
+- `ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE`：页面和组件只从 service 引用 `XxxQuery` / `XxxCommand`；`XxxRecord` / `XxxNode` 从 `*-types.ts` 引用。
+- `ADMIN_WEB_NAME_SERVICE_NAMESPACE_IMPORT`：页面和组件运行时引用同域 service 固定使用 `import * as service from "./xx-service"`；`import type` 不受限制。
+
+### Code Quality
+
+- `ADMIN_WEB_CODE_NO_CONSOLE_LOG`：禁止 `console.log`；临时诊断必须用带原因的 ESLint 单行豁免。
+- `ADMIN_WEB_CODE_NO_EXPLICIT_ANY`：禁止显式 `any`；无法建模的边界必须用带原因的 ESLint 单行豁免。
+
+### UI
+
+- `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
+- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口。
 
 ### Forbidden Defaults
 
@@ -383,16 +392,6 @@ effectiveAt
 取消 | 删除
 ```
 
-#### Status
-
-状态展示必须使用项目稳定的状态组件或状态样式，不直接裸露原始状态值。
-
-禁止：
-
-```tsx
-<span>{status}</span>
-```
-
 #### Empty State
 
 空状态必须包含：
@@ -569,8 +568,6 @@ test("delete requires confirmation", async ({ page }) => {
 ### General
 
 - [ ] 使用已有共享组件。
-- [ ] 无 `any`。
-- [ ] 无 `console.log`。
 - [ ] 无复杂 JSX。
 - [ ] 目录结构正确。
 

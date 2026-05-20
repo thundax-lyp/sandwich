@@ -231,6 +231,42 @@ const localRules = {
                 };
             }
         },
+        "no-console-log": {
+            create(context) {
+                return {
+                    CallExpression(node) {
+                        if (
+                            node.callee.type !== "MemberExpression" ||
+                            node.callee.object.type !== "Identifier" ||
+                            node.callee.object.name !== "console" ||
+                            node.callee.property.type !== "Identifier" ||
+                            node.callee.property.name !== "log"
+                        ) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_CODE_NO_CONSOLE_LOG: console.log is forbidden; use a focused eslint-disable comment with a reason for temporary diagnostics."
+                        });
+                    }
+                };
+            }
+        },
+        "no-explicit-any": {
+            create(context) {
+                return {
+                    TSAnyKeyword(node) {
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_CODE_NO_EXPLICIT_ANY: explicit any is forbidden; use a focused eslint-disable comment with a reason only when the boundary cannot be typed."
+                        });
+                    }
+                };
+            }
+        },
         "shared-component-css-local": {
             create(context) {
                 return {
@@ -1552,31 +1588,34 @@ export default tseslint.config(
                     ]
                 }
             ],
+            "local/post-helper-service-only": "error",
+            "local/shared-service-types-only": "error",
             "local/component-index-export-only": "error",
-            "local/confirm-hook-only": "error",
-            "local/business-data-type-location": "error",
-            "local/api-contract-type-location": "error",
+            "local/page-no-parent-relative-import": "error",
+            "local/page-component-no-external-page": "error",
+            "local/page-no-external-service": "error",
+            "local/shared-component-css-local": "error",
+            "local/page-style-file": "error",
+            "local/hook-file-path": "error",
             "local/e2e-spec-file-path": "error",
             "local/kebab-case-file-name": "error",
-            "local/no-dto-type-name": "error",
-            "local/page-component-no-external-page": "error",
             "local/page-component-single-export": "error",
             "local/page-class-name-prefix": "error",
-            "local/page-no-external-service": "error",
-            "local/page-no-parent-relative-import": "error",
-            "local/page-style-file": "error",
-            "local/post-helper-service-only": "error",
+            "local/api-contract-type-location": "error",
+            "local/service-input-type-location": "error",
+            "local/business-data-type-location": "error",
+            "local/no-dto-type-name": "error",
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
             "local/service-method-input-shape": "error",
-            "local/service-input-type-location": "error",
             "local/service-helper-contract-types": "error",
-            "local/service-namespace-import": "error",
             "local/service-type-exposure": "error",
-            "local/shared-service-types-only": "error",
-            "local/shared-component-css-local": "error",
+            "local/service-namespace-import": "error",
+            "local/no-console-log": "error",
+            "local/no-explicit-any": "error",
+            "@typescript-eslint/no-explicit-any": "off",
+            "local/confirm-hook-only": "error",
             "local/table-action-column-shape": "error",
-            "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [
                 "error",
                 {

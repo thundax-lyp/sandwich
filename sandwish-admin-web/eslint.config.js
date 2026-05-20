@@ -202,35 +202,6 @@ const localRules = {
                 };
             }
         },
-        "no-dto-type-name": {
-            create(context) {
-                const reportDtoName = (node, name) => {
-                    if (!/(?:DTO|Dto)$/.test(name)) {
-                        return;
-                    }
-
-                    context.report({
-                        node,
-                        message:
-                            "ADMIN_WEB_NAME_NO_DTO: DTO type names are forbidden; use XxxRecord/XxxNode for service output objects."
-                    });
-                };
-
-                return {
-                    TSInterfaceDeclaration(node) {
-                        reportDtoName(node.id, node.id.name);
-                    },
-                    TSTypeAliasDeclaration(node) {
-                        reportDtoName(node.id, node.id.name);
-                    },
-                    ClassDeclaration(node) {
-                        if (node.id) {
-                            reportDtoName(node.id, node.id.name);
-                        }
-                    }
-                };
-            }
-        },
         "no-console-log": {
             create(context) {
                 return {
@@ -1604,7 +1575,6 @@ export default tseslint.config(
             "local/api-contract-type-location": "error",
             "local/service-input-type-location": "error",
             "local/business-data-type-location": "error",
-            "local/no-dto-type-name": "error",
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
             "local/service-method-input-shape": "error",

@@ -111,7 +111,6 @@
 - `ADMIN_WEB_NAME_SERVICE_INPUT_TYPE_LOCATION`：`XxxQuery` / `XxxCommand` 只定义在 `*-service.ts`；`PageQuery<T>` 只定义在 `src/types/page.ts`。
 - `ADMIN_WEB_NAME_OPTION_RECORD_LOCATION`：`*OptionRecord` / `*OptionsRecord` 只定义在 `src/types/options.ts`；领域选项接口使用 `OptionsRecord<"xxxOptions">` 表达。
 - `ADMIN_WEB_NAME_BUSINESS_DATA_TYPE_LOCATION`：`XxxRecord` / `XxxNode` 只定义在明确边界的 `*-types.ts`。
-- `ADMIN_WEB_NAME_NO_DTO`：admin-web 不使用 `DTO` 类型名；service 输出对象使用 `XxxRecord` / `XxxNode`。
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。

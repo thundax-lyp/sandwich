@@ -29,6 +29,7 @@ import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -41,13 +42,17 @@ import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
+import com.github.thundax.modules.sys.service.query.DictQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
+import java.util.Arrays;
 import java.util.Collections;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -83,6 +88,7 @@ public class UserControllerContractTest {
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
                         userService,
                         departmentService,
+                        mock(DictService.class),
                         roleService,
                         principalIdentityService,
                         mock(PrincipalCredentialService.class),
@@ -105,6 +111,40 @@ public class UserControllerContractTest {
     }
 
     @Test
+    public void shouldReturnUserOptionsFromUserStatusDictionary() throws Exception {
+        DictService dictService = mock(DictService.class);
+        ArgumentCaptor<DictQuery> queryCaptor = ArgumentCaptor.forClass(DictQuery.class);
+        when(dictService.list(any(DictQuery.class)))
+                .thenReturn(Arrays.asList(dict("启用", "ENABLED"), dict("禁用", "DISABLED")));
+
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
+                        mock(UserService.class),
+                        mock(DepartmentService.class),
+                        dictService,
+                        mock(RoleService.class),
+                        mock(PrincipalIdentityService.class),
+                        mock(PrincipalCredentialService.class),
+                        mock(PreAuthSessionService.class),
+                        mock(CurrentUserResolver.class),
+                        mock(CurrentUserService.class)))
+                .setControllerAdvice(new ApiResponseBodyAdvice())
+                .build();
+
+        mockMvc.perform(post("/api/sys/user/options")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(ApiResponse.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data.statusOptions[0].label").value("启用"))
+                .andExpect(jsonPath("$.data.statusOptions[0].value").value("ENABLED"))
+                .andExpect(jsonPath("$.data.statusOptions[1].label").value("禁用"))
+                .andExpect(jsonPath("$.data.statusOptions[1].value").value("DISABLED"));
+
+        verify(dictService).list(queryCaptor.capture());
+        org.junit.Assert.assertEquals("user_status", queryCaptor.getValue().getType());
+    }
+
+    @Test
     public void shouldAllowDottedLoginNameWhenBelongsToSameUser() throws Exception {
         PrincipalIdentityService principalIdentityService = mock(PrincipalIdentityService.class);
         PrincipalIdentity identity = new PrincipalIdentity();
@@ -115,6 +155,7 @@ public class UserControllerContractTest {
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
                         mock(UserService.class),
                         mock(DepartmentService.class),
+                        mock(DictService.class),
                         mock(RoleService.class),
                         principalIdentityService,
                         mock(PrincipalCredentialService.class),
@@ -163,6 +204,7 @@ public class UserControllerContractTest {
             new UserController(
                             userService,
                             departmentService,
+                            mock(DictService.class),
                             mock(RoleService.class),
                             mock(PrincipalIdentityService.class),
                             mock(PrincipalCredentialService.class),
@@ -200,6 +242,7 @@ public class UserControllerContractTest {
             new UserController(
                             userService,
                             departmentService,
+                            mock(DictService.class),
                             mock(RoleService.class),
                             mock(PrincipalIdentityService.class),
                             mock(PrincipalCredentialService.class),
@@ -235,6 +278,7 @@ public class UserControllerContractTest {
             new UserController(
                             userService,
                             departmentService,
+                            mock(DictService.class),
                             mock(RoleService.class),
                             mock(PrincipalIdentityService.class),
                             mock(PrincipalCredentialService.class),
@@ -286,6 +330,14 @@ public class UserControllerContractTest {
         role.setName("系统管理员");
         role.setStatus(RoleStatus.ENABLED);
         return role;
+    }
+
+    private Dict dict(String label, String value) {
+        Dict dict = new Dict();
+        dict.setType("user_status");
+        dict.setLabel(label);
+        dict.setValue(value);
+        return dict;
     }
 
     private UserSaveRequest editableUserRequest() {

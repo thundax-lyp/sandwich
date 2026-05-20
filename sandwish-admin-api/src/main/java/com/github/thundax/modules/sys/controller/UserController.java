@@ -5,6 +5,7 @@ import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiResponse;
+import com.github.thundax.common.web.assembler.OptionInterfaceAssembler;
 import com.github.thundax.common.web.assembler.PageInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.common.web.response.PageResponse;
@@ -42,9 +43,11 @@ import com.github.thundax.modules.sys.controller.request.UserRoleRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
 import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
 import com.github.thundax.modules.sys.controller.response.UserDepartmentResponse;
+import com.github.thundax.modules.sys.controller.response.UserOptionsResponse;
 import com.github.thundax.modules.sys.controller.response.UserResponse;
 import com.github.thundax.modules.sys.controller.response.UserRoleResponse;
 import com.github.thundax.modules.sys.entity.Department;
+import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
 import com.github.thundax.modules.sys.entity.enums.RoleStatus;
@@ -56,12 +59,14 @@ import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.CurrentUserService;
 import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.RemoveCurrentUserAvatarCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
+import com.github.thundax.modules.sys.service.query.DictQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
 import com.github.thundax.modules.sys.utils.SysApiUtils;
@@ -105,9 +110,11 @@ public class UserController {
     private static final String AVATAR_PATH = "/api/sys/user/avatar";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
     private static final String PRIVATE_KEY_ITEM = "privateKey";
+    private static final String USER_STATUS_DICT_TYPE = "user_status";
 
     private final UserService userService;
     private final DepartmentService departmentService;
+    private final DictService dictService;
     private final RoleService roleService;
     private final PrincipalIdentityService principalIdentityService;
     private final PrincipalCredentialService principalCredentialService;
@@ -119,6 +126,7 @@ public class UserController {
     public UserController(
             UserService userService,
             DepartmentService departmentService,
+            DictService dictService,
             RoleService roleService,
             PrincipalIdentityService principalIdentityService,
             PrincipalCredentialService principalCredentialService,
@@ -128,6 +136,7 @@ public class UserController {
 
         this.userService = userService;
         this.departmentService = departmentService;
+        this.dictService = dictService;
         this.roleService = roleService;
         this.principalIdentityService = principalIdentityService;
         this.principalCredentialService = principalCredentialService;
@@ -191,6 +200,26 @@ public class UserController {
 
         return PageResponseHelper.fromPageResult(
                 userService.page(query, PageInterfaceAssembler.toPageQuery(request)), this::toResponse);
+    }
+
+    @ApiOperation(value = "获取用户选项", notes = "sys:user:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = AccessTokenNames.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @HasPermission("sys:user:view")
+    @PostMapping(value = "options")
+    @WrappedApiResponse
+    public UserOptionsResponse options() {
+        DictQuery query = new DictQuery();
+        query.setType(USER_STATUS_DICT_TYPE);
+        return UserOptionsResponse.builder()
+                .statusOptions(OptionInterfaceAssembler.toOptionResponseList(
+                        dictService.list(query), Dict::getValue, Dict::getLabel))
+                .build();
     }
 
     @ApiOperation(value = "添加", notes = "sys:user:edit")

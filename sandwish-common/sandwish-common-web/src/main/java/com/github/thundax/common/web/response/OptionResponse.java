@@ -1,0 +1,23 @@
+package com.github.thundax.common.web.response;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+@ApiModel(value = "OptionResponse", description = "选项响应")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class OptionResponse implements Serializable {
+
+    @ApiModelProperty(name = "value", value = "值")
+    private String value;
+
+    @ApiModelProperty(name = "label", value = "标签")
+    private String label;
+}

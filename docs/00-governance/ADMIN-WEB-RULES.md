@@ -582,8 +582,7 @@ test("delete requires confirmation", async ({ page }) => {
 
 ## Open Items
 
-- 是否把部分 UI 规则沉淀为共享组件默认行为或测试门禁。
+- 是否将列表页操作顺序、Drawer footer、Table actions、Confirm hook 继续沉淀为共享组件默认行为或测试门禁。
 - 是否将筛选项数量固定为 `<= 4` 直接展示、`5-8` 收起高级筛选、`> 8` 使用独立筛选面板。
 - 是否固定详情页结构为 `PageHeader`、`Summary`、`BasicInfo`、`BusinessInfo`、`Timeline`、`Logs`。
-- 是否新增统一 `StatusTag` 组件，替代当前页面内分散的 Ant Design `Tag` 状态样式。
 - Playwright 默认覆盖重点是否包含上传和核心业务流程。

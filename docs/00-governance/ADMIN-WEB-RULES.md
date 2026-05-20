@@ -506,10 +506,6 @@ JPG / PNG
 系统错误
 ```
 
-### Service
-
-- service 简单动作固定使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
-
 ### Permission
 
 - 无权限的操作默认隐藏。

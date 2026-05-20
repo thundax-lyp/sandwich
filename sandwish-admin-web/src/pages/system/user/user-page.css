@@ -313,45 +313,6 @@ html[data-theme="dark"] .user-page {
     white-space: nowrap;
 }
 
-.user-role-admin,
-.user-role-editor,
-.user-role-viewer,
-.user-rank-badge,
-.user-rank-super-admin {
-    border: 1px solid transparent;
-    border-radius: 7px;
-}
-
-.user-role-admin {
-    color: var(--user-blue);
-    background: var(--user-blue-soft);
-    border-color: var(--user-blue-line);
-}
-
-.user-role-editor {
-    color: var(--user-code);
-    background: var(--user-code-soft);
-    border-color: var(--user-code-line);
-}
-
-.user-role-viewer {
-    color: var(--user-copy);
-    background: rgba(255, 255, 255, 0.58);
-    border-color: var(--user-line);
-}
-
-.user-rank-badge {
-    color: var(--user-cyan);
-    background: var(--user-cyan-soft);
-    border-color: var(--user-cyan-line);
-}
-
-.user-rank-super-admin {
-    color: var(--user-blue);
-    background: var(--user-blue-soft);
-    border-color: var(--user-blue-line);
-}
-
 .user-edit-form {
     display: grid;
     gap: 14px;

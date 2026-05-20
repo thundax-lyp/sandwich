@@ -1,11 +1,12 @@
 import { MenuOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Space, Tag, Typography } from "antd";
+import { App, Button, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishSwitch } from "@/components/sandwish-switch";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
 import * as service from "./menu-service";
@@ -139,6 +140,18 @@ export const MenuPage = () => {
         }
     });
 
+    const displayMutation = useMutation({
+        mutationFn: ({ id, display }: { id: string; display: boolean }) =>
+            service.changeMenuDisplay(id, display),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });
+            messageApi.success("菜单显示状态已更新");
+        },
+        onError: (error) => {
+            messageApi.error(error instanceof Error ? error.message : "显示状态更新失败");
+        }
+    });
+
     const openCreateEditor = () => {
         setEditingMenu(null);
         setEditorOpen(true);
@@ -269,8 +282,18 @@ export const MenuPage = () => {
             dataIndex: "display",
             key: "display",
             width: DEFAULT_COLUMN_WIDTHS.display,
-            render: (display?: boolean | null) =>
-                display === false ? <Tag>隐藏</Tag> : <Tag color="success">显示</Tag>
+            render: (display: boolean | null | undefined, menu) => (
+                <SandwishSwitch
+                    checked={display !== false}
+                    checkedChildren="显示"
+                    unCheckedChildren="隐藏"
+                    disabled={!canEditMenu || displayMutation.isPending}
+                    aria-label={`切换 ${menu.name} 显示状态，当前${display === false ? "隐藏" : "显示"}`}
+                    onChange={(checked) =>
+                        displayMutation.mutate({ id: menu.id, display: checked })
+                    }
+                />
+            )
         },
         {
             key: "actions",

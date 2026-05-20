@@ -7,9 +7,10 @@ import {
     UserOutlined
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Input, Space, Tag, Typography } from "antd";
+import { Button, Input, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { ListPage } from "@/components/list-page";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import * as service from "./system-log-service";
@@ -61,9 +62,18 @@ const readUserDisplay = (log: LogRecord) => {
     return name || loginName || "";
 };
 
-const methodClassName = (method?: string | null) => {
+const methodTagType = (method?: string | null) => {
     const normalizedMethod = method?.toLowerCase();
-    return normalizedMethod ? `system-log-method-tag system-log-method-${normalizedMethod}` : "";
+    if (normalizedMethod === "get") {
+        return "success";
+    }
+    if (normalizedMethod === "post") {
+        return "accent";
+    }
+    if (normalizedMethod === "put" || normalizedMethod === "patch") {
+        return "warning";
+    }
+    return "info";
 };
 
 export const SystemLogPage = () => {
@@ -165,7 +175,7 @@ export const SystemLogPage = () => {
             key: "type",
             width: DEFAULT_COLUMN_WIDTHS.type,
             render: (type?: string | null) =>
-                type ? <Tag className="system-log-type-tag">{type}</Tag> : null
+                type ? <SandwishTag type="info">{type}</SandwishTag> : null
         },
         {
             title: "方法",
@@ -173,7 +183,7 @@ export const SystemLogPage = () => {
             key: "method",
             width: DEFAULT_COLUMN_WIDTHS.method,
             render: (method?: string | null) =>
-                method ? <Tag className={methodClassName(method)}>{method}</Tag> : null
+                method ? <SandwishTag type={methodTagType(method)}>{method}</SandwishTag> : null
         },
         {
             title: "请求地址",

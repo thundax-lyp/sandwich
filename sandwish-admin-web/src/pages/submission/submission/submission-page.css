@@ -29,35 +29,13 @@
     color: var(--sandwish-color-text-secondary);
 }
 
-.submission-status {
-    border: 0;
-    font-weight: 600;
-}
-
-.submission-status-submitted {
-    background: #eaf2ff;
-    color: #1f5fbf;
-}
-
-.submission-status-approved {
-    background: #eaf8ef;
-    color: #147a3a;
-}
-
-.submission-status-rejected {
-    background: #fff1f0;
-    color: #c02d2d;
-}
-
-.submission-status-closed {
-    background: #f2f3f5;
-    color: #5a6472;
-}
-
 .submission-image-id {
+    display: inline-block;
     max-width: 132px;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: bottom;
 }
 
 .submission-editor-form {

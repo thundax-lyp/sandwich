@@ -1,10 +1,11 @@
 import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { OpenClientEdit } from "./components/open-client-edit";
@@ -58,8 +59,14 @@ const readStatusLabel = (status?: string | null) => {
     return status && status in statusLabels ? statusLabels[status as OpenClientStatus] : "未知";
 };
 
-const statusClassName = (status?: string | null) => {
-    return status ? `open-client-status open-client-status-${status.toLowerCase()}` : "";
+const statusTagType = (status?: string | null) => {
+    if (status === "ENABLED") {
+        return "success";
+    }
+    if (status === "DISABLED") {
+        return "warning";
+    }
+    return "neutral";
 };
 
 const formatDateTime = (value?: string | null) => {
@@ -264,7 +271,7 @@ export const OpenClientPage = () => {
             title: "状态",
             width: DEFAULT_COLUMN_WIDTHS.status,
             render: (status?: string | null) => (
-                <Tag className={statusClassName(status)}>{readStatusLabel(status)}</Tag>
+                <SandwishTag type={statusTagType(status)}>{readStatusLabel(status)}</SandwishTag>
             )
         },
         {
@@ -282,7 +289,7 @@ export const OpenClientPage = () => {
             render: (permissions?: string[] | null) => (
                 <Space wrap size={[4, 4]} className="open-client-permission-list">
                     {(permissions || []).map((permission) => (
-                        <Tag key={permission}>{permission}</Tag>
+                        <SandwishTag key={permission}>{permission}</SandwishTag>
                     ))}
                     {!permissions?.length ? <Text type="secondary">-</Text> : null}
                 </Space>

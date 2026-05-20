@@ -29,22 +29,6 @@
     min-width: 0;
 }
 
-.audit-log-object-tag,
-.audit-log-action-tag {
-    border: 0;
-    font-weight: 600;
-}
-
-.audit-log-object-tag {
-    color: #245a8d;
-    background: #eaf3ff;
-}
-
-.audit-log-action-tag {
-    color: #147a3a;
-    background: #eaf8ef;
-}
-
 .audit-log-time-icon {
     color: var(--accent-blue);
 }
@@ -106,13 +90,6 @@
     gap: 6px;
     align-items: center;
     min-width: 0;
-}
-
-.audit-log-changed-tag {
-    margin-inline-end: 0;
-    color: #945f00;
-    background: #fff0bd;
-    border-color: #efc970;
 }
 
 .audit-log-field-values {

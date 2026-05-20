@@ -355,8 +355,9 @@ button {
     display: inline-flex;
     align-items: center;
     min-height: 38px;
-    color: var(--text-muted);
+    color: color-mix(in srgb, var(--text-secondary) 72%, var(--text-primary));
     font-size: 15px;
+    font-weight: 700;
     line-height: 1.2;
 }
 

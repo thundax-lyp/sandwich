@@ -1,11 +1,12 @@
 import { BookOutlined, DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { DictionaryEdit } from "./components/dictionary-edit";
@@ -166,7 +167,7 @@ export const DictionaryPage = () => {
             dataIndex: "type",
             key: "type",
             width: DEFAULT_COLUMN_WIDTHS.type,
-            render: (type: string) => <Tag className="dictionary-type-tag">{type}</Tag>
+            render: (type: string) => <SandwishTag type="info">{type}</SandwishTag>
         },
         {
             title: "标签",

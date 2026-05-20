@@ -6,13 +6,14 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Select, Space, Switch, Tag, Typography } from "antd";
+import { App, Button, Select, Space, Switch, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { RoleEdit } from "./components/role-edit";
 import * as service from "./role-service";
@@ -294,7 +295,11 @@ export const RolePage = () => {
             key: "admin",
             width: DEFAULT_COLUMN_WIDTHS.privilege,
             render: (admin?: boolean | null) =>
-                admin ? <Tag className="role-admin-tag">管理权限</Tag> : <Tag>普通角色</Tag>
+                admin ? (
+                    <SandwishTag type="info">管理权限</SandwishTag>
+                ) : (
+                    <SandwishTag>普通角色</SandwishTag>
+                )
         },
         {
             title: "状态",

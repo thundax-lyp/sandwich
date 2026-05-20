@@ -170,37 +170,6 @@ html[data-theme="dark"] .storage-object-page {
     border-radius: 6px;
 }
 
-.storage-object-status,
-.storage-object-reference {
-    border: 1px solid transparent;
-    border-radius: 7px;
-}
-
-.storage-object-status-active,
-.storage-object-reference-referenced {
-    color: var(--storage-object-green);
-    background: var(--storage-object-green-soft);
-    border-color: var(--storage-object-green-line);
-}
-
-.storage-object-status-deleting {
-    color: var(--storage-object-amber);
-    background: var(--storage-object-amber-soft);
-    border-color: var(--storage-object-amber-line);
-}
-
-.storage-object-status-deleted {
-    color: var(--storage-object-red);
-    background: var(--storage-object-red-soft);
-    border-color: var(--storage-object-red-line);
-}
-
-.storage-object-reference-unreferenced {
-    color: var(--storage-object-copy);
-    background: transparent;
-    border-color: var(--storage-object-line);
-}
-
 @media (max-width: 1020px) {
     .storage-object-filter-form {
         grid-template-columns: repeat(2, minmax(180px, 1fr));

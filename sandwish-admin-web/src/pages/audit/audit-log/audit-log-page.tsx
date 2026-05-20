@@ -6,6 +6,7 @@ import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ADMIN_API_BASE_URL } from "@/api/http";
 import { ListPage } from "@/components/list-page";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { AuditLogDetail } from "./components/audit-log-detail";
@@ -229,7 +230,7 @@ export const AuditLogPage = () => {
                 <div className="audit-log-object-cell">
                     <Text strong>{readObjectDisplay(log)}</Text>
                     <Space size={6} wrap>
-                        <Tag className="audit-log-object-tag">{readObjectTypeLabel(log)}</Tag>
+                        <SandwishTag type="accent">{readObjectTypeLabel(log)}</SandwishTag>
                         {log.version ? <Tag>v{log.version}</Tag> : null}
                     </Space>
                 </div>
@@ -241,7 +242,7 @@ export const AuditLogPage = () => {
             key: "action",
             width: DEFAULT_COLUMN_WIDTHS.action,
             render: (_, log) => (
-                <Tag className="audit-log-action-tag">{log.actionLabel || log.action || "-"}</Tag>
+                <SandwishTag type="success">{log.actionLabel || log.action || "-"}</SandwishTag>
             )
         },
         {

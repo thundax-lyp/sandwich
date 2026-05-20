@@ -1,6 +1,6 @@
 import { DeleteOutlined, FileOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
@@ -8,6 +8,7 @@ import { hasPermission } from "@/auth/permission-storage";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import * as service from "./storage-object-service";
@@ -72,14 +73,21 @@ const readStatusFilterValue = <T extends string>(value: T | "ALL") => {
     return value === "ALL" ? undefined : value;
 };
 
-const objectStatusClassName = (status?: string | null) => {
-    return status ? `storage-object-status storage-object-status-${status.toLowerCase()}` : "";
+const objectStatusTagType = (status?: string | null) => {
+    if (status === "ACTIVE") {
+        return "success";
+    }
+    if (status === "DELETING") {
+        return "warning";
+    }
+    if (status === "DELETED") {
+        return "danger";
+    }
+    return "neutral";
 };
 
-const referenceStatusClassName = (status?: string | null) => {
-    return status
-        ? `storage-object-reference storage-object-reference-${status.toLowerCase()}`
-        : "";
+const referenceStatusTagType = (status?: string | null) => {
+    return status === "REFERENCED" ? "success" : "neutral";
 };
 
 const sortByMove = (
@@ -296,10 +304,10 @@ export const StorageObjectPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.objectStatus,
             render: (status?: string | null) =>
                 status ? (
-                    <Tag className={objectStatusClassName(status)}>
+                    <SandwishTag type={objectStatusTagType(status)}>
                         {objectStatusLabels[status as Exclude<StorageObjectStatusFilter, "ALL">] ||
                             status}
-                    </Tag>
+                    </SandwishTag>
                 ) : null
         },
         {
@@ -309,11 +317,11 @@ export const StorageObjectPage = () => {
             width: DEFAULT_COLUMN_WIDTHS.referenceStatus,
             render: (status?: string | null) =>
                 status ? (
-                    <Tag className={referenceStatusClassName(status)}>
+                    <SandwishTag type={referenceStatusTagType(status)}>
                         {referenceStatusLabels[
                             status as Exclude<StorageReferenceStatusFilter, "ALL">
                         ] || status}
-                    </Tag>
+                    </SandwishTag>
                 ) : null
         },
         {

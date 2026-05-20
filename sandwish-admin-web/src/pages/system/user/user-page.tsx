@@ -7,7 +7,7 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Input, Select, Space, Tag, Tree, Typography } from "antd";
+import { App, Button, Input, Select, Space, Tree, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Key } from "react";
@@ -17,6 +17,7 @@ import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishSwitch } from "@/components/sandwish-switch";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserRecord } from "@/service/current-user-types";
@@ -93,15 +94,15 @@ const rankLabel = (user: UserRecord) => {
     return `等级 ${user.ranks ?? 0}`;
 };
 
-const rankClassName = (user: UserRecord) => {
-    return user.superAdmin || user.ranks === 9 ? "user-rank-super-admin" : "user-rank-badge";
+const rankTagType = (user: UserRecord) => {
+    return user.superAdmin || user.ranks === 9 ? "accent" : "info";
 };
 
-const roleClassName = (user: UserRecord, index: number) => {
+const roleTagType = (user: UserRecord, index: number) => {
     if (user.admin || user.superAdmin) {
-        return "user-role-admin";
+        return "accent";
     }
-    return index === 0 ? "user-role-editor" : "user-role-viewer";
+    return index === 0 ? "info" : "neutral";
 };
 
 const readRankValue = (user?: Pick<UserRecord, "ranks" | "superAdmin"> | null) => {
@@ -599,9 +600,9 @@ export const UserPage = () => {
                 return (
                     <Space size={[4, 4]} wrap>
                         {roleNames.map((roleName, index) => (
-                            <Tag key={roleName} className={roleClassName(user, index)}>
+                            <SandwishTag key={roleName} type={roleTagType(user, index)}>
                                 {roleName}
-                            </Tag>
+                            </SandwishTag>
                         ))}
                     </Space>
                 );
@@ -631,7 +632,9 @@ export const UserPage = () => {
             dataIndex: "ranks",
             key: "ranks",
             width: DEFAULT_COLUMN_WIDTHS.ranks,
-            render: (_, user) => <Tag className={rankClassName(user)}>{rankLabel(user)}</Tag>
+            render: (_, user) => (
+                <SandwishTag type={rankTagType(user)}>{rankLabel(user)}</SandwishTag>
+            )
         },
         {
             key: "actions",

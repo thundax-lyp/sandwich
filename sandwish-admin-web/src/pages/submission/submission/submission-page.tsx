@@ -1,11 +1,12 @@
 import { DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { SubmissionDetail } from "./components/submission-detail";
@@ -60,8 +61,17 @@ const readStatusLabel = (status?: string | null) => {
         : status || "未知";
 };
 
-const statusClassName = (status?: string | null) => {
-    return status ? `submission-status submission-status-${status.toLowerCase()}` : "";
+const statusTagType = (status?: string | null) => {
+    if (status === "SUBMITTED") {
+        return "info";
+    }
+    if (status === "APPROVED") {
+        return "success";
+    }
+    if (status === "REJECTED") {
+        return "danger";
+    }
+    return "neutral";
 };
 
 const formatDateTime = (value?: string | null) => {
@@ -296,7 +306,7 @@ export const SubmissionPage = () => {
             key: "status",
             width: DEFAULT_COLUMN_WIDTHS.status,
             render: (status?: string | null) => (
-                <Tag className={statusClassName(status)}>{readStatusLabel(status)}</Tag>
+                <SandwishTag type={statusTagType(status)}>{readStatusLabel(status)}</SandwishTag>
             )
         },
         {
@@ -318,11 +328,13 @@ export const SubmissionPage = () => {
                 return (
                     <Space wrap size={4}>
                         {imageObjectIds.slice(0, 3).map((id) => (
-                            <Tag key={id} className="submission-image-id">
-                                {id}
-                            </Tag>
+                            <SandwishTag key={id}>
+                                <span className="submission-image-id">{id}</span>
+                            </SandwishTag>
                         ))}
-                        {imageObjectIds.length > 3 ? <Tag>+{imageObjectIds.length - 3}</Tag> : null}
+                        {imageObjectIds.length > 3 ? (
+                            <SandwishTag>+{imageObjectIds.length - 3}</SandwishTag>
+                        ) : null}
                     </Space>
                 );
             }

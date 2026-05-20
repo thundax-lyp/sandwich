@@ -94,19 +94,6 @@ html[data-theme="dark"] .menu-page {
     min-width: 0;
 }
 
-.menu-table .ant-tag {
-    color: var(--menu-amber);
-    background: var(--menu-amber-soft);
-    border-color: var(--menu-amber-line);
-    border-radius: 7px;
-}
-
-.menu-table .ant-tag-success {
-    color: var(--menu-green);
-    background: var(--menu-green-soft);
-    border-color: var(--menu-green-line);
-}
-
 .menu-drag-action {
     cursor: grab;
 }

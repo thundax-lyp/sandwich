@@ -168,39 +168,6 @@ html[data-theme="dark"] .system-log-page {
     color: var(--system-log-blue);
 }
 
-.system-log-type-tag {
-    color: var(--system-log-cyan);
-    background: var(--system-log-cyan-soft);
-    border-color: var(--system-log-cyan-line);
-    border-radius: 7px;
-}
-
-.system-log-method-tag {
-    color: var(--system-log-code);
-    background: var(--system-log-code-soft);
-    border-color: var(--system-log-code-line);
-    border-radius: 7px;
-}
-
-.system-log-method-get {
-    color: var(--system-log-green);
-    background: var(--system-log-green-soft);
-    border-color: var(--system-log-green-line);
-}
-
-.system-log-method-post {
-    color: var(--system-log-blue);
-    background: var(--system-log-blue-soft);
-    border-color: var(--system-log-blue-line);
-}
-
-.system-log-method-put,
-.system-log-method-patch {
-    color: var(--system-log-amber);
-    background: var(--system-log-amber-soft);
-    border-color: var(--system-log-amber-line);
-}
-
 .system-log-table .ant-typography code {
     padding: 2px 7px;
     color: var(--system-log-code);

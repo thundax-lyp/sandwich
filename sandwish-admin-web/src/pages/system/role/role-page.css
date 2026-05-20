@@ -148,19 +148,8 @@ html[data-theme="dark"] .role-page {
     border-color: var(--role-danger-line);
 }
 
-.role-name-icon,
-.role-admin-tag {
+.role-name-icon {
     color: var(--role-cyan);
-}
-
-.role-admin-tag {
-    background: var(--role-cyan-soft);
-    border-color: var(--role-cyan-line);
-    border-radius: 7px;
-}
-
-.role-table .ant-tag {
-    border-radius: 7px;
 }
 
 .role-drag-action {

@@ -48,6 +48,12 @@ export const removeMenus = (ids: string[]) => {
     });
 };
 
+export const changeMenuDisplay = (id: string, display: boolean) => {
+    return postJson<boolean, Array<{ id: string; display: boolean }>>("/sys/menu/display", {
+        body: [{ id, display }]
+    });
+};
+
 export const moveMenu = (request: MenuMoveCommand) => {
     return postJson<boolean, MenuMoveCommand>("/sys/menu/move", {
         body: request

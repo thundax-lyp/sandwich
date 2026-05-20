@@ -1,14 +1,3 @@
-export interface AuditOptionRecord {
-    value: string;
-    label: string;
-}
-
-export interface AuditOptionsRecord {
-    objectTypes?: AuditOptionRecord[];
-    actions?: AuditOptionRecord[];
-    operatorTypes?: AuditOptionRecord[];
-}
-
 export interface AuditFieldRecord {
     fieldName?: string | null;
     fieldLabel?: string | null;

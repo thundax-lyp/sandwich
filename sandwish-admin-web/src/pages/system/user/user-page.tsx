@@ -21,17 +21,13 @@ import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserRecord } from "@/service/current-user-types";
+import type { OptionsRecord } from "@/types/options";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { UserAvatar } from "./components/user-avatar";
 import { UserEdit } from "./components/user-edit";
 import * as service from "./user-service";
-import type { PageQuery, SaveCommand } from "./user-service";
-import type {
-    UserDepartmentNode,
-    UserFormValues,
-    UserOptionsRecord,
-    UserRecord
-} from "./user-types";
+import type { PageQuery, SaveCommand, UserOptionKeys } from "./user-service";
+import type { UserDepartmentNode, UserFormValues, UserRecord } from "./user-types";
 import "./user-page.css";
 
 const { Text } = Typography;
@@ -62,7 +58,7 @@ const DEFAULT_USER_FILTERS: UserFilters = {
 
 const EMPTY_USERS: UserRecord[] = [];
 const EMPTY_DEPARTMENTS: UserDepartmentNode[] = [];
-const EMPTY_USER_OPTIONS: UserOptionsRecord = {
+const EMPTY_USER_OPTIONS: OptionsRecord<UserOptionKeys> = {
     statusOptions: [],
     rankOptions: []
 };

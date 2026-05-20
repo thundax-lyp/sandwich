@@ -39,13 +39,3 @@ export interface UserFormValues {
     admin: boolean;
     enable: boolean;
 }
-
-export interface UserOptionRecord {
-    value: string;
-    label: string;
-}
-
-export interface UserOptionsRecord {
-    statusOptions: UserOptionRecord[];
-    rankOptions: UserOptionRecord[];
-}

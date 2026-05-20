@@ -1102,6 +1102,7 @@ const localRules = {
         "business-data-type-location": {
             create(context) {
                 const isBusinessDataName = (name) => /(?:Record|Node)$/.test(name);
+                const isOptionDataName = (name) => /(?:OptionRecord|OptionsRecord)$/.test(name);
 
                 const isAllowedFile = () => {
                     const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
@@ -1113,7 +1114,7 @@ const localRules = {
                 };
 
                 const reportInvalidBusinessDataType = (node, name) => {
-                    if (!isBusinessDataName(name) || isAllowedFile()) {
+                    if (!isBusinessDataName(name) || isOptionDataName(name) || isAllowedFile()) {
                         return;
                     }
 
@@ -1302,7 +1303,13 @@ const localRules = {
                 const isApiContractName = (name) => /(?:Request|Response)$/.test(name);
                 const isServiceInputName = (name) => /(?:Query|Command)$/.test(name);
                 const isBusinessDataName = (name) => /(?:Record|Node)$/.test(name);
-                const transparentTypeNames = ["Array", "ReadonlyArray", "Page", "Promise"];
+                const transparentTypeNames = [
+                    "Array",
+                    "ReadonlyArray",
+                    "Page",
+                    "Partial",
+                    "Promise"
+                ];
                 const scalarTypeNames = [
                     "boolean",
                     "string",
@@ -1381,7 +1388,7 @@ const localRules = {
                         return;
                     }
 
-                    if (isBusinessDataName(name)) {
+                    if (name === "OptionsRecord" || isBusinessDataName(name)) {
                         return;
                     }
 

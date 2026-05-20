@@ -4,6 +4,7 @@ import com.github.thundax.common.exception.AdminResponseExceptions;
 import com.github.thundax.common.security.annotation.HasPermission;
 import com.github.thundax.common.security.token.AccessTokenNames;
 import com.github.thundax.common.web.annotation.WrappedApiController;
+import com.github.thundax.common.web.assembler.OptionInterfaceAssembler;
 import com.github.thundax.common.web.request.RequestListHelper;
 import com.github.thundax.modules.auth.entity.PrincipalIdentity;
 import com.github.thundax.modules.auth.entity.enums.PrincipalIdentityType;
@@ -22,9 +23,11 @@ import com.github.thundax.modules.sys.controller.request.RoleSortRequest;
 import com.github.thundax.modules.sys.controller.request.RoleStatusRequest;
 import com.github.thundax.modules.sys.controller.request.RoleUserRequest;
 import com.github.thundax.modules.sys.controller.response.RoleMenuResponse;
+import com.github.thundax.modules.sys.controller.response.RoleOptionsResponse;
 import com.github.thundax.modules.sys.controller.response.RoleResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserResponse;
 import com.github.thundax.modules.sys.controller.response.RoleUserTreeNodeResponse;
+import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.Menu;
 import com.github.thundax.modules.sys.entity.Role;
 import com.github.thundax.modules.sys.entity.User;
@@ -36,6 +39,7 @@ import com.github.thundax.modules.sys.entity.valueobject.RoleIdCodec;
 import com.github.thundax.modules.sys.entity.valueobject.UserId;
 import com.github.thundax.modules.sys.entity.valueobject.UserIdCodec;
 import com.github.thundax.modules.sys.service.DepartmentService;
+import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.MenuService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
@@ -43,6 +47,7 @@ import com.github.thundax.modules.sys.service.command.AssignRoleUsersCommand;
 import com.github.thundax.modules.sys.service.command.ChangeRoleStatusCommand;
 import com.github.thundax.modules.sys.service.command.RoleSortCommand;
 import com.github.thundax.modules.sys.service.query.DepartmentQuery;
+import com.github.thundax.modules.sys.service.query.DictQuery;
 import com.github.thundax.modules.sys.service.query.MenuQuery;
 import com.github.thundax.modules.sys.service.query.RoleQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -68,10 +73,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RoleController {
 
     private static final String DEPARTMENT_ID_PREFIX = "DEPARTMENT_";
+    private static final String ROLE_PRIVILEGE_DICT_TYPE = "role_privilege";
+    private static final String ROLE_STATUS_DICT_TYPE = "role_status";
 
     private final RoleService roleService;
     private final MenuService menuService;
     private final DepartmentService departmentService;
+    private final DictService dictService;
     private final UserService userService;
     private final PrincipalIdentityService principalIdentityService;
 
@@ -80,12 +88,14 @@ public class RoleController {
             RoleService roleService,
             MenuService menuService,
             DepartmentService departmentService,
+            DictService dictService,
             UserService userService,
             PrincipalIdentityService principalIdentityService) {
 
         this.roleService = roleService;
         this.menuService = menuService;
         this.departmentService = departmentService;
+        this.dictService = dictService;
         this.userService = userService;
         this.principalIdentityService = principalIdentityService;
     }
@@ -124,6 +134,29 @@ public class RoleController {
         RoleQuery query = RoleInterfaceAssembler.toQuery(request);
 
         return roleService.list(query).stream().map(role -> toResponse(role)).collect(Collectors.toList());
+    }
+
+    @ApiOperation(value = "获取角色选项", notes = "sys:role:view")
+    @ApiImplicitParams({
+        @ApiImplicitParam(
+                name = AccessTokenNames.HEADER_TOKEN,
+                value = "令牌",
+                paramType = "header",
+                dataTypeClass = String.class),
+    })
+    @HasPermission("sys:role:view")
+    @PostMapping(value = "options")
+    public RoleOptionsResponse options() {
+        DictQuery statusQuery = new DictQuery();
+        statusQuery.setType(ROLE_STATUS_DICT_TYPE);
+        DictQuery privilegeQuery = new DictQuery();
+        privilegeQuery.setType(ROLE_PRIVILEGE_DICT_TYPE);
+        return RoleOptionsResponse.builder()
+                .statusOptions(OptionInterfaceAssembler.toOptionResponseList(
+                        dictService.list(statusQuery), Dict::getValue, Dict::getLabel))
+                .privilegeOptions(OptionInterfaceAssembler.toOptionResponseList(
+                        dictService.list(privilegeQuery), Dict::getValue, Dict::getLabel))
+                .build();
     }
 
     @ApiOperation(value = "添加", notes = "sys:role:edit")

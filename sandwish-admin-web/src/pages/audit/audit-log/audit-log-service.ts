@@ -1,6 +1,7 @@
 import { postJson } from "@/api/http";
+import type { OptionsRecord } from "@/types/options";
 import type { Page } from "@/types/page";
-import type { AuditLogDetailRecord, AuditLogRecord, AuditOptionsRecord } from "./audit-log-types";
+import type { AuditLogDetailRecord, AuditLogRecord } from "./audit-log-types";
 
 export interface AuditLogPageQuery {
     pageNo?: number;
@@ -16,6 +17,8 @@ export interface AuditLogPageQuery {
     endDate?: string | null;
 }
 
+export type AuditOptionKeys = "objectTypes" | "actions" | "operatorTypes";
+
 export const pageAuditLogs = (request: AuditLogPageQuery = {}) => {
     return postJson<Page<AuditLogRecord>, AuditLogPageQuery>("/audit/log/page", {
         body: request
@@ -29,7 +32,10 @@ export const getAuditLogDetail = (id: string) => {
 };
 
 export const getAuditOptions = () => {
-    return postJson<AuditOptionsRecord, Record<string, never>>("/audit/log/options", {
-        body: {}
-    });
+    return postJson<Partial<OptionsRecord<AuditOptionKeys>>, Record<string, never>>(
+        "/audit/log/options",
+        {
+            body: {}
+        }
+    );
 };

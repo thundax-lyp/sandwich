@@ -2,16 +2,11 @@ import { CameraOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select, Switch, Upload } from "antd";
 import { useMemo, useState } from "react";
-import * as service from "../user-service";
-import type {
-    UserDepartmentNode,
-    UserFormValues,
-    UserOptionRecord,
-    UserRecord,
-    UserRoleRecord
-} from "../user-types";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { CurrentUserRecord } from "@/service/current-user-types";
+import type { OptionsRecord } from "@/types/options";
+import * as service from "../user-service";
+import type { UserDepartmentNode, UserFormValues, UserRecord, UserRoleRecord } from "../user-types";
 import { UserAvatar } from "./user-avatar";
 
 interface UserEditProps {
@@ -21,7 +16,7 @@ interface UserEditProps {
     user?: UserRecord | null;
     currentUser?: CurrentUserRecord | null;
     departments?: UserDepartmentNode[];
-    rankOptions?: UserOptionRecord[];
+    rankOptions?: OptionsRecord[string];
     saving?: boolean;
     onClose: () => void;
     onSave?: (form: UserFormValues) => void;
@@ -67,7 +62,7 @@ const fallbackRankOptions = (maxRank: number) => {
     }));
 };
 
-const toEditableRankOptions = (options: UserOptionRecord[] | undefined, maxRank: number) => {
+const toEditableRankOptions = (options: OptionsRecord[string] | undefined, maxRank: number) => {
     const sourceOptions = options?.length ? options : fallbackRankOptions(maxRank);
     return sourceOptions
         .map((option) => ({

@@ -6,22 +6,29 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Select, Space, Switch, Typography } from "antd";
+import { App, Button, Select, Space, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishSwitch } from "@/components/sandwish-switch";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import type { OptionsRecord } from "@/types/options";
 import { RoleEdit } from "./components/role-edit";
 import * as service from "./role-service";
-import type { RoleSaveCommand } from "./role-service";
+import type { RoleOptionKeys, RoleSaveCommand } from "./role-service";
 import type { RoleMenuNode, RoleMenuTreeNode, RoleRecord } from "./role-types";
 import "./role-page.css";
 
 const { Text } = Typography;
+
+const EMPTY_ROLE_OPTIONS: OptionsRecord<RoleOptionKeys> = {
+    statusOptions: [],
+    privilegeOptions: []
+};
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 220,
@@ -118,17 +125,30 @@ export const RolePage = () => {
 
     const roleQuery = useQuery({
         queryKey: ["role", "list", query],
-        queryFn: () => service.listRoles(query),
+        queryFn: () => service.list(query),
         enabled: canViewRole,
         retry: false
     });
     const roleMenuQuery = useQuery({
         queryKey: ["role", "menu", "tree"],
-        queryFn: service.listRoleMenus,
+        queryFn: service.listMenus,
+        enabled: canViewRole,
+        retry: false
+    });
+    const roleOptionsQuery = useQuery({
+        queryKey: ["role", "options"],
+        queryFn: service.getOptions,
         enabled: canViewRole,
         retry: false
     });
     const roles = useMemo(() => roleQuery.data || [], [roleQuery.data]);
+    const roleOptions = roleOptionsQuery.data ?? EMPTY_ROLE_OPTIONS;
+    const statusLabelByValue = useMemo(() => {
+        return new Map(roleOptions.statusOptions.map((option) => [option.value, option.label]));
+    }, [roleOptions.statusOptions]);
+    const privilegeLabelByValue = useMemo(() => {
+        return new Map(roleOptions.privilegeOptions.map((option) => [option.value, option.label]));
+    }, [roleOptions.privilegeOptions]);
     const filteredRoles = useMemo(() => {
         const keyword = searchText.trim().toLowerCase();
         if (!keyword) {
@@ -147,7 +167,7 @@ export const RolePage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: RoleSaveCommand) =>
-            values.id ? service.changeRoleInfo(values) : service.addRole(values),
+            values.id ? service.changeInfo(values) : service.create(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingRole(null);
@@ -160,7 +180,7 @@ export const RolePage = () => {
     });
 
     const statusMutation = useMutation({
-        mutationFn: service.changeRoleStatus,
+        mutationFn: service.changeStatus,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
@@ -172,7 +192,7 @@ export const RolePage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: service.removeRoles,
+        mutationFn: service.remove,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
@@ -184,7 +204,7 @@ export const RolePage = () => {
     });
 
     const sortMutation = useMutation({
-        mutationFn: service.sortRoles,
+        mutationFn: service.sort,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
             messageApi.success("角色排序已更新");
@@ -242,6 +262,19 @@ export const RolePage = () => {
         });
     };
 
+    const readStatusOptionLabel = (value: "ENABLED" | "DISABLED") => {
+        return statusLabelByValue.get(value) || (value === "DISABLED" ? "禁用" : "启用");
+    };
+
+    const readRoleStatusLabel = (role: RoleRecord) => {
+        return readStatusOptionLabel(role.enable === false ? "DISABLED" : "ENABLED");
+    };
+
+    const readPrivilegeLabel = (role: RoleRecord) => {
+        const value = role.admin ? "ADMIN" : "NORMAL";
+        return privilegeLabelByValue.get(value) || (role.admin ? "管理员角色" : "普通角色");
+    };
+
     const confirmDeleteRole = (role: RoleRecord) => {
         confirm.danger({
             title: "删除角色",
@@ -294,11 +327,11 @@ export const RolePage = () => {
             dataIndex: "admin",
             key: "admin",
             width: DEFAULT_COLUMN_WIDTHS.privilege,
-            render: (admin?: boolean | null) =>
-                admin ? (
-                    <SandwishTag type="info">管理权限</SandwishTag>
+            render: (_, role) =>
+                role.admin ? (
+                    <SandwishTag type="info">{readPrivilegeLabel(role)}</SandwishTag>
                 ) : (
-                    <SandwishTag>普通角色</SandwishTag>
+                    <SandwishTag>{readPrivilegeLabel(role)}</SandwishTag>
                 )
         },
         {
@@ -307,10 +340,11 @@ export const RolePage = () => {
             key: "enable",
             width: DEFAULT_COLUMN_WIDTHS.status,
             render: (enable: boolean | null | undefined, role) => (
-                <Switch
+                <SandwishSwitch
                     checked={enable !== false}
-                    checkedChildren="启用"
-                    unCheckedChildren="禁用"
+                    checkedChildren={readStatusOptionLabel("ENABLED")}
+                    unCheckedChildren={readStatusOptionLabel("DISABLED")}
+                    aria-label={`切换 ${role.name} 状态，当前${readRoleStatusLabel(role)}`}
                     disabled={!canEditRole || statusMutation.isPending}
                     onChange={(checked) => updateSingleStatus(role, checked)}
                 />
@@ -374,9 +408,12 @@ export const RolePage = () => {
                                 value={filters.enable}
                                 options={[
                                     { label: "全部", value: "ALL" },
-                                    { label: "启用", value: "ENABLED" },
-                                    { label: "禁用", value: "DISABLED" }
+                                    ...roleOptions.statusOptions.map((option) => ({
+                                        label: option.label,
+                                        value: option.value as RoleFilters["enable"]
+                                    }))
                                 ]}
+                                loading={roleOptionsQuery.isFetching}
                                 onChange={(enable) =>
                                     setFilters((currentFilters) => ({
                                         ...currentFilters,
@@ -474,6 +511,8 @@ export const RolePage = () => {
                 role={editingRole}
                 treeData={treeData}
                 expandedMenuIds={expandedMenuIds}
+                statusOptions={roleOptions.statusOptions}
+                privilegeOptions={roleOptions.privilegeOptions}
                 saving={saveMutation.isPending}
                 onClose={closeEditor}
                 onSave={saveRole}

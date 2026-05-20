@@ -4,7 +4,10 @@ import process from "node:process";
 
 const SOURCE_ROOT = path.resolve("src");
 const COMPONENT_ROOT = path.join(SOURCE_ROOT, "components");
+const OPTIONS_TYPE_FILE = path.join(SOURCE_ROOT, "types", "options.ts").split(path.sep).join("/");
 const CLASS_NAME_PATTERN = /\.((?:sandwish-[a-z0-9]+)(?:-[a-z0-9]+)*)/g;
+const OPTION_RECORD_DECLARATION_PATTERN =
+    /\b(?:export\s+)?(?:interface|type)\s+[A-Za-z0-9_]*(?:OptionRecord|OptionsRecord)\b/g;
 const FORBIDDEN_DIRECTORY_RULES = new Map([
     ["common", "ADMIN_WEB_FORBID_BOUNDARYLESS_DIR"],
     ["base", "ADMIN_WEB_FORBID_BOUNDARYLESS_DIR"],
@@ -119,6 +122,14 @@ sourceFiles.forEach((filePath) => {
         violations.push(
             `${normalizedFilePath}: ADMIN_WEB_FORBID_STYLE_SYSTEM forbids styled-components and Tailwind.`
         );
+    }
+
+    if (/\.(?:ts|tsx)$/.test(filePath) && normalizedFilePath !== OPTIONS_TYPE_FILE) {
+        for (const match of content.matchAll(OPTION_RECORD_DECLARATION_PATTERN)) {
+            violations.push(
+                `${normalizedFilePath}: ADMIN_WEB_NAME_OPTION_RECORD_LOCATION ${match[0]} must be defined in ${OPTIONS_TYPE_FILE}`
+            );
+        }
     }
 });
 

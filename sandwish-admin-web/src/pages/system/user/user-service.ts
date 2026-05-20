@@ -1,11 +1,7 @@
 import { postFormData, postJson } from "@/api/http";
+import type { OptionsRecord } from "@/types/options";
 import type { Page } from "@/types/page";
-import type {
-    UserDepartmentNode,
-    UserOptionsRecord,
-    UserRecord,
-    UserRoleRecord
-} from "./user-types";
+import type { UserDepartmentNode, UserRecord, UserRoleRecord } from "./user-types";
 
 export interface PageQuery {
     pageNo?: number;
@@ -40,6 +36,8 @@ export interface SaveCommand {
     roles?: Array<{ id: string }> | null;
 }
 
+export type UserOptionKeys = "statusOptions" | "rankOptions";
+
 export const page = (request: PageQuery = {}) => {
     return postJson<Page<UserRecord>, PageQuery>("/sys/user/page", {
         body: request
@@ -55,7 +53,7 @@ export const listRoles = () => {
 };
 
 export const getOptions = () => {
-    return postJson<UserOptionsRecord, Record<string, never>>("/sys/user/options", {
+    return postJson<OptionsRecord<UserOptionKeys>, Record<string, never>>("/sys/user/options", {
         body: {}
     });
 };

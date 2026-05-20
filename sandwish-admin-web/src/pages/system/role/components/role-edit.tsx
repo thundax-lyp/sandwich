@@ -1,8 +1,10 @@
-import { Button, Form, Input, Switch, Tree, Typography } from "antd";
+import { Button, Form, Input, Tree, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useEffect, useState } from "react";
 import type { Key } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
+import { SandwishSwitch } from "@/components/sandwish-switch";
+import type { OptionsRecord } from "@/types/options";
 import type { RoleSaveCommand } from "../role-service";
 import type { RoleRecord } from "../role-types";
 
@@ -14,6 +16,8 @@ interface RoleEditProps {
     role?: RoleRecord | null;
     treeData: DataNode[];
     expandedMenuIds: Key[];
+    statusOptions?: OptionsRecord[string];
+    privilegeOptions?: OptionsRecord[string];
     saving?: boolean;
     onClose: () => void;
     onSave: (request: RoleSaveCommand) => void;
@@ -53,11 +57,21 @@ const toFormValues = (role: RoleRecord): RoleFormValues => {
     };
 };
 
+const readOptionLabel = (
+    options: OptionsRecord[string] | undefined,
+    value: string,
+    fallbackLabel: string
+) => {
+    return options?.find((option) => option.value === value)?.label || fallbackLabel;
+};
+
 export const RoleEdit = ({
     open,
     role,
     treeData,
     expandedMenuIds,
+    statusOptions,
+    privilegeOptions,
     saving,
     onClose,
     onSave
@@ -113,10 +127,24 @@ export const RoleEdit = ({
                 </Form.Item>
                 <div className="role-editor-switches">
                     <Form.Item name="admin" label="管理权限" valuePropName="checked">
-                        <Switch checkedChildren="管理" unCheckedChildren="普通" />
+                        <SandwishSwitch
+                            checkedChildren={readOptionLabel(
+                                privilegeOptions,
+                                "ADMIN",
+                                "管理员角色"
+                            )}
+                            unCheckedChildren={readOptionLabel(
+                                privilegeOptions,
+                                "NORMAL",
+                                "普通角色"
+                            )}
+                        />
                     </Form.Item>
                     <Form.Item name="enable" label="角色状态" valuePropName="checked">
-                        <Switch checkedChildren="启用" unCheckedChildren="禁用" />
+                        <SandwishSwitch
+                            checkedChildren={readOptionLabel(statusOptions, "ENABLED", "启用")}
+                            unCheckedChildren={readOptionLabel(statusOptions, "DISABLED", "禁用")}
+                        />
                     </Form.Item>
                 </div>
                 <Form.Item name="remarks" label="备注">

@@ -1,6 +1,7 @@
 import { GlobalOutlined, IdcardOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Select } from "antd";
-import type { AuditOptionsRecord } from "../audit-log-types";
+import type { OptionsRecord } from "@/types/options";
+import type { AuditOptionKeys } from "../audit-log-service";
 
 export interface AuditLogFilters {
     objectType: string;
@@ -15,7 +16,7 @@ export interface AuditLogFilters {
 }
 
 interface AuditLogFilterProps {
-    auditOptions?: AuditOptionsRecord;
+    auditOptions?: Partial<OptionsRecord<AuditOptionKeys>>;
     filters: AuditLogFilters;
     hasActiveFilters: boolean;
     loading?: boolean;
@@ -24,7 +25,7 @@ interface AuditLogFilterProps {
     onReset: () => void;
 }
 
-const optionItems = (options?: Array<{ value: string; label: string }>) => [
+const optionItems = (options?: OptionsRecord[string]) => [
     { value: "ALL", label: "全部" },
     ...(options || []).map((option) => ({
         value: option.value,

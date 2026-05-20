@@ -51,14 +51,39 @@ const submissionStatusOptions: Array<{ label: string; value: SubmissionStatus }>
     { value: "CLOSED", label: submissionStatusLabels.CLOSED }
 ];
 
+const submissionStatusActions: Record<
+    SubmissionStatus,
+    Array<{
+        key: string;
+        text: string;
+        status: SubmissionStatus;
+        type?: "text" | "warning";
+    }>
+> = {
+    SUBMITTED: [
+        { key: "approve", text: "通过", status: "APPROVED" },
+        { key: "reject", text: "驳回", status: "REJECTED", type: "warning" },
+        { key: "close", text: "关闭", status: "CLOSED", type: "warning" }
+    ],
+    APPROVED: [{ key: "close", text: "关闭", status: "CLOSED", type: "warning" }],
+    REJECTED: [
+        { key: "reopen", text: "重开", status: "SUBMITTED" },
+        { key: "close", text: "关闭", status: "CLOSED", type: "warning" }
+    ],
+    CLOSED: []
+};
+
 const readStatusFilterValue = (value: SubmissionStatus | "ALL") => {
     return value === "ALL" ? undefined : value;
 };
 
+const readSubmissionStatus = (status?: string | null) => {
+    return status && status in submissionStatusLabels ? (status as SubmissionStatus) : null;
+};
+
 const readStatusLabel = (status?: string | null) => {
-    return status && status in submissionStatusLabels
-        ? submissionStatusLabels[status as SubmissionStatus]
-        : status || "未知";
+    const submissionStatus = readSubmissionStatus(status);
+    return submissionStatus ? submissionStatusLabels[submissionStatus] : status || "未知";
 };
 
 const statusTagType = (status?: string | null) => {
@@ -284,6 +309,21 @@ export const SubmissionPage = () => {
         });
     };
 
+    const readStatusActions = (submission: SubmissionRecord) => {
+        const currentStatus = readSubmissionStatus(submission.status);
+        if (!currentStatus) {
+            return [];
+        }
+        return submissionStatusActions[currentStatus].map((action) => ({
+            key: action.key,
+            text: action.text,
+            type: action.type,
+            ariaLabel: `${action.text} ${submission.title}`,
+            disabled: !canEditSubmission || statusMutation.isPending,
+            onClick: () => changeStatus(submission, action.status)
+        }));
+    };
+
     const columns: SandwishTableProps<SubmissionRecord>["columns"] = [
         {
             title: "内容",
@@ -348,13 +388,7 @@ export const SubmissionPage = () => {
                     ariaLabel: `查看 ${submission.title}`,
                     onClick: () => setDetailSubmission(submission)
                 },
-                ...submissionStatusOptions.map((statusOption) => ({
-                    key: `status:${statusOption.value}`,
-                    text: statusOption.label,
-                    type: "warning" as const,
-                    disabled: !canEditSubmission || submission.status === statusOption.value,
-                    onClick: () => changeStatus(submission, statusOption.value)
-                })),
+                ...readStatusActions(submission),
                 { type: "divider" as const },
                 {
                     key: "delete",

@@ -1,33 +1,22 @@
-import {
-    ClockCircleOutlined,
-    EyeOutlined,
-    GlobalOutlined,
-    IdcardOutlined,
-    ReloadOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { ClockCircleOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Button, Descriptions, Empty, Input, Select, Space, Tag, Typography } from "antd";
+import { Avatar, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ADMIN_API_BASE_URL } from "@/api/http";
 import { ListPage } from "@/components/list-page";
-import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
+import { AuditLogDetail } from "./components/audit-log-detail";
+import { AuditLogFilter } from "./components/audit-log-filter";
+import type { AuditLogFilters } from "./components/audit-log-filter";
 import { getAuditLogDetail, getAuditOptions, pageAuditLogs } from "./audit-log-service";
 import type { AuditLogPageQuery } from "./audit-log-service";
-import type {
-    AuditFieldRecord,
-    AuditLogRecord,
-    AuditSnapshotFieldRecord,
-    AuditSnapshotRecord
-} from "./audit-log-types";
+import type { AuditLogRecord } from "./audit-log-types";
 import "./audit-log-page.css";
 
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 
 const DEFAULT_COLUMN_WIDTHS = {
     occurredAt: 180,
@@ -40,19 +29,6 @@ const DEFAULT_COLUMN_WIDTHS = {
 };
 
 const ADMIN_OPERATOR_TYPE = "USER";
-
-interface AuditLogFilters {
-    objectType: string;
-    objectId: string;
-    action: string;
-    operatorType: string;
-    operatorId: string;
-    source: string;
-    requestId: string;
-    beginDate: string;
-    endDate: string;
-}
-
 const DEFAULT_AUDIT_LOG_FILTERS: AuditLogFilters = {
     objectType: "ALL",
     objectId: "",
@@ -119,132 +95,7 @@ const readOperatorUser = (log: AuditLogRecord) => {
     return { avatarUrl, name };
 };
 
-const optionItems = (options?: Array<{ value: string; label: string }>) => [
-    { value: "ALL", label: "全部" },
-    ...(options || []).map((option) => ({
-        value: option.value,
-        label: option.label || option.value
-    }))
-];
-
-const renderChangedFields = (fields?: AuditFieldRecord[] | null) => {
-    if (!fields?.length) {
-        return <Text type="secondary">无字段变更</Text>;
-    }
-
-    return (
-        <div className="audit-log-field-list">
-            {fields.map((field) => (
-                <div key={field.fieldName || field.fieldLabel} className="audit-log-field-row">
-                    <Text strong>{field.fieldLabel || field.fieldName}</Text>
-                    <div className="audit-log-field-values">
-                        <Text type="secondary">{field.beforeDisplayValue || "-"}</Text>
-                        <span>→</span>
-                        <Text>{field.afterDisplayValue || "-"}</Text>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const snapshotFieldKey = (field: Pick<AuditSnapshotFieldRecord, "fieldName" | "fieldLabel">) => {
-    return field.fieldName || field.fieldLabel || "";
-};
-
-const snapshotFieldValue = (field?: AuditSnapshotFieldRecord | null) => {
-    return field?.displayValue || "-";
-};
-
-const changedFieldKeys = (fields?: AuditFieldRecord[] | null) => {
-    const keys = new Set<string>();
-    (fields || []).forEach((field) => {
-        if (field.fieldName) {
-            keys.add(field.fieldName);
-        }
-        if (field.fieldLabel) {
-            keys.add(field.fieldLabel);
-        }
-    });
-    return keys;
-};
-
-const snapshotFieldMap = (snapshot?: AuditSnapshotRecord | null) => {
-    const fields = new Map<string, AuditSnapshotFieldRecord>();
-    (snapshot?.fields || []).forEach((field) => {
-        const key = snapshotFieldKey(field);
-        if (key) {
-            fields.set(key, field);
-        }
-    });
-    return fields;
-};
-
-const snapshotFieldKeys = (
-    beforeSnapshot?: AuditSnapshotRecord | null,
-    afterSnapshot?: AuditSnapshotRecord | null
-) => {
-    const keys: string[] = [];
-    [...(beforeSnapshot?.fields || []), ...(afterSnapshot?.fields || [])].forEach((field) => {
-        const key = snapshotFieldKey(field);
-        if (key && !keys.includes(key)) {
-            keys.push(key);
-        }
-    });
-    return keys;
-};
-
-const renderSnapshotCompare = (
-    beforeSnapshot?: AuditSnapshotRecord | null,
-    afterSnapshot?: AuditSnapshotRecord | null,
-    fields?: AuditFieldRecord[] | null
-) => {
-    const keys = snapshotFieldKeys(beforeSnapshot, afterSnapshot);
-    if (!keys.length) {
-        return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无快照" />;
-    }
-    const beforeFields = snapshotFieldMap(beforeSnapshot);
-    const afterFields = snapshotFieldMap(afterSnapshot);
-    const changedKeys = changedFieldKeys(fields);
-
-    return (
-        <div className="audit-log-snapshot-compare">
-            <div className="audit-log-snapshot-head">
-                <Text type="secondary">字段</Text>
-                <Text type="secondary">变更前</Text>
-                <Text type="secondary">变更后</Text>
-            </div>
-            {keys.map((key) => {
-                const beforeField = beforeFields.get(key);
-                const afterField = afterFields.get(key);
-                const beforeValue = snapshotFieldValue(beforeField);
-                const afterValue = snapshotFieldValue(afterField);
-                const changed = changedKeys.has(key) || beforeValue !== afterValue;
-                return (
-                    <div
-                        key={key}
-                        className={
-                            changed
-                                ? "audit-log-snapshot-row audit-log-snapshot-row-changed"
-                                : "audit-log-snapshot-row"
-                        }
-                    >
-                        <div className="audit-log-snapshot-field">
-                            <Text strong={changed}>
-                                {beforeField?.fieldLabel || afterField?.fieldLabel || key}
-                            </Text>
-                            {changed ? <Tag className="audit-log-changed-tag">已变更</Tag> : null}
-                        </div>
-                        <Text type="secondary">{beforeValue}</Text>
-                        <Text strong={changed}>{afterValue}</Text>
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
-
-const renderOperator = (log: AuditLogRecord, accessToken: string | null, nameNode?: ReactNode) => {
+const renderOperator = (log: AuditLogRecord, accessToken: string | null) => {
     const user = readOperatorUser(log);
     const avatarUrl = toAuthenticatedResourceUrl(user.avatarUrl, accessToken);
     return (
@@ -252,7 +103,7 @@ const renderOperator = (log: AuditLogRecord, accessToken: string | null, nameNod
             <Avatar size={28} src={avatarUrl}>
                 {getInitials(user.name)}
             </Avatar>
-            {nameNode || <Text ellipsis>{user.name}</Text>}
+            <Text ellipsis>{user.name}</Text>
         </Space>
     );
 };
@@ -450,142 +301,15 @@ export const AuditLogPage = () => {
                 filterActive={hasActiveFilters}
                 filterClassName="audit-log-filter-panel"
                 filter={({ closeFilter }) => (
-                    <div className="audit-log-filter-form">
-                        <label>
-                            <span>对象类型</span>
-                            <Select
-                                value={filters.objectType}
-                                options={optionItems(auditOptions?.objectTypes)}
-                                loading={auditOptionsQuery.isFetching}
-                                onChange={(objectType) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        objectType
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>动作</span>
-                            <Select
-                                value={filters.action}
-                                options={optionItems(auditOptions?.actions)}
-                                loading={auditOptionsQuery.isFetching}
-                                onChange={(action) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        action
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>操作者类型</span>
-                            <Select
-                                value={filters.operatorType}
-                                options={optionItems(auditOptions?.operatorTypes)}
-                                loading={auditOptionsQuery.isFetching}
-                                onChange={(operatorType) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        operatorType
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>对象 ID</span>
-                            <Input
-                                allowClear
-                                prefix={<IdcardOutlined />}
-                                value={filters.objectId}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        objectId: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>操作者 ID</span>
-                            <Input
-                                allowClear
-                                value={filters.operatorId}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        operatorId: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>来源</span>
-                            <Input
-                                allowClear
-                                prefix={<GlobalOutlined />}
-                                value={filters.source}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        source: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>请求 ID</span>
-                            <Input
-                                allowClear
-                                value={filters.requestId}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        requestId: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>开始时间</span>
-                            <Input
-                                allowClear
-                                placeholder="2026-05-19 00:00:00"
-                                value={filters.beginDate}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        beginDate: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <label>
-                            <span>结束时间</span>
-                            <Input
-                                allowClear
-                                placeholder="2026-05-19 23:59:59"
-                                value={filters.endDate}
-                                onChange={(event) =>
-                                    setFilters((currentFilters) => ({
-                                        ...currentFilters,
-                                        endDate: event.target.value
-                                    }))
-                                }
-                            />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="audit-log-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => applyFilters(closeFilter)}
-                        >
-                            查询
-                        </Button>
-                    </div>
+                    <AuditLogFilter
+                        auditOptions={auditOptions}
+                        filters={filters}
+                        hasActiveFilters={hasActiveFilters}
+                        loading={auditOptionsQuery.isFetching}
+                        onApply={() => applyFilters(closeFilter)}
+                        onChange={setFilters}
+                        onReset={resetFilters}
+                    />
                 )}
                 pageActions={
                     <Button
@@ -616,82 +340,14 @@ export const AuditLogPage = () => {
                 }}
             />
 
-            <SandwishDrawer
-                title="审计详情"
-                open={Boolean(detailLogId)}
-                size="large"
+            <AuditLogDetail
+                accessToken={accessToken}
+                auditLog={detailLog}
+                error={detailQuery.isError}
                 loading={detailQuery.isFetching}
+                open={Boolean(detailLogId)}
                 onClose={() => setDetailLogId(null)}
-            >
-                {detailLog ? (
-                    <div className="audit-log-detail">
-                        <Descriptions column={2} size="small" bordered>
-                            <Descriptions.Item label="对象">
-                                {detailLog.objectDisplayName || detailLog.objectId || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="对象类型">
-                                {detailLog.objectTypeLabel || detailLog.objectType || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="动作">
-                                {detailLog.actionLabel || detailLog.action || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="版本">
-                                {detailLog.version ?? "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="操作者">
-                                {renderOperator(
-                                    detailLog,
-                                    accessToken,
-                                    <span>{readOperatorName(detailLog)}</span>
-                                )}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="操作者类型">
-                                {detailLog.operatorTypeLabel || detailLog.operatorType || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="来源">
-                                {detailLog.source || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="远端地址">
-                                {detailLog.remoteAddr || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="请求 ID">
-                                {detailLog.requestId || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="链路 ID">
-                                {detailLog.traceId || "-"}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="发生时间">
-                                {formatDateTime(detailLog.occurredAt)}
-                            </Descriptions.Item>
-                            <Descriptions.Item label="幂等键">
-                                {detailLog.idempotencyKey || "-"}
-                            </Descriptions.Item>
-                        </Descriptions>
-
-                        <section>
-                            <Text type="secondary">摘要</Text>
-                            <Paragraph>{detailLog.summary || "-"}</Paragraph>
-                        </section>
-
-                        <section>
-                            <Text type="secondary">字段变更</Text>
-                            {renderChangedFields(detailLog.changedFields)}
-                        </section>
-
-                        <section>
-                            <Text type="secondary">快照对比</Text>
-                            {renderSnapshotCompare(
-                                detailLog.beforeSnapshot,
-                                detailLog.afterSnapshot,
-                                detailLog.changedFields
-                            )}
-                        </section>
-                    </div>
-                ) : null}
-                {!detailLog && detailQuery.isError ? (
-                    <Empty description="审计详情加载失败" />
-                ) : null}
-            </SandwishDrawer>
+            />
         </>
     );
 };

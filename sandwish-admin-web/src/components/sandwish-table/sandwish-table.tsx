@@ -14,12 +14,12 @@ import "./sandwish-table.css";
 const DEFAULT_ACTION_COLUMN_KEY = "actions";
 const DEFAULT_ACTION_COLUMN_WIDTH = 116;
 const DEFAULT_ACTION_COLUMN_MOBILE_WIDTH = 54;
-const ACTION_BUTTON_WIDTH = 31;
-const ACTION_CELL_GAP = 3;
-const ACTION_CELL_PADDING = 28;
-const ACTION_DIVIDER_WIDTH = 9;
+const ACTION_BUTTON_WIDTH = 24;
+const ACTION_CELL_GAP = 0;
+const ACTION_CELL_PADDING = 20;
+const ACTION_DIVIDER_WIDTH = 5;
 const ACTION_INLINE_LIMIT = 2;
-const ACTION_TEXT_BASE_WIDTH = 26;
+const ACTION_TEXT_BASE_WIDTH = 10;
 const ACTION_TEXT_CHAR_WIDTH = 14;
 const DEFAULT_MIN_COLUMN_WIDTH = 96;
 const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
@@ -150,13 +150,13 @@ const calculateActionColumnWidth = <RecordType extends object>(
         return DEFAULT_ACTION_COLUMN_MOBILE_WIDTH;
     }
 
-    const visibleActions = actions.filter((action) => !isActionDivider(action));
-    const visibleActionCount = Math.min(actionCount, ACTION_INLINE_LIMIT);
+    const { inlineActions, overflowActions } = splitActions(actions, ACTION_INLINE_LIMIT);
+    const inlineWidth = inlineActions.reduce(
+        (total, action) => total + calculateActionButtonWidth(action),
+        0
+    );
     const hasOverflow = actionCount > ACTION_INLINE_LIMIT;
-    const inlineWidth = visibleActions
-        .slice(0, ACTION_INLINE_LIMIT)
-        .reduce((total, action) => total + calculateActionButtonWidth(action), 0);
-    const itemCount = visibleActionCount + (hasOverflow ? 1 : 0);
+    const itemCount = inlineActions.length + (overflowActions.length > 0 ? 1 : 0);
 
     return (
         ACTION_CELL_PADDING +

@@ -406,7 +406,7 @@ public class UserController {
             if (bean == null) {
                 throw AdminResponseExceptions.objectNotFound();
             }
-            validateEditableUser(currentUser, bean);
+            validateEditableStatusUser(currentUser, bean);
             commandList.add(new ChangeUserStatusCommand(
                     bean.getId(), Boolean.TRUE.equals(request.getEnable()) ? UserStatus.ENABLED : UserStatus.DISABLED));
         }
@@ -628,6 +628,19 @@ public class UserController {
                 || currentUser.getRank() == null
                 || targetUser == null
                 || targetUser.getRank() == null
+                || targetUser.getRank().value() >= currentUser.getRank().value()) {
+            throw AdminResponseExceptions.permissionDenied();
+        }
+    }
+
+    private void validateEditableStatusUser(User currentUser, User targetUser) {
+        if (currentUser == null
+                || currentUser.getId() == null
+                || currentUser.getRank() == null
+                || targetUser == null
+                || targetUser.getId() == null
+                || targetUser.getRank() == null
+                || Objects.equals(currentUser.getId(), targetUser.getId())
                 || targetUser.getRank().value() >= currentUser.getRank().value()) {
             throw AdminResponseExceptions.permissionDenied();
         }

@@ -28,6 +28,7 @@ import com.github.thundax.modules.auth.service.PrincipalIdentityService;
 import com.github.thundax.modules.auth.service.query.PreAuthSessionValueQuery;
 import com.github.thundax.modules.sys.controller.request.UserDepartmentRequest;
 import com.github.thundax.modules.sys.controller.request.UserSaveRequest;
+import com.github.thundax.modules.sys.controller.request.UserStatusRequest;
 import com.github.thundax.modules.sys.entity.Department;
 import com.github.thundax.modules.sys.entity.Dict;
 import com.github.thundax.modules.sys.entity.Role;
@@ -46,6 +47,7 @@ import com.github.thundax.modules.sys.service.DictService;
 import com.github.thundax.modules.sys.service.RoleService;
 import com.github.thundax.modules.sys.service.UserService;
 import com.github.thundax.modules.sys.service.command.ChangeUserInfoCommand;
+import com.github.thundax.modules.sys.service.command.ChangeUserStatusCommand;
 import com.github.thundax.modules.sys.service.command.CreateUserCommand;
 import com.github.thundax.modules.sys.service.query.DictQuery;
 import com.github.thundax.modules.sys.service.query.UserQuery;
@@ -294,6 +296,36 @@ public class UserControllerContractTest {
     }
 
     @Test
+    public void shouldRejectChangingOwnStatusEvenForSuperUser() {
+        UserService userService = mock(UserService.class);
+        CurrentUserResolver currentUserResolver = mock(CurrentUserResolver.class);
+        User currentUser = user();
+        currentUser.setPrivilege(UserPrivilege.SUPER);
+        currentUser.setRank(AccessRank.of(9));
+
+        when(currentUserResolver.currentUser()).thenReturn(currentUser);
+        when(userService.get(UserIdCodec.toDomain("1001"))).thenReturn(currentUser);
+
+        try {
+            new UserController(
+                            userService,
+                            mock(DepartmentService.class),
+                            mock(DictService.class),
+                            mock(RoleService.class),
+                            mock(PrincipalIdentityService.class),
+                            mock(PrincipalCredentialService.class),
+                            mock(PreAuthSessionService.class),
+                            currentUserResolver,
+                            mock(CurrentUserService.class))
+                    .updateStatus(Collections.singletonList(userStatusRequest("1001", false)));
+            org.junit.Assert.fail("changing own status should be rejected");
+        } catch (SandwishException e) {
+            org.junit.Assert.assertEquals(WebErrorCode.FORBIDDEN, e.getErrorCode());
+        }
+        verify(userService, never()).changeStatus(any(ChangeUserStatusCommand.class));
+    }
+
+    @Test
     public void shouldBuildAvatarUrlWithContextPath() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setContextPath("/admin-api");
@@ -338,6 +370,13 @@ public class UserControllerContractTest {
         dict.setLabel(label);
         dict.setValue(value);
         return dict;
+    }
+
+    private UserStatusRequest userStatusRequest(String id, boolean enable) {
+        UserStatusRequest request = new UserStatusRequest();
+        request.setId(id);
+        request.setEnable(enable);
+        return request;
     }
 
     private UserSaveRequest editableUserRequest() {

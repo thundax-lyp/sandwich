@@ -317,10 +317,7 @@ html[data-theme="dark"] .user-page {
 .user-role-editor,
 .user-role-viewer,
 .user-rank-badge,
-.user-rank-super-admin,
-.user-status-active,
-.user-status-inactive,
-.user-status-invited {
+.user-rank-super-admin {
     border: 1px solid transparent;
     border-radius: 7px;
 }
@@ -353,24 +350,6 @@ html[data-theme="dark"] .user-page {
     color: var(--user-blue);
     background: var(--user-blue-soft);
     border-color: var(--user-blue-line);
-}
-
-.user-status-active {
-    color: var(--user-success);
-    background: var(--user-success-soft);
-    border-color: var(--user-success-line);
-}
-
-.user-status-inactive {
-    color: var(--user-danger);
-    background: var(--user-danger-soft);
-    border-color: var(--user-danger-line);
-}
-
-.user-status-invited {
-    color: var(--user-warning);
-    background: var(--user-warning-soft);
-    border-color: var(--user-warning-line);
 }
 
 .user-edit-form {

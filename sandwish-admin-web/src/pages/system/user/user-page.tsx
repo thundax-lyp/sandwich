@@ -16,6 +16,7 @@ import { createLoginForm } from "@/auth/auth-service";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
+import { SandwishSwitch } from "@/components/sandwish-switch";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserRecord } from "@/service/current-user-types";
@@ -85,10 +86,6 @@ const statusValue = (user: UserRecord): Exclude<UserFilterStatus, "ALL"> => {
     return user.enable === false ? "DISABLED" : "ENABLED";
 };
 
-const statusClassName = (user: UserRecord) => {
-    return user.enable === false ? "user-status-inactive" : "user-status-active";
-};
-
 const rankLabel = (user: UserRecord) => {
     if (user.superAdmin || user.ranks === 9) {
         return "超级管理员";
@@ -121,8 +118,8 @@ const canManageUserByRank = (
     currentUser: CurrentUserRecord | undefined,
     targetUser: UserRecord
 ) => {
-    if (currentUser?.superAdmin) {
-        return true;
+    if (!currentUser || currentUser.id === targetUser.id) {
+        return false;
     }
     return readRankValue(targetUser) < readRankValue(currentUser);
 };
@@ -310,6 +307,16 @@ export const UserPage = () => {
     const readStatusLabel = (user: UserRecord) => {
         const value = statusValue(user);
         return statusLabelByValue.get(value) || (value === "DISABLED" ? "禁用" : "启用");
+    };
+
+    const readStatusOptionLabel = (value: Exclude<UserFilterStatus, "ALL">) => {
+        return statusLabelByValue.get(value) || (value === "DISABLED" ? "禁用" : "启用");
+    };
+
+    const updateSingleStatus = (user: UserRecord, enable: boolean) => {
+        statusMutation.mutate({
+            users: [{ id: user.id, enable }]
+        });
     };
 
     const statusMutation = useMutation({
@@ -605,9 +612,19 @@ export const UserPage = () => {
             dataIndex: "enable",
             key: "status",
             width: DEFAULT_COLUMN_WIDTHS.status,
-            render: (_, user) => (
-                <Tag className={statusClassName(user)}>{readStatusLabel(user)}</Tag>
-            )
+            render: (_, user) => {
+                const canManageCurrentUser = canManageUserByRank(currentUserQuery.data, user);
+                return (
+                    <SandwishSwitch
+                        checked={user.enable !== false}
+                        checkedChildren={readStatusOptionLabel("ENABLED")}
+                        unCheckedChildren={readStatusOptionLabel("DISABLED")}
+                        disabled={!canEditUser || !canManageCurrentUser || statusMutation.isPending}
+                        aria-label={`切换 ${readUserName(user)} 状态，当前${readStatusLabel(user)}`}
+                        onChange={(checked) => updateSingleStatus(user, checked)}
+                    />
+                );
+            }
         },
         {
             title: "级别",

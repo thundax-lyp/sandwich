@@ -1092,6 +1092,18 @@ describe("App", () => {
                 const body = init?.body ? JSON.parse(String(init.body)) : {};
                 const allUsers = [
                     {
+                        id: "current",
+                        loginName: "root",
+                        name: "Root",
+                        email: "root@example.com",
+                        ranks: 9,
+                        superAdmin: true,
+                        admin: true,
+                        enable: true,
+                        department: { id: "1", name: "Product", namePath: "Product" },
+                        roles: [{ id: "r1", name: "管理员" }]
+                    },
+                    {
                         id: "1",
                         loginName: "ethan",
                         name: "Ethan Chen",
@@ -1153,7 +1165,8 @@ describe("App", () => {
 
         expect(screen.getByRole("heading", { name: "用户管理" })).toBeInTheDocument();
         expect(await screen.findByText("Ethan Chen")).toBeInTheDocument();
-        expect(await screen.findByText("字典启用")).toBeInTheDocument();
+        expect((await screen.findAllByText("字典启用")).length).toBeGreaterThan(0);
+        expect(screen.getByRole("switch", { name: /切换 Root 状态/ })).toBeDisabled();
 
         const filterButton = screen.getByRole("button", { name: /筛选/ });
         fireEvent.click(filterButton);

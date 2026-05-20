@@ -194,14 +194,7 @@ Right:
 - 最多 1 个主按钮。
 - 最多 2 个次级按钮。
 - 更多操作收敛到下拉菜单。
-- 列表页右侧操作顺序固定为：搜索输入、筛选、刷新、更多操作、新增主按钮。
-- 不存在的操作直接跳过，剩余操作保持相对顺序。
-
-示例：
-
-```text
-搜索 | 筛选 | 刷新 | 更多 | 新增
-```
+- 列表页优先使用 `SandwishListPage` 组织右侧操作；页面不要绕过骨架塞入多个主操作。
 
 #### FilterBar
 
@@ -209,9 +202,7 @@ Right:
 
 列表页默认展示模糊搜索；筛选面板只承载结构化筛选，不重复展示模糊查询。
 
-页面通过 `SandwishListPage` 的 `filterFields` 声明筛选字段；字段使用 `{ name, label, render }`，由 `SandwishFilterPanel` 统一渲染 label、字段布局和按钮区。
-
-`filterFields` 按屏幕宽度自动决定每行字段数量。字段控件撑满所在 field；当整行字段不足时保留行内间隙，不强行撑满整行。`重置` / `查询` 作为最后一个 field 参与整体布局。
+页面通过 `SandwishListPage` 的 `filterFields` 声明结构化筛选字段；页面不自绘筛选面板布局和固定按钮。
 
 搜索框 placeholder 必须表达可搜索对象。
 
@@ -234,7 +225,6 @@ Right:
 - 回车触发搜索。
 - 重置恢复默认筛选状态。
 - 输入即搜索时必须 debounce `300-500ms`。
-- 固定按钮文案为 `重置`、`查询`，顺序为 `重置` 在前、`查询` 在后。
 
 #### Toolbar
 
@@ -300,7 +290,7 @@ Actions
 - 使用危险样式。
 - 要求二次确认。
 
-页面只判断操作语义、顺序、危险级别和是否需要复杂 `render`；展示数量、分隔线、列宽、固定列、移动端下拉和排序拖动入口由 `SandwishTable` 处理。
+页面只判断操作语义、顺序、危险级别和是否需要复杂 `render`；展示数量、分隔线、列宽、固定列、移动端下拉和排序拖动入口交给 `SandwishTable`。
 
 #### Pagination
 
@@ -586,6 +576,7 @@ test("delete requires confirmation", async ({ page }) => {
 
 ## Open Items
 
-- 是否将列表页操作顺序、Drawer footer、Table actions、Confirm hook 继续沉淀为共享组件默认行为或测试门禁。
+- 是否将 Drawer footer 继续沉淀为共享组件默认行为或测试门禁。
+- 是否为列表页操作顺序、Table actions、Confirm hook 补充测试门禁。
 - 是否固定详情页结构为 `PageHeader`、`Summary`、`BasicInfo`、`BusinessInfo`、`Timeline`、`Logs`。
 - Playwright 默认覆盖重点是否包含上传和核心业务流程。

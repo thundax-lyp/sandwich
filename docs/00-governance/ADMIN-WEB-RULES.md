@@ -316,7 +316,7 @@ fixed: "right"
 
 #### Form
 
-短表单优先使用 Modal；存在复杂关系、权限、树选择或多区块内容时，优先使用 Drawer 或 Page。
+业务表单默认使用 Drawer 或 Page，避免使用 Modal 承载业务录入。
 
 表单按钮默认位于右下角，顺序固定为：
 
@@ -377,14 +377,14 @@ effectiveAt
 - 提交失败时滚动到第一个错误字段。
 - 异步校验必须 debounce `500ms`。
 
-#### Modal And Drawer
+#### Drawer And Modal
 
 默认用途：
 
 | Type | Usage |
 | --- | --- |
-| Modal | 确认、短表单 |
-| Drawer | 复杂表单、详情 |
+| Drawer | 业务表单、详情、复杂关系 |
+| Modal | 确认、轻量反馈 |
 
 底部按钮顺序：
 
@@ -593,9 +593,6 @@ test("delete requires confirmation", async ({ page }) => {
 - 是否将表格操作数量固定为 `<= 3` 直接展示、`4-5` 部分收敛、`> 5` 必须使用下拉菜单。
 - 是否要求表格操作下拉菜单中的危险操作前必须使用分隔线。
 - 是否统一分页默认页大小和可选页大小；当前多数页面默认 `10`，基础稿建议默认 `20`、选项 `10 / 20 / 50 / 100`。
-- 是否将表单承载形式固定为 `<= 6` 使用 Modal、`7-20` 使用 Drawer、`> 20` 使用 Page。
-- 是否继续使用 Modal 具体宽度规则：确认 `400px`、小表单 `520px`、中表单 `640px`、超过 `640px` 改用 Drawer。
-- Modal 和 Drawer 宽度规则是否应改为使用 `SandwishDrawer` 的 `small`、`middle`、`large`、`full` 尺寸档位。
 - 是否固定详情页结构为 `PageHeader`、`Summary`、`BasicInfo`、`BusinessInfo`、`Timeline`、`Logs`。
 - 是否固定详情页操作顺序为编辑、复制、导出、删除。
 - 是否新增统一 `StatusTag` 组件，替代当前页面内分散的 Ant Design `Tag` 状态样式。

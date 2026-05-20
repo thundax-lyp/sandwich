@@ -19,8 +19,10 @@ export interface RoleSaveCommand {
 }
 
 export interface RoleStatusCommand {
-    id: string;
-    enable?: boolean | null;
+    roles: Array<{
+        id: string;
+        enable?: boolean | null;
+    }>;
 }
 
 export interface RoleSortCommand {
@@ -50,9 +52,9 @@ export const changeRoleInfo = (request: RoleSaveCommand) => {
     });
 };
 
-export const changeRoleStatus = (request: RoleStatusCommand[]) => {
-    return postJson<boolean, RoleStatusCommand[]>("/sys/role/enable", {
-        body: request
+export const changeRoleStatus = (request: RoleStatusCommand) => {
+    return postJson<boolean, Array<{ id: string; enable?: boolean | null }>>("/sys/role/enable", {
+        body: request.roles
     });
 };
 

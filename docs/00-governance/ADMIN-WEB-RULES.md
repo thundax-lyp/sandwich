@@ -91,6 +91,8 @@
 - `ADMIN_WEB_NAME_NO_NESTED_TERNARY`：禁止嵌套三元表达式。
 - `ADMIN_WEB_NAME_CAMEL_CASE`：变量和方法使用 camelCase。
 - `ADMIN_WEB_NAME_SERVICE_METHOD`：service 方法必须使用固定动词前缀。
+- `ADMIN_WEB_NAME_SERVICE_METHOD_INPUT`：service 方法入参固定为无入参、单个 `XxxQuery`、单个 `XxxCommand` 或最多 3 个 plain parameters。
+- `ADMIN_WEB_NAME_SERVICE_HELPER_TYPE`：service helper 泛型固定为 `XxxQuery`、`XxxCommand`、inline payload、plain value、`XxxRecord`、`XxxNode`、`Page<XxxRecord/XxxNode>` 或数组。
 - `ADMIN_WEB_NAME_API_CONTRACT_TYPE_LOCATION`：`XxxRequest` / `XxxResponse` 只定义在 `*-service.ts` 或 `src/api/`。
 - `ADMIN_WEB_NAME_API_CONTRACT_TYPE_EXPOSURE`：`XxxRequest` / `XxxResponse` 是 service 内部 API 契约，不从 service 导出。
 - `ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE`：页面和组件只从 service 引用 `XxxQuery` / `XxxCommand`；`XxxRecord` / `XxxNode` 从 `*-types.ts` 引用。

@@ -13,8 +13,10 @@ export interface UserPageQuery {
 }
 
 export interface UserStatusCommand {
-    id: string;
-    enable?: boolean | null;
+    users: Array<{
+        id: string;
+        enable?: boolean | null;
+    }>;
 }
 
 export interface UserSaveCommand {
@@ -47,9 +49,9 @@ export const listUserRoles = () => {
     return postJson<UserRoleRecord[]>("/sys/user/role/list");
 };
 
-export const changeUserStatus = (request: UserStatusCommand[]) => {
-    return postJson<boolean, UserStatusCommand[]>("/sys/user/enable", {
-        body: request
+export const changeUserStatus = (request: UserStatusCommand) => {
+    return postJson<boolean, Array<{ id: string; enable?: boolean | null }>>("/sys/user/enable", {
+        body: request.users
     });
 };
 

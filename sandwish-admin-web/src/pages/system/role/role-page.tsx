@@ -245,11 +245,13 @@ export const RolePage = () => {
         if (!canEditRole) {
             return;
         }
-        statusMutation.mutate([{ id: role.id, enable }]);
+        statusMutation.mutate({ roles: [{ id: role.id, enable }] });
     };
 
     const batchUpdateStatus = (enable: boolean) => {
-        statusMutation.mutate(selectedRowKeys.map((id) => ({ id: String(id), enable })));
+        statusMutation.mutate({
+            roles: selectedRowKeys.map((id) => ({ id: String(id), enable }))
+        });
     };
 
     const deleteRole = () => {

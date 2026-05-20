@@ -432,7 +432,9 @@ export const UserPage = () => {
         if (!hasSelectedUsers || !canEditUser) {
             return;
         }
-        statusMutation.mutate(selectedRowKeys.map((id) => ({ id: String(id), enable })));
+        statusMutation.mutate({
+            users: selectedRowKeys.map((id) => ({ id: String(id), enable }))
+        });
     };
 
     const openCreateUser = () => {

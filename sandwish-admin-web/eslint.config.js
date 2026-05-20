@@ -775,6 +775,132 @@ const localRules = {
                 };
             }
         },
+        "service-method-input-shape": {
+            create(context) {
+                const scalarTypeNames = ["Blob", "File", "FormData", "Date"];
+                const isServiceInputName = (name) => /(?:Query|Command)$/.test(name);
+
+                const readTypeAnnotation = (param) => {
+                    if (param.type === "AssignmentPattern") {
+                        return param.left.typeAnnotation?.typeAnnotation;
+                    }
+                    return param.typeAnnotation?.typeAnnotation;
+                };
+
+                const readTypeName = (typeNode) => {
+                    if (!typeNode || typeNode.type !== "TSTypeReference") {
+                        return "";
+                    }
+                    if (typeNode.typeName.type === "Identifier") {
+                        return typeNode.typeName.name;
+                    }
+                    return "";
+                };
+
+                const readTypeArguments = (typeNode) => {
+                    return (
+                        typeNode?.typeArguments?.params ?? typeNode?.typeParameters?.params ?? []
+                    );
+                };
+
+                const isPlainType = (typeNode) => {
+                    if (!typeNode) {
+                        return false;
+                    }
+
+                    if (
+                        [
+                            "TSBooleanKeyword",
+                            "TSStringKeyword",
+                            "TSNumberKeyword",
+                            "TSNullKeyword",
+                            "TSUndefinedKeyword",
+                            "TSLiteralType"
+                        ].includes(typeNode.type)
+                    ) {
+                        return true;
+                    }
+
+                    if (typeNode.type === "TSArrayType") {
+                        return isPlainType(typeNode.elementType);
+                    }
+
+                    if (typeNode.type === "TSUnionType") {
+                        return typeNode.types.every(isPlainType);
+                    }
+
+                    const name = readTypeName(typeNode);
+                    if (scalarTypeNames.includes(name)) {
+                        return true;
+                    }
+
+                    if (name === "Array" || name === "ReadonlyArray") {
+                        return readTypeArguments(typeNode).every(isPlainType);
+                    }
+
+                    return false;
+                };
+
+                const reportInvalidInput = (node) => {
+                    context.report({
+                        node,
+                        message:
+                            "ADMIN_WEB_NAME_SERVICE_METHOD_INPUT: service method parameters must be void, one XxxQuery, one XxxCommand, or up to 3 plain parameters."
+                    });
+                };
+
+                const checkInputShape = (node, params) => {
+                    if (params.length === 0) {
+                        return;
+                    }
+
+                    if (params.length > 3) {
+                        reportInvalidInput(node);
+                        return;
+                    }
+
+                    const typeNodes = params.map(readTypeAnnotation);
+                    if (params.length === 1) {
+                        const name = readTypeName(typeNodes[0]);
+                        if (isServiceInputName(name) || isPlainType(typeNodes[0])) {
+                            return;
+                        }
+                        reportInvalidInput(params[0]);
+                        return;
+                    }
+
+                    if (typeNodes.every(isPlainType)) {
+                        return;
+                    }
+
+                    reportInvalidInput(node);
+                };
+
+                return {
+                    ExportNamedDeclaration(node) {
+                        const filePath = context.physicalFilename;
+                        if (!filePath.endsWith("-service.ts")) {
+                            return;
+                        }
+
+                        if (node.declaration?.type !== "VariableDeclaration") {
+                            return;
+                        }
+
+                        node.declaration.declarations.forEach((declaration) => {
+                            if (
+                                declaration.id.type !== "Identifier" ||
+                                declaration.init?.type !== "ArrowFunctionExpression"
+                            ) {
+                                return;
+                            }
+
+                            checkInputShape(declaration.id, declaration.init.params);
+                        });
+                    }
+                };
+            }
+        },
         "api-contract-type-location": {
             create(context) {
                 const isApiContractName = (name) => /(?:Request|Response)$/.test(name);
@@ -1021,7 +1147,7 @@ const localRules = {
                         context.report({
                             node,
                             message:
-                                "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service helper generic types must not expose XxxRequest/XxxResponse."
+                                "ADMIN_WEB_NAME_SERVICE_HELPER_TYPE: service helper generic types must not expose XxxRequest/XxxResponse."
                         });
                     }
 
@@ -1073,7 +1199,7 @@ const localRules = {
                     context.report({
                         node,
                         message:
-                            "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service return object types must be XxxRecord/XxxNode or Page<XxxRecord/XxxNode>."
+                            "ADMIN_WEB_NAME_SERVICE_HELPER_TYPE: service return types must be plain value, XxxRecord, XxxNode, Page<XxxRecord/XxxNode>, or arrays."
                     });
                 };
 
@@ -1112,7 +1238,7 @@ const localRules = {
                     context.report({
                         node,
                         message:
-                            "ADMIN_WEB_NAME_SERVICE_TYPE_EXPOSURE: service request object types must be XxxQuery/XxxCommand or inline payload types."
+                            "ADMIN_WEB_NAME_SERVICE_HELPER_TYPE: service request object types must be XxxQuery/XxxCommand or inline payload types."
                     });
                 };
 
@@ -1245,6 +1371,7 @@ export default tseslint.config(
             "local/post-helper-service-only": "error",
             "local/sandwish-component-name": "error",
             "local/service-method-verb-prefix": "error",
+            "local/service-method-input-shape": "error",
             "local/service-input-type-location": "error",
             "local/service-helper-contract-types": "error",
             "local/service-type-exposure": "error",

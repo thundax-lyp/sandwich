@@ -506,7 +506,6 @@ JPG / PNG
 
 ### Service
 
-- service 方法内部固定完成 API 契约到页面业务类型的转换；页面、布局和组件不处理后端 `XxxRequest` / `XxxResponse` 字段兼容。
 - service 简单动作固定使用 plain parameters，例如 `removeUsers(ids: string[])`、`changeUserStatus(id: string, enable: boolean)`；不为单个 id 包装多余类型。
 
 ### Permission

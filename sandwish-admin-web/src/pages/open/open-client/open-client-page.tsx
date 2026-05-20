@@ -361,7 +361,7 @@ export const OpenClientPage = () => {
                 onFilterApply={applyFilters}
                 onFilterReset={resetFilters}
                 enableAdd={canEditOpenClient}
-                addText="新增客户端"
+                addText="新增"
                 onAdd={openCreateEditor}
                 pageActions={
                     <Button

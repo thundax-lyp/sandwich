@@ -1,4 +1,4 @@
-import { BookOutlined, DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { BookOutlined, DeleteOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Input, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
@@ -229,10 +229,11 @@ export const DictionaryPage = () => {
                 onSearchChange={searchDictionaries}
                 onAdd={openCreateEditor}
                 filterActive={hasActiveFilters}
-                filter={({ closeFilter }) => (
-                    <div className="dictionary-filter-form">
-                        <label>
-                            <span>字典类型</span>
+                filterFields={[
+                    {
+                        name: "type",
+                        label: "字典类型",
+                        render: () => (
                             <Input
                                 allowClear
                                 placeholder="user_status"
@@ -245,9 +246,12 @@ export const DictionaryPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <label>
-                            <span>备注</span>
+                        )
+                    },
+                    {
+                        name: "remarks",
+                        label: "备注",
+                        render: () => (
                             <Input
                                 allowClear
                                 placeholder="备注关键词"
@@ -259,22 +263,11 @@ export const DictionaryPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="dictionary-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => {
-                                applyFilters();
-                                closeFilter();
-                            }}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
                     <Button icon={<ReloadOutlined />} onClick={() => dictionaryQuery.refetch()}>
                         刷新

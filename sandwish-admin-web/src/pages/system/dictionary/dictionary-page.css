@@ -116,48 +116,6 @@ html[data-theme="dark"] .dictionary-page {
     box-shadow: 0 0 0 3px var(--dictionary-blue-soft) !important;
 }
 
-.dictionary-filter-form {
-    display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto auto;
-    min-width: 0;
-    align-items: flex-end;
-    gap: 12px;
-    padding: 12px;
-    background: linear-gradient(
-        180deg,
-        var(--dictionary-filter-bg-start),
-        var(--dictionary-filter-bg-end)
-    );
-    border: 1px solid var(--dictionary-line);
-    border-radius: 10px;
-    box-shadow: inset 0 1px 0 var(--dictionary-filter-inset);
-    backdrop-filter: blur(10px);
-}
-
-.dictionary-filter-form label {
-    display: grid;
-    gap: 5px;
-    min-width: 0;
-    color: var(--dictionary-copy);
-    font-size: 12px;
-}
-
-.dictionary-filter-form .ant-btn {
-    min-width: 86px;
-}
-
-.dictionary-filter-form .dictionary-filter-search {
-    color: var(--dictionary-blue);
-    background: var(--dictionary-blue-soft);
-    border-color: var(--dictionary-blue-line);
-}
-
-.dictionary-filter-form .dictionary-filter-search:hover {
-    color: var(--dictionary-blue) !important;
-    background: color-mix(in srgb, var(--dictionary-blue) 14%, transparent) !important;
-    border-color: color-mix(in srgb, var(--dictionary-blue) 34%, transparent) !important;
-}
-
 .dictionary-table-toolbar .ant-btn-dangerous:not(:disabled) {
     color: var(--dictionary-danger);
     border-color: var(--dictionary-danger-line);
@@ -185,16 +143,4 @@ html[data-theme="dark"] .dictionary-page {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-}
-
-@media (max-width: 760px) {
-    .dictionary-filter-form {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-    }
-
-    .dictionary-filter-form label,
-    .dictionary-filter-form .ant-btn {
-        width: 100%;
-    }
 }

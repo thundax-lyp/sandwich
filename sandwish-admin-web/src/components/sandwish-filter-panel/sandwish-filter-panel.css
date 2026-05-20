@@ -13,6 +13,11 @@
 .sandwish-filter-panel-open {
     max-height: 420px;
     margin: var(--sandwish-filter-panel-open-margin, 0 0 10px);
+    padding: 12px;
+    background: color-mix(in srgb, var(--surface-panel) 82%, var(--surface-soft));
+    border: 1px solid var(--line-subtle);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, white 54%, transparent);
     opacity: 1;
 }
 
@@ -20,30 +25,19 @@
     display: block;
 }
 
-.sandwish-filter-panel-fields {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(min(220px, 100%), var(--sandwish-filter-panel-field-width, 240px))
-    );
-    gap: 12px;
-    align-items: end;
-    min-width: 0;
-}
-
 .sandwish-filter-panel-field {
-    display: grid;
-    gap: 6px;
     min-width: 0;
 }
 
 .sandwish-filter-panel-label {
     color: var(--sandwish-color-text-secondary);
     font-size: 12px;
+    font-weight: 600;
 }
 
 .sandwish-filter-panel-control {
     min-width: 0;
+    margin-top: 6px;
 }
 
 .sandwish-filter-panel-control > .ant-select,
@@ -52,9 +46,9 @@
     width: 100%;
 }
 
-.sandwish-filter-panel-fields .ant-select,
-.sandwish-filter-panel-fields .ant-input-affix-wrapper,
-.sandwish-filter-panel-fields .ant-input {
+.sandwish-filter-panel .ant-select,
+.sandwish-filter-panel .ant-input-affix-wrapper,
+.sandwish-filter-panel .ant-input {
     min-width: 0;
 }
 
@@ -67,8 +61,7 @@
 }
 
 .sandwish-filter-panel-action-field {
-    display: block;
-    grid-column: var(--sandwish-filter-panel-action-offset, -2) / -1;
+    margin-left: auto;
 }
 
 .sandwish-filter-panel-actions .ant-btn {
@@ -76,10 +69,10 @@
 }
 
 .sandwish-filter-panel-actions .ant-btn-primary {
-    color: var(--accent-blue);
-    background: var(--accent-blue-soft);
-    border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent);
-    box-shadow: none;
+    color: var(--accent-blue) !important;
+    background: var(--accent-blue-soft) !important;
+    border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent) !important;
+    box-shadow: none !important;
 }
 
 .sandwish-filter-panel-actions .ant-btn-primary:not(:disabled):hover {

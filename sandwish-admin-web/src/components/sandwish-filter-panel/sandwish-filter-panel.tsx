@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "antd";
+import { Button, Col, Row } from "antd";
 import "./sandwish-filter-panel.css";
 
 export interface SandwishFilterPanelField {
@@ -29,14 +29,25 @@ export const SandwishFilterPanel = ({
 }: SandwishFilterPanelProps) => {
     const structuredContent = fields?.length ? (
         <div className="sandwish-filter-panel-form">
-            <div className="sandwish-filter-panel-fields">
+            <Row className="sandwish-filter-panel-fields" gutter={[12, 12]} align="bottom">
                 {fields.map((field) => (
-                    <div className="sandwish-filter-panel-field" key={field.name}>
+                    <Col
+                        className="sandwish-filter-panel-field"
+                        key={field.name}
+                        xs={24}
+                        sm={12}
+                        lg={6}
+                    >
                         <div className="sandwish-filter-panel-label">{field.label}</div>
                         <div className="sandwish-filter-panel-control">{field.render()}</div>
-                    </div>
+                    </Col>
                 ))}
-                <div className="sandwish-filter-panel-field sandwish-filter-panel-action-field">
+                <Col
+                    className="sandwish-filter-panel-field sandwish-filter-panel-action-field"
+                    xs={24}
+                    sm={12}
+                    lg={6}
+                >
                     <div className="sandwish-filter-panel-actions">
                         <Button disabled={resetDisabled} onClick={onReset}>
                             重置
@@ -45,8 +56,8 @@ export const SandwishFilterPanel = ({
                             查询
                         </Button>
                     </div>
-                </div>
-            </div>
+                </Col>
+            </Row>
         </div>
     ) : null;
 

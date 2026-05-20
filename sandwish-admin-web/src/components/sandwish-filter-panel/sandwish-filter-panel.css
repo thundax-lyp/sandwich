@@ -22,7 +22,10 @@
 
 .sandwish-filter-panel-fields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(220px, 100%), var(--sandwish-filter-panel-field-width, 240px))
+    );
     gap: 12px;
     align-items: end;
     min-width: 0;

@@ -211,7 +211,7 @@ Right:
 
 页面通过 `SandwishListPage` 的 `filterFields` 声明筛选字段；字段使用 `{ name, label, render }`，由 `SandwishFilterPanel` 统一渲染 label、字段布局和按钮区。
 
-`filterFields` 按屏幕宽度自动决定每行字段数量。字段控件尽量撑满可用宽度；`重置` / `查询` 作为最后一个 field 参与整体布局。
+`filterFields` 按屏幕宽度自动决定每行字段数量。字段控件撑满所在 field；当整行字段不足时保留行内间隙，不强行撑满整行。`重置` / `查询` 作为最后一个 field 参与整体布局。
 
 搜索框 placeholder 必须表达可搜索对象。
 

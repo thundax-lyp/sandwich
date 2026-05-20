@@ -74,3 +74,16 @@
 .sandwish-filter-panel-actions .ant-btn {
     width: 100%;
 }
+
+.sandwish-filter-panel-actions .ant-btn-primary {
+    color: var(--accent-blue);
+    background: var(--accent-blue-soft);
+    border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent);
+    box-shadow: none;
+}
+
+.sandwish-filter-panel-actions .ant-btn-primary:not(:disabled):hover {
+    color: var(--accent-blue) !important;
+    background: color-mix(in srgb, var(--accent-blue) 14%, transparent) !important;
+    border-color: color-mix(in srgb, var(--accent-blue) 34%, transparent) !important;
+}

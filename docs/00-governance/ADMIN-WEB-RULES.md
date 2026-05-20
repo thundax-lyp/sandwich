@@ -110,7 +110,7 @@
 ### UI
 
 - `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
-- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口；标题、宽度、分隔线清理和窄屏下拉由 `SandwishTable` 处理。
+- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口。
 
 ### Placement
 
@@ -277,12 +277,6 @@ Actions
 
 #### Action Column
 
-表格存在横向滚动或操作列可能被遮挡时，操作列应固定在右侧。
-
-```tsx
-fixed: "right"
-```
-
 操作默认顺序：
 
 ```text
@@ -299,26 +293,7 @@ fixed: "right"
 - 使用危险样式。
 - 要求二次确认。
 
-操作数量过多时应收敛到下拉菜单。下拉菜单中的危险操作必须放在最后。
-
-操作数量收敛规则：
-
-- `<= 4` 个真实操作直接展示。
-- `> 4` 个真实操作从第 5 个开始收敛到下拉菜单。
-- `divider` 不参与操作数量计算。
-- `divider` 只保留在两个真实操作之间；开头、结尾和连续 `divider` 由 `SandwishTable` 清理。
-- 移动端固定隐藏 inline 操作，只保留行操作下拉入口。
-
-```tsx
-[
-    { key: "copy", label: "复制" },
-    { key: "disable", label: "禁用" },
-    { type: "divider" },
-    { key: "delete", label: "删除", danger: true },
-]
-```
-
-可排序表格的拖动入口由 `SandwishTable sortable` 自动生成独立无标题列，固定在最右侧；页面不在 `actions.options` 中手写 `拖动` 操作。
+页面只判断操作语义、顺序、危险级别和是否需要复杂 `render`；展示数量、分隔线、列宽、固定列、移动端下拉和排序拖动入口由 `SandwishTable` 处理。
 
 #### Pagination
 

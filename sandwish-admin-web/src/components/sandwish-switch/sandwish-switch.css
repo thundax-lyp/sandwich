@@ -42,10 +42,18 @@
     padding-inline: 22px 7px;
     font-size: 12px;
     font-weight: 600;
+    line-height: 22px;
 }
 
 .sandwish-switch.ant-switch.ant-switch-checked .ant-switch-inner {
     padding-inline: 7px 22px;
+}
+
+.sandwish-switch .ant-switch-inner-checked,
+.sandwish-switch .ant-switch-inner-unchecked {
+    height: 22px;
+    line-height: 22px;
+    transform: translateY(1px);
 }
 
 .sandwish-switch.ant-switch:focus-visible {

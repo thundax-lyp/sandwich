@@ -54,6 +54,7 @@
 - `State`
 - `Permission`
 - `Testing`
+- `Forbidden Defaults`
 
 `Hard Rules` 必须能够通过 ESLint、TypeScript、测试或架构脚本稳定门禁。
 暂时没有门禁支撑的语义判断固定放入 `Review Rules`。
@@ -119,12 +120,21 @@
 - `ADMIN_WEB_PATH_E2E_PAGE_SPEC`：页面 E2E 放在 `e2e/<module>/<domain>/<domain>.spec.ts`。
 - `ADMIN_WEB_PATH_E2E_LAYOUT_SPEC`：布局 E2E 放在 `e2e/layout/*.spec.ts`。
 
+### Forbidden Defaults
+
+- `ADMIN_WEB_FORBID_BOUNDARYLESS_DIR`：`src` 下禁止 `common`、`base`、`shared` 子目录。
+- `ADMIN_WEB_FORBID_EXTRA_SYSTEM`：禁止新增第二套路由、请求、权限、状态或样式体系目录。
+- `ADMIN_WEB_FORBID_BACKEND_LAYER_DIR`：前端目录禁止 `controller`、`dao`、`mapper`、`repository`。
+- `ADMIN_WEB_FORBID_STYLE_SYSTEM`：禁止 CSS module、styled-components、Tailwind。
+- `ADMIN_WEB_FORBID_BUCKET_DIR`：`src` 下禁止 `utils`、`models`、`stores` 兜底目录。
+
 ## Review Rules
 
 ### Architecture
 
 - 复杂业务逻辑不得直接写在 JSX 中。
 - 页面应优先复用项目已有共享组件和页面骨架。
+- 不为了“目录统一”进行大规模机械迁移；优先在新增页面或正在修改的页面执行本规则。
 
 ### Naming
 
@@ -574,16 +584,6 @@ test("delete requires confirmation", async ({ page }) => {
 - [ ] 无 `console.log`。
 - [ ] 无复杂 JSX。
 - [ ] 目录结构正确。
-
-## Forbidden Defaults
-
-- 不新增无边界的 `common`、`base`、`shared` 子目录作为默认归属。
-- 不新增与当前技术栈无关的状态管理层，例如全局 store，除非有明确跨页面状态需求。
-- 不新增第二套路由、请求、权限或样式体系。
-- 不把后端 Java 分层术语机械套进前端目录，例如 `controller`、`dao`、`mapper`、`repository`。
-- 不新增 CSS module、styled-components、Tailwind 或其他样式体系，除非先形成明确前端治理决策。
-- 不为了“目录统一”进行大规模机械迁移；优先在新增页面或正在修改的页面执行本规则。
-- 不为了提前复用抽象出空 `utils/`、`models/`、`stores/` 等目录。
 
 ## Open Items
 

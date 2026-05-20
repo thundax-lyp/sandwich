@@ -726,6 +726,39 @@ const localRules = {
                 };
             }
         },
+        "confirm-hook-only": {
+            create(context) {
+                const isConfirmHookFile = () => {
+                    return context.physicalFilename
+                        .split(path.sep)
+                        .join("/")
+                        .endsWith(
+                            "/src/components/sandwish-confirm-modal/hooks/use-sandwish-confirm.ts"
+                        );
+                };
+
+                return {
+                    CallExpression(node) {
+                        if (
+                            isConfirmHookFile() ||
+                            node.callee.type !== "MemberExpression" ||
+                            node.callee.object.type !== "Identifier" ||
+                            node.callee.object.name !== "Modal" ||
+                            node.callee.property.type !== "Identifier" ||
+                            node.callee.property.name !== "confirm"
+                        ) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_UI_CONFIRM_HOOK: confirmation actions must use useSandwishConfirm instead of Modal.confirm."
+                        });
+                    }
+                };
+            }
+        },
         "service-method-verb-prefix": {
             create(context) {
                 const startsWithServiceVerb = (name) => {
@@ -1357,6 +1390,7 @@ export default tseslint.config(
                 }
             ],
             "local/component-index-export-only": "error",
+            "local/confirm-hook-only": "error",
             "local/business-data-type-location": "error",
             "local/api-contract-type-location": "error",
             "local/e2e-spec-file-path": "error",

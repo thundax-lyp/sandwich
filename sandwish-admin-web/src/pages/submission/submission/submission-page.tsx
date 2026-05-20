@@ -7,11 +7,12 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Modal, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Dropdown, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { SubmissionDetail } from "./components/submission-detail";
@@ -127,6 +128,7 @@ const sortByMove = (
 
 export const SubmissionPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const canEditSubmission = hasPermission("submission:submission:edit");
     const [query, setQuery] = useState<SubmissionPageQuery>({
@@ -247,16 +249,12 @@ export const SubmissionPage = () => {
     };
 
     const confirmDelete = (ids: string[]) => {
-        Modal.confirm({
+        confirm.danger({
             title: "删除提交内容",
-            content: `确认删除 ${ids.length} 条提交内容？图片会解除业务绑定，存储对象由存储模块清理。`,
+            message: `确认删除 ${ids.length} 条提交内容？`,
+            description: "图片会解除业务绑定，存储对象由存储模块清理。",
             okText: "删除",
-            okButtonProps: {
-                danger: true,
-                loading: deleteMutation.isPending
-            },
-            cancelText: "取消",
-            onOk: () => deleteMutation.mutateAsync(ids)
+            onConfirm: () => deleteMutation.mutateAsync(ids)
         });
     };
 

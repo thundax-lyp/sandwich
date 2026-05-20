@@ -15,7 +15,7 @@ import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { hasPermission } from "@/auth/permission-storage";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import {
@@ -47,11 +47,6 @@ interface StorageObjectFilters {
     objectStatus: StorageObjectStatusFilter;
     referenceStatus: StorageReferenceStatusFilter;
     remarks: string;
-}
-
-interface DeleteTarget {
-    ids: string[];
-    title: string;
 }
 
 const DEFAULT_STORAGE_OBJECT_FILTERS: StorageObjectFilters = {
@@ -125,6 +120,7 @@ const sortByMove = (
 
 export const StorageObjectPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const canEditStorage = hasPermission("storage:storage:edit");
     const accessToken = useCurrentAccessToken();
@@ -135,7 +131,6 @@ export const StorageObjectPage = () => {
     const [searchText, setSearchText] = useState("");
     const [filters, setFilters] = useState<StorageObjectFilters>(DEFAULT_STORAGE_OBJECT_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
-    const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
     const hasSelectedStorages = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(
         filters.contentType.trim() ||
@@ -162,7 +157,6 @@ export const StorageObjectPage = () => {
     const deleteMutation = useMutation({
         mutationFn: removeStorageObjects,
         onSuccess: async () => {
-            setDeleteTarget(null);
             setSelectedRowKeys([]);
             await invalidateStoragePage();
             messageApi.success("存储对象已删除");
@@ -225,9 +219,12 @@ export const StorageObjectPage = () => {
     };
 
     const openDeleteConfirm = (storage: StorageRecord) => {
-        setDeleteTarget({
-            ids: [storage.id],
-            title: readFilename(storage)
+        confirm.danger({
+            title: "删除存储对象",
+            message: `确认删除 ${readFilename(storage)}？`,
+            description: "删除后需要重新上传。若对象仍被业务引用，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync([storage.id])
         });
     };
 
@@ -235,17 +232,13 @@ export const StorageObjectPage = () => {
         if (!hasSelectedStorages) {
             return;
         }
-        setDeleteTarget({
-            ids: selectedRowKeys.map(String),
-            title: `${selectedRowKeys.length} 个存储对象`
+        confirm.danger({
+            title: "批量删除存储对象",
+            message: `确认删除 ${selectedRowKeys.length} 个存储对象？`,
+            description: "删除后需要重新上传。若对象仍被业务引用，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync(selectedRowKeys.map(String))
         });
-    };
-
-    const deleteStorages = () => {
-        if (!deleteTarget) {
-            return;
-        }
-        deleteMutation.mutate(deleteTarget.ids);
     };
 
     const moveStorage = (
@@ -559,22 +552,6 @@ export const StorageObjectPage = () => {
                     onChange: setSelectedRowKeys
                 }}
                 sortable={canEditStorage}
-            />
-
-            <SandwishConfirmModal
-                title="删除存储对象"
-                open={Boolean(deleteTarget)}
-                message={`确认删除 ${deleteTarget?.title || ""}？`}
-                description="删除后需要重新上传。若对象仍被业务引用，接口会按后端校验结果拦截。"
-                okText="删除"
-                confirmLoading={deleteMutation.isPending}
-                cancelText="取消"
-                onCancel={() => {
-                    if (!deleteMutation.isPending) {
-                        setDeleteTarget(null);
-                    }
-                }}
-                onOk={deleteStorages}
             />
         </>
     );

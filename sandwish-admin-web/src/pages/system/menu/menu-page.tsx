@@ -14,7 +14,7 @@ import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
 import { addMenu, changeMenuInfo, listMenus, moveMenu, removeMenus } from "./menu-service";
@@ -79,9 +79,9 @@ const toMoveType = (position: SandwishTableSortPosition): MenuMoveCommand["type"
 
 export const MenuPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const [editingMenu, setEditingMenu] = useState<MenuTableNode | null>(null);
-    const [deletingMenu, setDeletingMenu] = useState<MenuTableNode | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const [expandedRowKeys, setExpandedRowKeys] = useState<Key[] | null>(null);
     const canEditMenu = hasPermission("super");
@@ -130,7 +130,6 @@ export const MenuPage = () => {
     const deleteMutation = useMutation({
         mutationFn: removeMenus,
         onSuccess: async () => {
-            setDeletingMenu(null);
             await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });
             messageApi.success("菜单已删除");
         },
@@ -173,21 +172,13 @@ export const MenuPage = () => {
     };
 
     const openDeleteConfirm = (menu: MenuTableNode) => {
-        setDeletingMenu(menu);
-    };
-
-    const closeDeleteConfirm = () => {
-        if (deleteMutation.isPending) {
-            return;
-        }
-        setDeletingMenu(null);
-    };
-
-    const deleteMenu = () => {
-        if (!deletingMenu) {
-            return;
-        }
-        deleteMutation.mutate([deletingMenu.id]);
+        confirm.danger({
+            title: "删除菜单",
+            message: `确认删除 ${menu.name || ""}？`,
+            description: "删除后需要重新新增。若该菜单下仍有关联子菜单，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync([menu.id])
+        });
     };
 
     const sortMenu = (
@@ -406,18 +397,6 @@ export const MenuPage = () => {
                 saving={saveMutation.isPending}
                 onClose={closeEditor}
                 onSave={saveMenu}
-            />
-
-            <SandwishConfirmModal
-                title="删除菜单"
-                open={Boolean(deletingMenu)}
-                message={`确认删除 ${deletingMenu?.name || ""}？`}
-                description="删除后需要重新新增。若该菜单下仍有关联子菜单，接口会按后端校验结果拦截。"
-                okText="删除"
-                confirmLoading={deleteMutation.isPending}
-                cancelText="取消"
-                onCancel={closeDeleteConfirm}
-                onOk={deleteMenu}
             />
         </>
     );

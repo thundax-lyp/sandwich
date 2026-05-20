@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DepartmentEdit } from "./components/department-edit";
 import {
@@ -90,9 +90,9 @@ const toMoveType = (position: SandwishTableSortPosition): DepartmentMoveCommand[
 
 export const DepartmentPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const [editingDepartment, setEditingDepartment] = useState<DepartmentTableNode | null>(null);
-    const [deletingDepartment, setDeletingDepartment] = useState<DepartmentTableNode | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const [expandedRowKeys, setExpandedRowKeys] = useState<Key[] | null>(null);
     const canEditDepartment = hasPermission("sys:department:edit");
@@ -144,7 +144,6 @@ export const DepartmentPage = () => {
     const deleteMutation = useMutation({
         mutationFn: removeDepartments,
         onSuccess: async () => {
-            setDeletingDepartment(null);
             await queryClient.invalidateQueries({ queryKey: ["department", "list"] });
             messageApi.success("部门已删除");
         },
@@ -187,21 +186,14 @@ export const DepartmentPage = () => {
     };
 
     const openDeleteConfirm = (department: DepartmentTableNode) => {
-        setDeletingDepartment(department);
-    };
-
-    const closeDeleteConfirm = () => {
-        if (deleteMutation.isPending) {
-            return;
-        }
-        setDeletingDepartment(null);
-    };
-
-    const deleteDepartment = () => {
-        if (!deletingDepartment) {
-            return;
-        }
-        deleteMutation.mutate([deletingDepartment.id]);
+        confirm.danger({
+            title: "删除部门",
+            message: `确认删除 ${department.name || ""}？`,
+            description:
+                "删除后需要重新新增。若该部门下仍有关联用户或子部门，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync([department.id])
+        });
     };
 
     const sortDepartment = (
@@ -413,18 +405,6 @@ export const DepartmentPage = () => {
                 saving={saveMutation.isPending}
                 onClose={closeEditor}
                 onSave={saveDepartment}
-            />
-
-            <SandwishConfirmModal
-                title="删除部门"
-                open={Boolean(deletingDepartment)}
-                message={`确认删除 ${deletingDepartment?.name || ""}？`}
-                description="删除后需要重新新增。若该部门下仍有关联用户或子部门，接口会按后端校验结果拦截。"
-                okText="删除"
-                confirmLoading={deleteMutation.isPending}
-                cancelText="取消"
-                onCancel={closeDeleteConfirm}
-                onOk={deleteDepartment}
             />
         </>
     );

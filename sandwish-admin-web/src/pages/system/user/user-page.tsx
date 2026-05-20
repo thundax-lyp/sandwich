@@ -17,7 +17,7 @@ import { sm2 } from "sm-crypto";
 import { createLoginForm } from "@/auth/auth-service";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserRecord } from "@/service/current-user-types";
@@ -179,6 +179,7 @@ const toEnableQueryValue = (enable: UserFilterStatus) => {
 
 export const UserPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const departmentPanelRef = useRef<HTMLDivElement | null>(null);
     const [query, setQuery] = useState<UserPageQuery>({
@@ -190,7 +191,6 @@ export const UserPage = () => {
     const [selectedDepartmentId, setSelectedDepartmentId] = useState(ALL_DEPARTMENT_ID);
     const [activeUser, setActiveUser] = useState<UserRecord | null>(null);
     const [userEditorOpen, setUserEditorOpen] = useState(false);
-    const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const hasSelectedUsers = selectedRowKeys.length > 0;
     const hasActiveFilters = Boolean(filters.loginName.trim()) || filters.enable !== "ALL";
@@ -316,7 +316,6 @@ export const UserPage = () => {
     const deleteMutation = useMutation({
         mutationFn: removeUsers,
         onSuccess: async () => {
-            setDeletingUser(null);
             setSelectedRowKeys([]);
             await invalidateUserPage();
             messageApi.success("用户已删除");
@@ -413,18 +412,27 @@ export const UserPage = () => {
         });
     };
 
-    const deleteUser = () => {
-        if (!deletingUser) {
-            return;
-        }
-        deleteMutation.mutate([deletingUser.id]);
+    const confirmDeleteUser = (user: UserRecord) => {
+        confirm.danger({
+            title: "删除用户",
+            message: `确认删除 ${readUserName(user)}？`,
+            description: "删除后需要重新新增。若用户存在安全约束，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync([user.id])
+        });
     };
 
     const batchDeleteUsers = () => {
         if (!hasSelectedUsers || !canEditUser) {
             return;
         }
-        deleteMutation.mutate(selectedRowKeys.map(String));
+        confirm.danger({
+            title: "批量删除用户",
+            message: `确认删除 ${selectedRowKeys.length} 个用户？`,
+            description: "删除后需要重新新增。若用户存在安全约束，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync(selectedRowKeys.map(String))
+        });
     };
 
     const batchUpdateStatus = (enable: boolean) => {
@@ -624,7 +632,7 @@ export const UserPage = () => {
                                 icon={<DeleteOutlined />}
                                 type="text"
                                 danger
-                                onClick={() => setDeletingUser(user)}
+                                onClick={() => confirmDeleteUser(user)}
                             />
                         </Space.Compact>
                         <Dropdown
@@ -650,7 +658,7 @@ export const UserPage = () => {
                                         setUserEditorOpen(true);
                                     }
                                     if (key === "delete") {
-                                        setDeletingUser(user);
+                                        confirmDeleteUser(user);
                                     }
                                 }
                             }}
@@ -844,22 +852,6 @@ export const UserPage = () => {
                     }
                     return undefined;
                 }}
-            />
-
-            <SandwishConfirmModal
-                title="删除用户"
-                open={Boolean(deletingUser)}
-                message={`确认删除 ${deletingUser ? readUserName(deletingUser) : ""}？`}
-                description="删除后需要重新新增。若用户存在安全约束，接口会按后端校验结果拦截。"
-                okText="删除"
-                confirmLoading={deleteMutation.isPending}
-                cancelText="取消"
-                onCancel={() => {
-                    if (!deleteMutation.isPending) {
-                        setDeletingUser(null);
-                    }
-                }}
-                onOk={deleteUser}
             />
         </>
     );

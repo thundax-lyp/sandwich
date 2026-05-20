@@ -7,11 +7,12 @@ import {
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Input, Modal, Space, Tag, Typography } from "antd";
+import { App, Button, Dropdown, Input, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { DictionaryEdit } from "./components/dictionary-edit";
@@ -47,6 +48,7 @@ const normalizeSearch = (value?: string | null) => {
 
 export const DictionaryPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const canEditDictionary = hasPermission("sys:dict:edit");
     const [query, setQuery] = useState<DictPageQuery>({
@@ -157,16 +159,12 @@ export const DictionaryPage = () => {
     };
 
     const confirmDelete = (ids: string[]) => {
-        Modal.confirm({
+        confirm.danger({
             title: "删除字典项",
-            content: `确认删除 ${ids.length} 个字典项？删除后需要重新新增。`,
+            message: `确认删除 ${ids.length} 个字典项？`,
+            description: "删除后需要重新新增。",
             okText: "删除",
-            okButtonProps: {
-                danger: true,
-                loading: deleteMutation.isPending
-            },
-            cancelText: "取消",
-            onOk: () => deleteMutation.mutateAsync(ids)
+            onConfirm: () => deleteMutation.mutateAsync(ids)
         });
     };
 

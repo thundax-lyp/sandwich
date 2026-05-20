@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { RoleEdit } from "./components/role-edit";
 import {
@@ -114,6 +114,7 @@ const sortByMove = (
 
 export const RolePage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const canViewRole = hasPermission("sys:role:view") || hasPermission("sys:role:edit");
     const canEditRole = hasPermission("sys:role:edit");
@@ -122,7 +123,6 @@ export const RolePage = () => {
     const [filters, setFilters] = useState<RoleFilters>(DEFAULT_ROLE_FILTERS);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [editingRole, setEditingRole] = useState<RoleRecord | null>(null);
-    const [deletingRole, setDeletingRole] = useState<RoleRecord | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const hasSelectedRoles = selectedRowKeys.length > 0;
     const hasActiveFilters = filters.enable !== "ALL";
@@ -185,7 +185,6 @@ export const RolePage = () => {
     const deleteMutation = useMutation({
         mutationFn: removeRoles,
         onSuccess: async () => {
-            setDeletingRole(null);
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
             messageApi.success("角色已删除");
@@ -254,15 +253,24 @@ export const RolePage = () => {
         });
     };
 
-    const deleteRole = () => {
-        if (!deletingRole) {
-            return;
-        }
-        deleteMutation.mutate([deletingRole.id]);
+    const confirmDeleteRole = (role: RoleRecord) => {
+        confirm.danger({
+            title: "删除角色",
+            message: `确认删除 ${role.name || ""}？`,
+            description: "删除后需要重新新增。若角色仍有关联用户，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync([role.id])
+        });
     };
 
     const batchDeleteRoles = () => {
-        deleteMutation.mutate(selectedRowKeys.map(String));
+        confirm.danger({
+            title: "批量删除角色",
+            message: `确认删除 ${selectedRowKeys.length} 个角色？`,
+            description: "删除后需要重新新增。若角色仍有关联用户，接口会按后端校验结果拦截。",
+            okText: "删除",
+            onConfirm: () => deleteMutation.mutateAsync(selectedRowKeys.map(String))
+        });
     };
 
     const sortRole = (
@@ -351,7 +359,7 @@ export const RolePage = () => {
                             icon={<DeleteOutlined />}
                             type="text"
                             danger
-                            onClick={() => setDeletingRole(role)}
+                            onClick={() => confirmDeleteRole(role)}
                         />
                         <Button
                             aria-label={`拖动 ${role.name}`}
@@ -383,7 +391,7 @@ export const RolePage = () => {
                                     openEditEditor(role);
                                 }
                                 if (key === "delete") {
-                                    setDeletingRole(role);
+                                    confirmDeleteRole(role);
                                 }
                             }
                         }}
@@ -525,22 +533,6 @@ export const RolePage = () => {
                 saving={saveMutation.isPending}
                 onClose={closeEditor}
                 onSave={saveRole}
-            />
-
-            <SandwishConfirmModal
-                title="删除角色"
-                open={Boolean(deletingRole)}
-                message={`确认删除 ${deletingRole?.name || ""}？`}
-                description="删除后需要重新新增。若角色仍有关联用户，接口会按后端校验结果拦截。"
-                okText="删除"
-                confirmLoading={deleteMutation.isPending}
-                cancelText="取消"
-                onCancel={() => {
-                    if (!deleteMutation.isPending) {
-                        setDeletingRole(null);
-                    }
-                }}
-                onOk={deleteRole}
             />
         </>
     );

@@ -106,6 +106,10 @@
 - `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面 `className` 使用页面域前缀；共享组件 class 使用 `sandwish-`。
 - `ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION`：组件域 CSS class 只定义在对应组件 CSS 文件中。
 
+### UI
+
+- `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
+
 ### Placement
 
 - `ADMIN_WEB_PATH_PAGE_SHAPE`：页面放在 `src/pages/<module>/<domain>/<domain>-page.tsx`。

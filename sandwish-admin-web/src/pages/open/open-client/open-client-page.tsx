@@ -11,7 +11,7 @@ import { App, Button, Dropdown, Input, Select, Space, Tag, Typography } from "an
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
-import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
+import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { OpenClientEdit } from "./components/open-client-edit";
@@ -98,6 +98,7 @@ const formatDateTime = (value?: string | null) => {
 
 export const OpenClientPage = () => {
     const { message: messageApi } = App.useApp();
+    const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const canEditOpenClient = hasPermission("open:client:edit");
     const [query, setQuery] = useState<OpenClientPageQuery>({
@@ -109,7 +110,6 @@ export const OpenClientPage = () => {
     const [editingClient, setEditingClient] = useState<OpenClientRecord | null>(null);
     const [editorOpen, setEditorOpen] = useState(false);
     const [secretResponse, setSecretResponse] = useState<OpenClientSecretRecord | null>(null);
-    const [resettingClient, setResettingClient] = useState<OpenClientRecord | null>(null);
     const hasActiveFilters = filters.status !== "ALL";
 
     const openClientQuery = useQuery({
@@ -173,7 +173,6 @@ export const OpenClientPage = () => {
     const resetSecretMutation = useMutation({
         mutationFn: resetOpenClientSecret,
         onSuccess: async (response) => {
-            setResettingClient(null);
             await invalidateOpenClientPage();
             setEditingClient((current) =>
                 current && current.id === response.id
@@ -240,11 +239,14 @@ export const OpenClientPage = () => {
         });
     };
 
-    const resetSecret = () => {
-        if (!resettingClient) {
-            return;
-        }
-        resetSecretMutation.mutate({ id: resettingClient.id });
+    const confirmResetSecret = (client: OpenClientRecord) => {
+        confirm.danger({
+            title: "重置 API SECRET",
+            message: `确认重置 ${client.name || ""} 的 API SECRET？`,
+            description: "原 API SECRET 会立即失效，新明文只会在本次结果中显示。",
+            okText: "重置",
+            onConfirm: () => resetSecretMutation.mutateAsync({ id: client.id })
+        });
     };
 
     const copySecretValue = async (label: string, value?: string | null) => {
@@ -336,7 +338,7 @@ export const OpenClientPage = () => {
                                         icon: <KeyOutlined />,
                                         label: "重置 API SECRET",
                                         disabled: !canEditOpenClient,
-                                        onClick: () => setResettingClient(client)
+                                        onClick: () => confirmResetSecret(client)
                                     }
                                 ]
                             }}
@@ -435,19 +437,8 @@ export const OpenClientPage = () => {
                 resetSecretLoading={resetSecretMutation.isPending}
                 onClose={closeEditor}
                 onSave={saveOpenClient}
-                onGenerateSecret={setResettingClient}
+                onGenerateSecret={confirmResetSecret}
                 onCopySecret={copySecretValue}
-            />
-
-            <SandwishConfirmModal
-                open={Boolean(resettingClient)}
-                title="重置 API SECRET"
-                message={`确认重置 ${resettingClient?.name || ""} 的 API SECRET？`}
-                description="原 API SECRET 会立即失效，新明文只会在本次结果中显示。"
-                okText="重置"
-                confirmLoading={resetSecretMutation.isPending}
-                onOk={resetSecret}
-                onCancel={() => setResettingClient(null)}
             />
 
             <OpenClientSecretModal

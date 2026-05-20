@@ -40,9 +40,12 @@ export interface UserFormValues {
     enable: boolean;
 }
 
+export interface UserOptionRecord {
+    value: string;
+    label: string;
+}
+
 export interface UserOptionsRecord {
-    statusOptions: Array<{
-        value: string;
-        label: string;
-    }>;
+    statusOptions: UserOptionRecord[];
+    rankOptions: UserOptionRecord[];
 }

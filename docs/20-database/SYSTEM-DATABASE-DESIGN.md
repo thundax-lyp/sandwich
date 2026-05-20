@@ -217,7 +217,7 @@
 索引：
 
 - 主键：`pk_sys_dict(id)`
-- 唯一索引：`uk_sys_dict_priority(priority)`
+- 唯一索引：`uk_sys_dict_type_value(type, value)`
 - 普通索引：`idx_sys_dict_type(type, priority)`
 
 ### 6.6 sys_log

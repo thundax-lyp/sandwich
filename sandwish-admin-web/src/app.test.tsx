@@ -1078,6 +1078,12 @@ describe("App", () => {
                                 statusOptions: [
                                     { value: "ENABLED", label: "字典启用" },
                                     { value: "DISABLED", label: "字典禁用" }
+                                ],
+                                rankOptions: [
+                                    { value: "0", label: "等级 0" },
+                                    { value: "1", label: "等级 1" },
+                                    { value: "2", label: "等级 2" },
+                                    { value: "9", label: "超级管理员" }
                                 ]
                             }
                         }),

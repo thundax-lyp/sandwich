@@ -3,7 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select, Switch, Upload } from "antd";
 import { useMemo, useState } from "react";
 import * as service from "../user-service";
-import type { UserDepartmentNode, UserFormValues, UserRecord, UserRoleRecord } from "../user-types";
+import type {
+    UserDepartmentNode,
+    UserFormValues,
+    UserOptionRecord,
+    UserRecord,
+    UserRoleRecord
+} from "../user-types";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { CurrentUserRecord } from "@/service/current-user-types";
 import { UserAvatar } from "./user-avatar";
@@ -15,6 +21,7 @@ interface UserEditProps {
     user?: UserRecord | null;
     currentUser?: CurrentUserRecord | null;
     departments?: UserDepartmentNode[];
+    rankOptions?: UserOptionRecord[];
     saving?: boolean;
     onClose: () => void;
     onSave?: (form: UserFormValues) => void;
@@ -53,11 +60,21 @@ const maxCreatableRank = (user?: Pick<CurrentUserRecord, "ranks" | "superAdmin">
     return Math.max(readRankValue(user) - 1, 0);
 };
 
-const rankOptions = (maxRank: number) => {
+const fallbackRankOptions = (maxRank: number) => {
     return Array.from({ length: Math.max(maxRank, 0) + 1 }, (_, rank) => ({
         value: rank,
-        label: String(rank)
+        label: `等级 ${rank}`
     }));
+};
+
+const toEditableRankOptions = (options: UserOptionRecord[] | undefined, maxRank: number) => {
+    const sourceOptions = options?.length ? options : fallbackRankOptions(maxRank);
+    return sourceOptions
+        .map((option) => ({
+            value: Number(option.value),
+            label: option.label
+        }))
+        .filter((option) => Number.isFinite(option.value) && option.value <= maxRank);
 };
 
 const departmentOptions = (departments: UserDepartmentNode[]) => {
@@ -89,6 +106,7 @@ export const UserEdit = ({
     user,
     currentUser,
     departments = [],
+    rankOptions = [],
     saving,
     onClose,
     onSave,
@@ -100,6 +118,10 @@ export const UserEdit = ({
     const visible = Boolean(open);
     const creating = visible && !editing;
     const editableMaxRank = currentUser ? maxCreatableRank(currentUser) : (user?.ranks ?? 0);
+    const editableRankOptions = useMemo(
+        () => toEditableRankOptions(rankOptions, editableMaxRank),
+        [editableMaxRank, rankOptions]
+    );
     const [createForm, setCreateForm] = useState<UserFormValues>(() => {
         const initialForm =
             user && editing
@@ -248,7 +270,7 @@ export const UserEdit = ({
                         <span>等级</span>
                         <Select
                             value={createForm.ranks}
-                            options={rankOptions(editableMaxRank)}
+                            options={editableRankOptions}
                             onChange={(ranks) => updateForm({ ranks })}
                         />
                     </label>
@@ -336,7 +358,7 @@ export const UserEdit = ({
                         <span>等级</span>
                         <Select
                             value={createForm.ranks}
-                            options={rankOptions(editableMaxRank)}
+                            options={editableRankOptions}
                             onChange={(ranks) => updateForm({ ranks })}
                         />
                     </label>

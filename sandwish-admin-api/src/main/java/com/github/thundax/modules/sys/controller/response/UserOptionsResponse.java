@@ -20,4 +20,7 @@ public class UserOptionsResponse implements Serializable {
 
     @ApiModelProperty(name = "statusOptions", value = "用户状态选项")
     private List<OptionResponse> statusOptions = new ArrayList<>();
+
+    @ApiModelProperty(name = "rankOptions", value = "用户等级选项")
+    private List<OptionResponse> rankOptions = new ArrayList<>();
 }

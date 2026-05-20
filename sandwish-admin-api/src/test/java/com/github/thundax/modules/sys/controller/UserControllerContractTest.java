@@ -117,7 +117,9 @@ public class UserControllerContractTest {
         DictService dictService = mock(DictService.class);
         ArgumentCaptor<DictQuery> queryCaptor = ArgumentCaptor.forClass(DictQuery.class);
         when(dictService.list(any(DictQuery.class)))
-                .thenReturn(Arrays.asList(dict("启用", "ENABLED"), dict("禁用", "DISABLED")));
+                .thenReturn(
+                        Arrays.asList(dict("启用", "ENABLED"), dict("禁用", "DISABLED")),
+                        Arrays.asList(dict("等级 0", "0"), dict("等级 1", "1")));
 
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new UserController(
                         mock(UserService.class),
@@ -140,10 +142,17 @@ public class UserControllerContractTest {
                 .andExpect(jsonPath("$.data.statusOptions[0].label").value("启用"))
                 .andExpect(jsonPath("$.data.statusOptions[0].value").value("ENABLED"))
                 .andExpect(jsonPath("$.data.statusOptions[1].label").value("禁用"))
-                .andExpect(jsonPath("$.data.statusOptions[1].value").value("DISABLED"));
+                .andExpect(jsonPath("$.data.statusOptions[1].value").value("DISABLED"))
+                .andExpect(jsonPath("$.data.rankOptions[0].label").value("等级 0"))
+                .andExpect(jsonPath("$.data.rankOptions[0].value").value("0"))
+                .andExpect(jsonPath("$.data.rankOptions[1].label").value("等级 1"))
+                .andExpect(jsonPath("$.data.rankOptions[1].value").value("1"));
 
-        verify(dictService).list(queryCaptor.capture());
-        org.junit.Assert.assertEquals("user_status", queryCaptor.getValue().getType());
+        verify(dictService, org.mockito.Mockito.times(2)).list(queryCaptor.capture());
+        org.junit.Assert.assertEquals(
+                "user_status", queryCaptor.getAllValues().get(0).getType());
+        org.junit.Assert.assertEquals(
+                "user_rank", queryCaptor.getAllValues().get(1).getType());
     }
 
     @Test

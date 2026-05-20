@@ -63,7 +63,8 @@ const DEFAULT_USER_FILTERS: UserFilters = {
 const EMPTY_USERS: UserRecord[] = [];
 const EMPTY_DEPARTMENTS: UserDepartmentNode[] = [];
 const EMPTY_USER_OPTIONS: UserOptionsRecord = {
-    statusOptions: []
+    statusOptions: [],
+    rankOptions: []
 };
 
 const normalizeSearch = (value?: string | null) => {
@@ -85,13 +86,6 @@ const readRoleNames = (user: UserRecord) => {
 
 const statusValue = (user: UserRecord): Exclude<UserFilterStatus, "ALL"> => {
     return user.enable === false ? "DISABLED" : "ENABLED";
-};
-
-const rankLabel = (user: UserRecord) => {
-    if (user.superAdmin || user.ranks === 9) {
-        return "超级管理员";
-    }
-    return `等级 ${user.ranks ?? 0}`;
 };
 
 const rankTagType = (user: UserRecord) => {
@@ -223,6 +217,9 @@ export const UserPage = () => {
     const statusLabelByValue = useMemo(() => {
         return new Map(userOptions.statusOptions.map((option) => [option.value, option.label]));
     }, [userOptions.statusOptions]);
+    const rankLabelByValue = useMemo(() => {
+        return new Map(userOptions.rankOptions.map((option) => [option.value, option.label]));
+    }, [userOptions.rankOptions]);
     const departmentTreeData = useMemo(() => buildDepartmentTree(departments), [departments]);
     const departmentTreeKeys = useMemo(
         () => collectTreeKeys(departmentTreeData),
@@ -312,6 +309,11 @@ export const UserPage = () => {
 
     const readStatusOptionLabel = (value: Exclude<UserFilterStatus, "ALL">) => {
         return statusLabelByValue.get(value) || (value === "DISABLED" ? "禁用" : "启用");
+    };
+
+    const readRankLabel = (user: UserRecord) => {
+        const value = user.superAdmin ? "9" : String(user.ranks ?? 0);
+        return rankLabelByValue.get(value) || (user.superAdmin ? "超级管理员" : `等级 ${value}`);
     };
 
     const updateSingleStatus = (user: UserRecord, enable: boolean) => {
@@ -633,7 +635,7 @@ export const UserPage = () => {
             key: "ranks",
             width: DEFAULT_COLUMN_WIDTHS.ranks,
             render: (_, user) => (
-                <SandwishTag type={rankTagType(user)}>{rankLabel(user)}</SandwishTag>
+                <SandwishTag type={rankTagType(user)}>{readRankLabel(user)}</SandwishTag>
             )
         },
         {
@@ -832,6 +834,7 @@ export const UserPage = () => {
                 user={activeUser}
                 currentUser={currentUserQuery.data}
                 departments={departments}
+                rankOptions={userOptions.rankOptions}
                 saving={isCreatingUser ? createMutation.isPending : updateMutation.isPending}
                 onClose={() => {
                     setUserEditorOpen(false);

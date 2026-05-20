@@ -110,6 +110,7 @@ public class UserController {
     private static final String AVATAR_PATH = "/api/sys/user/avatar";
     private static final int DEFAULT_PASSWORD_FAILED_LIMIT = 0;
     private static final String PRIVATE_KEY_ITEM = "privateKey";
+    private static final String USER_RANK_DICT_TYPE = "user_rank";
     private static final String USER_STATUS_DICT_TYPE = "user_status";
 
     private final UserService userService;
@@ -214,11 +215,15 @@ public class UserController {
     @PostMapping(value = "options")
     @WrappedApiResponse
     public UserOptionsResponse options() {
-        DictQuery query = new DictQuery();
-        query.setType(USER_STATUS_DICT_TYPE);
+        DictQuery statusQuery = new DictQuery();
+        statusQuery.setType(USER_STATUS_DICT_TYPE);
+        DictQuery rankQuery = new DictQuery();
+        rankQuery.setType(USER_RANK_DICT_TYPE);
         return UserOptionsResponse.builder()
                 .statusOptions(OptionInterfaceAssembler.toOptionResponseList(
-                        dictService.list(query), Dict::getValue, Dict::getLabel))
+                        dictService.list(statusQuery), Dict::getValue, Dict::getLabel))
+                .rankOptions(OptionInterfaceAssembler.toOptionResponseList(
+                        dictService.list(rankQuery), Dict::getValue, Dict::getLabel))
                 .build();
     }
 

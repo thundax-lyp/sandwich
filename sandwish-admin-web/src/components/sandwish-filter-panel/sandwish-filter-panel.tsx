@@ -18,6 +18,11 @@ export interface SandwishFilterPanelProps {
     resetDisabled?: boolean;
 }
 
+const resolveActionOffset = (fieldCount: number, columns: number, span: number) => {
+    const usedColumns = fieldCount % columns;
+    return (columns - usedColumns - 1) * span;
+};
+
 export const SandwishFilterPanel = ({
     children,
     className,
@@ -27,6 +32,7 @@ export const SandwishFilterPanel = ({
     open,
     resetDisabled = false
 }: SandwishFilterPanelProps) => {
+    const fieldCount = fields?.length ?? 0;
     const structuredContent = fields?.length ? (
         <div className="sandwish-filter-panel-form">
             <Row className="sandwish-filter-panel-fields" gutter={[12, 12]} align="bottom">
@@ -44,9 +50,9 @@ export const SandwishFilterPanel = ({
                 ))}
                 <Col
                     className="sandwish-filter-panel-field sandwish-filter-panel-action-field"
-                    xs={24}
-                    sm={12}
-                    lg={6}
+                    xs={{ span: 24, offset: 0 }}
+                    sm={{ span: 12, offset: resolveActionOffset(fieldCount, 2, 12) }}
+                    lg={{ span: 6, offset: resolveActionOffset(fieldCount, 4, 6) }}
                 >
                     <div className="sandwish-filter-panel-actions">
                         <Button disabled={resetDisabled} onClick={onReset}>

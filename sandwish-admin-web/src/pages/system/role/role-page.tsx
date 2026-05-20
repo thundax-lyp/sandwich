@@ -15,15 +15,7 @@ import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { RoleEdit } from "./components/role-edit";
-import {
-    addRole,
-    removeRoles,
-    listRoleMenus,
-    listRoles,
-    sortRoles,
-    changeRoleInfo,
-    changeRoleStatus
-} from "./role-service";
+import * as service from "./role-service";
 import type { RoleSaveCommand } from "./role-service";
 import type { RoleMenuNode, RoleMenuTreeNode, RoleRecord } from "./role-types";
 import "./role-page.css";
@@ -125,13 +117,13 @@ export const RolePage = () => {
 
     const roleQuery = useQuery({
         queryKey: ["role", "list", query],
-        queryFn: () => listRoles(query),
+        queryFn: () => service.listRoles(query),
         enabled: canViewRole,
         retry: false
     });
     const roleMenuQuery = useQuery({
         queryKey: ["role", "menu", "tree"],
-        queryFn: listRoleMenus,
+        queryFn: service.listRoleMenus,
         enabled: canViewRole,
         retry: false
     });
@@ -154,7 +146,7 @@ export const RolePage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: RoleSaveCommand) =>
-            values.id ? changeRoleInfo(values) : addRole(values),
+            values.id ? service.changeRoleInfo(values) : service.addRole(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingRole(null);
@@ -167,7 +159,7 @@ export const RolePage = () => {
     });
 
     const statusMutation = useMutation({
-        mutationFn: changeRoleStatus,
+        mutationFn: service.changeRoleStatus,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
@@ -179,7 +171,7 @@ export const RolePage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: removeRoles,
+        mutationFn: service.removeRoles,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
@@ -191,7 +183,7 @@ export const RolePage = () => {
     });
 
     const sortMutation = useMutation({
-        mutationFn: sortRoles,
+        mutationFn: service.sortRoles,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["role", "list"] });
             messageApi.success("角色排序已更新");

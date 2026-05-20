@@ -11,7 +11,7 @@ import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { AuditLogDetail } from "./components/audit-log-detail";
 import { AuditLogFilter } from "./components/audit-log-filter";
 import type { AuditLogFilters } from "./components/audit-log-filter";
-import { getAuditLogDetail, getAuditOptions, pageAuditLogs } from "./audit-log-service";
+import * as service from "./audit-log-service";
 import type { AuditLogPageQuery } from "./audit-log-service";
 import type { AuditLogRecord } from "./audit-log-types";
 import "./audit-log-page.css";
@@ -130,17 +130,17 @@ export const AuditLogPage = () => {
 
     const auditOptionsQuery = useQuery({
         queryKey: ["audit-log", "options"],
-        queryFn: getAuditOptions,
+        queryFn: service.getAuditOptions,
         retry: false
     });
     const auditLogQuery = useQuery({
         queryKey: ["audit-log", "page", query],
-        queryFn: () => pageAuditLogs(query),
+        queryFn: () => service.pageAuditLogs(query),
         retry: false
     });
     const detailQuery = useQuery({
         queryKey: ["audit-log", "detail", detailLogId],
-        queryFn: () => getAuditLogDetail(detailLogId || ""),
+        queryFn: () => service.getAuditLogDetail(detailLogId || ""),
         enabled: Boolean(detailLogId),
         retry: false
     });

@@ -9,14 +9,7 @@ import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { OpenClientEdit } from "./components/open-client-edit";
 import { OpenClientSecretModal } from "./components/open-client-secret-modal";
-import {
-    changeOpenClientStatus,
-    createOpenClient,
-    getOpenClient,
-    pageOpenClients,
-    resetOpenClientSecret,
-    changeOpenClientInfo
-} from "./open-client-service";
+import * as service from "./open-client-service";
 import type {
     OpenClientPageQuery,
     OpenClientSaveCommand,
@@ -106,7 +99,7 @@ export const OpenClientPage = () => {
 
     const openClientQuery = useQuery({
         queryKey: ["open-client", "page", query],
-        queryFn: () => pageOpenClients(query),
+        queryFn: () => service.pageOpenClients(query),
         retry: false
     });
     const openClientPage = openClientQuery.data;
@@ -125,7 +118,7 @@ export const OpenClientPage = () => {
         OpenClientSaveCommand
     >({
         mutationFn: (request: OpenClientSaveCommand) =>
-            request.id ? changeOpenClientInfo(request) : createOpenClient(request),
+            request.id ? service.changeOpenClientInfo(request) : service.createOpenClient(request),
         onSuccess: async (response, variables) => {
             setEditorOpen(false);
             setEditingClient(null);
@@ -141,7 +134,7 @@ export const OpenClientPage = () => {
     });
 
     const statusMutation = useMutation({
-        mutationFn: changeOpenClientStatus,
+        mutationFn: service.changeOpenClientStatus,
         onSuccess: async () => {
             await invalidateOpenClientPage();
             messageApi.success("开放客户端状态已更新");
@@ -152,7 +145,7 @@ export const OpenClientPage = () => {
     });
 
     const detailMutation = useMutation({
-        mutationFn: getOpenClient,
+        mutationFn: service.getOpenClient,
         onSuccess: (client) => {
             setEditingClient(client);
             setEditorOpen(true);
@@ -163,7 +156,7 @@ export const OpenClientPage = () => {
     });
 
     const resetSecretMutation = useMutation({
-        mutationFn: resetOpenClientSecret,
+        mutationFn: service.resetOpenClientSecret,
         onSuccess: async (response) => {
             await invalidateOpenClientPage();
             setEditingClient((current) =>

@@ -13,13 +13,7 @@ import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DepartmentEdit } from "./components/department-edit";
-import {
-    addDepartment,
-    removeDepartments,
-    listDepartments,
-    moveDepartment,
-    changeDepartmentInfo
-} from "./department-service";
+import * as service from "./department-service";
 import type { DepartmentMoveCommand, DepartmentSaveCommand } from "./department-service";
 import type { DepartmentNode, DepartmentTableNode } from "./department-types";
 import "./department-page.css";
@@ -92,7 +86,7 @@ export const DepartmentPage = () => {
     const canEditDepartment = hasPermission("sys:department:edit");
     const departmentQuery = useQuery({
         queryKey: ["department", "list"],
-        queryFn: () => listDepartments(),
+        queryFn: () => service.listDepartments(),
         retry: false
     });
     const departments = useMemo(() => departmentQuery.data || [], [departmentQuery.data]);
@@ -123,7 +117,7 @@ export const DepartmentPage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: DepartmentSaveCommand) =>
-            values.id ? changeDepartmentInfo(values) : addDepartment(values),
+            values.id ? service.changeDepartmentInfo(values) : service.addDepartment(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingDepartment(null);
@@ -136,7 +130,7 @@ export const DepartmentPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: removeDepartments,
+        mutationFn: service.removeDepartments,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["department", "list"] });
             messageApi.success("部门已删除");
@@ -147,7 +141,7 @@ export const DepartmentPage = () => {
     });
 
     const moveMutation = useMutation({
-        mutationFn: moveDepartment,
+        mutationFn: service.moveDepartment,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["department", "list"] });
             messageApi.success("部门顺序已更新");

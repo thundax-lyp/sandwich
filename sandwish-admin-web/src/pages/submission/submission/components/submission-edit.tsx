@@ -3,7 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { App, Button, Form, Input, Space, Typography, Upload } from "antd";
 import { useEffect, useState } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
-import { type SubmissionSaveCommand, uploadSubmissionImage } from "../submission-service";
+import * as service from "../submission-service";
+import type { SubmissionSaveCommand } from "../submission-service";
 import type { StorageUploadRecord } from "../submission-types";
 
 const { Text } = Typography;
@@ -45,7 +46,7 @@ export const SubmissionEdit = ({ open, saving, onClose, onSave }: SubmissionEdit
     const [uploadedImages, setUploadedImages] = useState<UploadedSubmissionImage[]>([]);
 
     const uploadMutation = useMutation({
-        mutationFn: uploadSubmissionImage,
+        mutationFn: service.uploadSubmissionImage,
         onSuccess: (response, file) => {
             if (response.error) {
                 messageApi.error(response.error);

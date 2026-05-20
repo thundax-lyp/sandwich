@@ -8,7 +8,7 @@ import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { MenuEdit } from "./components/menu-edit";
-import { addMenu, changeMenuInfo, listMenus, moveMenu, removeMenus } from "./menu-service";
+import * as service from "./menu-service";
 import type { MenuMoveCommand, MenuSaveCommand } from "./menu-service";
 import type { MenuNode, MenuTableNode } from "./menu-types";
 import "./menu-page.css";
@@ -77,7 +77,7 @@ export const MenuPage = () => {
     const canEditMenu = hasPermission("super");
     const menuQuery = useQuery({
         queryKey: ["menu", "list"],
-        queryFn: () => listMenus(),
+        queryFn: () => service.listMenus(),
         retry: false
     });
     const menus = useMemo(() => menuQuery.data || [], [menuQuery.data]);
@@ -105,7 +105,7 @@ export const MenuPage = () => {
 
     const saveMutation = useMutation({
         mutationFn: (values: MenuSaveCommand) =>
-            values.id ? changeMenuInfo(values) : addMenu(values),
+            values.id ? service.changeMenuInfo(values) : service.addMenu(values),
         onSuccess: async () => {
             setEditorOpen(false);
             setEditingMenu(null);
@@ -118,7 +118,7 @@ export const MenuPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: removeMenus,
+        mutationFn: service.removeMenus,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });
             messageApi.success("菜单已删除");
@@ -129,7 +129,7 @@ export const MenuPage = () => {
     });
 
     const moveMutation = useMutation({
-        mutationFn: moveMenu,
+        mutationFn: service.moveMenu,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["menu", "list"] });
             messageApi.success("菜单层级已更新");

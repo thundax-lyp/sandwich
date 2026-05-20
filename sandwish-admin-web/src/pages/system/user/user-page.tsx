@@ -22,17 +22,14 @@ import type { CurrentUserRecord } from "@/service/current-user-types";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { UserAvatar } from "./components/user-avatar";
 import { UserEdit } from "./components/user-edit";
-import {
-    createUser,
-    removeUsers,
-    listUserDepartments,
-    pageUsers,
-    changeUserInfo,
-    uploadUserAvatar,
-    changeUserStatus
-} from "./user-service";
-import type { UserPageQuery, UserSaveCommand } from "./user-service";
-import type { UserDepartmentNode, UserFormValues, UserRecord } from "./user-types";
+import * as service from "./user-service";
+import type { PageQuery, SaveCommand } from "./user-service";
+import type {
+    UserDepartmentNode,
+    UserFormValues,
+    UserOptionsRecord,
+    UserRecord
+} from "./user-types";
 import "./user-page.css";
 
 const { Text } = Typography;
@@ -63,6 +60,9 @@ const DEFAULT_USER_FILTERS: UserFilters = {
 
 const EMPTY_USERS: UserRecord[] = [];
 const EMPTY_DEPARTMENTS: UserDepartmentNode[] = [];
+const EMPTY_USER_OPTIONS: UserOptionsRecord = {
+    statusOptions: []
+};
 
 const normalizeSearch = (value?: string | null) => {
     const normalizedValue = value?.trim();
@@ -81,8 +81,8 @@ const readRoleNames = (user: UserRecord) => {
     return (user.roles || []).map((role) => role.name).filter(Boolean);
 };
 
-const statusLabel = (user: UserRecord) => {
-    return user.enable === false ? "禁用" : "启用";
+const statusValue = (user: UserRecord): Exclude<UserFilterStatus, "ALL"> => {
+    return user.enable === false ? "DISABLED" : "ENABLED";
 };
 
 const statusClassName = (user: UserRecord) => {
@@ -179,7 +179,7 @@ export const UserPage = () => {
     const confirm = useSandwishConfirm();
     const queryClient = useQueryClient();
     const departmentPanelRef = useRef<HTMLDivElement | null>(null);
-    const [query, setQuery] = useState<UserPageQuery>({
+    const [query, setQuery] = useState<PageQuery>({
         pageNo: DEFAULT_PAGE_NO,
         pageSize: DEFAULT_PAGE_SIZE
     });
@@ -196,12 +196,17 @@ export const UserPage = () => {
 
     const userQuery = useQuery({
         queryKey: ["user", "page", query],
-        queryFn: () => pageUsers(query),
+        queryFn: () => service.page(query),
         retry: false
     });
     const departmentQuery = useQuery({
         queryKey: ["user", "department", "tree"],
-        queryFn: () => listUserDepartments(),
+        queryFn: () => service.listDepartments(),
+        retry: false
+    });
+    const userOptionsQuery = useQuery({
+        queryKey: ["user", "options"],
+        queryFn: service.getOptions,
         retry: false
     });
     const currentUserQuery = useQuery({
@@ -216,6 +221,10 @@ export const UserPage = () => {
         () => departmentQuery.data ?? EMPTY_DEPARTMENTS,
         [departmentQuery.data]
     );
+    const userOptions = userOptionsQuery.data ?? EMPTY_USER_OPTIONS;
+    const statusLabelByValue = useMemo(() => {
+        return new Map(userOptions.statusOptions.map((option) => [option.value, option.label]));
+    }, [userOptions.statusOptions]);
     const departmentTreeData = useMemo(() => buildDepartmentTree(departments), [departments]);
     const departmentTreeKeys = useMemo(
         () => collectTreeKeys(departmentTreeData),
@@ -294,15 +303,20 @@ export const UserPage = () => {
         };
     }, [departmentTreeData]);
 
-    const invalidateUserPage = async () => {
+    const invalidatePage = async () => {
         await queryClient.invalidateQueries({ queryKey: ["user", "page"] });
     };
 
+    const readStatusLabel = (user: UserRecord) => {
+        const value = statusValue(user);
+        return statusLabelByValue.get(value) || (value === "DISABLED" ? "禁用" : "启用");
+    };
+
     const statusMutation = useMutation({
-        mutationFn: changeUserStatus,
+        mutationFn: service.changeStatus,
         onSuccess: async () => {
             setSelectedRowKeys([]);
-            await invalidateUserPage();
+            await invalidatePage();
             messageApi.success("用户状态已更新");
         },
         onError: (error) => {
@@ -311,10 +325,10 @@ export const UserPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: removeUsers,
+        mutationFn: service.remove,
         onSuccess: async () => {
             setSelectedRowKeys([]);
-            await invalidateUserPage();
+            await invalidatePage();
             messageApi.success("用户已删除");
         },
         onError: (error) => {
@@ -323,7 +337,8 @@ export const UserPage = () => {
     });
 
     const avatarUploadMutation = useMutation({
-        mutationFn: ({ id, avatar }: { id: string; avatar: File }) => uploadUserAvatar(id, avatar),
+        mutationFn: ({ id, avatar }: { id: string; avatar: File }) =>
+            service.uploadAvatar(id, avatar),
         onSuccess: async (_, variables) => {
             const refreshedUsers = await userQuery.refetch();
             const refreshedUser = refreshedUsers.data?.records?.find(
@@ -339,10 +354,10 @@ export const UserPage = () => {
         }
     });
     const updateMutation = useMutation({
-        mutationFn: changeUserInfo,
+        mutationFn: service.changeInfo,
         onSuccess: async (savedUser) => {
             setActiveUser(savedUser);
-            await invalidateUserPage();
+            await invalidatePage();
             setUserEditorOpen(false);
             setActiveUser(null);
             messageApi.success("用户已更新");
@@ -355,13 +370,13 @@ export const UserPage = () => {
         mutationFn: async (form: UserFormValues) => {
             const loginForm = await createLoginForm();
             const encryptedPassword = sm2.doEncrypt(form.loginPass, loginForm.publicKey, 0);
-            return createUser(
-                toCreateUserSaveCommand(form, encryptedPassword, loginForm.loginToken)
+            return service.create(
+                toCreateSaveCommand(form, encryptedPassword, loginForm.loginToken)
             );
         },
         onSuccess: async () => {
             setUserEditorOpen(false);
-            await invalidateUserPage();
+            await invalidatePage();
             messageApi.success("用户已新增");
         },
         onError: (error) => {
@@ -369,7 +384,7 @@ export const UserPage = () => {
         }
     });
 
-    const updateQuery = (nextQuery: Partial<UserPageQuery>) => {
+    const updateQuery = (nextQuery: Partial<PageQuery>) => {
         setSelectedRowKeys([]);
         setQuery((currentQuery) => ({
             ...currentQuery,
@@ -462,7 +477,7 @@ export const UserPage = () => {
         setUserEditorOpen(true);
     };
 
-    const toUserSaveCommand = (user: UserRecord, form: UserFormValues): UserSaveCommand => ({
+    const toSaveCommand = (user: UserRecord, form: UserFormValues): SaveCommand => ({
         id: user.id,
         remarks: user.remarks,
         loginName: normalizeSearch(form.loginName),
@@ -476,11 +491,11 @@ export const UserPage = () => {
         roles: form.roleIds.map((roleId) => ({ id: roleId }))
     });
 
-    const toCreateUserSaveCommand = (
+    const toCreateSaveCommand = (
         form: UserFormValues,
         encryptedPassword: string,
         token: string
-    ): UserSaveCommand => ({
+    ): SaveCommand => ({
         loginName: normalizeSearch(form.loginName),
         loginPass: encryptedPassword,
         token,
@@ -530,7 +545,7 @@ export const UserPage = () => {
             messageApi.error("请选择部门");
             return;
         }
-        updateMutation.mutate(toUserSaveCommand(activeUser, form));
+        updateMutation.mutate(toSaveCommand(activeUser, form));
     };
 
     const columns: SandwishTableProps<UserRecord>["columns"] = [
@@ -590,7 +605,9 @@ export const UserPage = () => {
             dataIndex: "enable",
             key: "status",
             width: DEFAULT_COLUMN_WIDTHS.status,
-            render: (_, user) => <Tag className={statusClassName(user)}>{statusLabel(user)}</Tag>
+            render: (_, user) => (
+                <Tag className={statusClassName(user)}>{readStatusLabel(user)}</Tag>
+            )
         },
         {
             title: "级别",
@@ -666,9 +683,12 @@ export const UserPage = () => {
                                 value={filters.enable}
                                 options={[
                                     { value: "ALL", label: "全部" },
-                                    { value: "ENABLED", label: "启用" },
-                                    { value: "DISABLED", label: "禁用" }
+                                    ...userOptions.statusOptions.map((option) => ({
+                                        value: option.value as UserFilterStatus,
+                                        label: option.label
+                                    }))
                                 ]}
+                                loading={userOptionsQuery.isFetching}
                                 onChange={(enable) =>
                                     setFilters((currentFilters) => ({
                                         ...currentFilters,

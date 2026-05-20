@@ -1236,6 +1236,65 @@ const localRules = {
                 };
             }
         },
+        "service-namespace-import": {
+            create(context) {
+                const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+
+                const resolveImportPath = (importPath) => {
+                    if (importPath.startsWith("@/")) {
+                        return `/src/${importPath.slice(2)}`;
+                    }
+                    if (!importPath.startsWith(".")) {
+                        return importPath;
+                    }
+                    return path
+                        .resolve(path.dirname(context.physicalFilename), importPath)
+                        .split(path.sep)
+                        .join("/");
+                };
+
+                const isPageRuntimeFile = () => {
+                    return (
+                        normalizedFilePath.includes("/src/pages/") &&
+                        !normalizedFilePath.endsWith("-service.ts") &&
+                        !normalizedFilePath.endsWith("-types.ts")
+                    );
+                };
+
+                const isPageServiceImport = (importPath) => {
+                    const resolvedImportPath = resolveImportPath(importPath);
+                    return /\/src\/pages\/[^/]+\/[^/]+\/[^/]+-service$/.test(resolvedImportPath);
+                };
+
+                return {
+                    ImportDeclaration(node) {
+                        if (!isPageRuntimeFile() || node.importKind === "type") {
+                            return;
+                        }
+
+                        const importPath = node.source.value;
+                        if (typeof importPath !== "string" || !isPageServiceImport(importPath)) {
+                            return;
+                        }
+
+                        const hasOnlyNamespaceRuntimeImport = node.specifiers.every(
+                            (specifier) =>
+                                specifier.type === "ImportNamespaceSpecifier" ||
+                                specifier.importKind === "type"
+                        );
+                        if (hasOnlyNamespaceRuntimeImport) {
+                            return;
+                        }
+
+                        context.report({
+                            node,
+                            message:
+                                "ADMIN_WEB_NAME_SERVICE_NAMESPACE_IMPORT: runtime service imports in pages/components must use namespace import; import type is allowed."
+                        });
+                    }
+                };
+            }
+        },
         "service-helper-contract-types": {
             create(context) {
                 const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
@@ -1505,6 +1564,7 @@ export default tseslint.config(
             "local/service-method-input-shape": "error",
             "local/service-input-type-location": "error",
             "local/service-helper-contract-types": "error",
+            "local/service-namespace-import": "error",
             "local/service-type-exposure": "error",
             "local/shared-service-types-only": "error",
             "local/shared-component-css-local": "error",

@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
-import { pageLogs } from "./system-log-service";
+import * as service from "./system-log-service";
 import type { LogPageQuery } from "./system-log-service";
 import type { LogRecord } from "./system-log-types";
 import "./system-log-page.css";
@@ -84,7 +84,7 @@ export const SystemLogPage = () => {
 
     const logQuery = useQuery({
         queryKey: ["system-log", "page", query],
-        queryFn: () => pageLogs(query),
+        queryFn: () => service.pageLogs(query),
         retry: false
     });
     const logPage = logQuery.data;

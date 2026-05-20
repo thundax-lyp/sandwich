@@ -1068,6 +1068,26 @@ describe("App", () => {
                     )
                 );
             }
+            if (url.endsWith("/sys/user/options")) {
+                return Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            code: "COMMON-00000",
+                            message: "success",
+                            data: {
+                                statusOptions: [
+                                    { value: "ENABLED", label: "字典启用" },
+                                    { value: "DISABLED", label: "字典禁用" }
+                                ]
+                            }
+                        }),
+                        {
+                            headers: { "Content-Type": "application/json" },
+                            status: 200
+                        }
+                    )
+                );
+            }
             if (url.endsWith("/sys/user/page")) {
                 const body = init?.body ? JSON.parse(String(init.body)) : {};
                 const allUsers = [
@@ -1133,6 +1153,7 @@ describe("App", () => {
 
         expect(screen.getByRole("heading", { name: "用户管理" })).toBeInTheDocument();
         expect(await screen.findByText("Ethan Chen")).toBeInTheDocument();
+        expect(await screen.findByText("字典启用")).toBeInTheDocument();
 
         const filterButton = screen.getByRole("button", { name: /筛选/ });
         fireEvent.click(filterButton);
@@ -1162,6 +1183,10 @@ describe("App", () => {
                 "/admin-api/api/sys/user/role/list",
                 expect.any(Object)
             )
+        );
+        expect(globalThis.fetch).toHaveBeenCalledWith(
+            "/admin-api/api/sys/user/options",
+            expect.any(Object)
         );
 
         fireEvent.click(screen.getByRole("button", { name: "删除 Olivia Martinez" }));

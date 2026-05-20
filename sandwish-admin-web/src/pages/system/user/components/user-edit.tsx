@@ -2,7 +2,7 @@ import { CameraOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Select, Switch, Upload } from "antd";
 import { useMemo, useState } from "react";
-import { listUserRoles } from "../user-service";
+import * as service from "../user-service";
 import type { UserDepartmentNode, UserFormValues, UserRecord, UserRoleRecord } from "../user-types";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { CurrentUserRecord } from "@/service/current-user-types";
@@ -118,7 +118,7 @@ export const UserEdit = ({
     };
     const userRoleQuery = useQuery({
         queryKey: ["user", "role", "list"],
-        queryFn: () => listUserRoles(),
+        queryFn: () => service.listRoles(),
         enabled: visible,
         retry: false
     });

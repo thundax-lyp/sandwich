@@ -1,8 +1,13 @@
 import { postFormData, postJson } from "@/api/http";
 import type { Page } from "@/types/page";
-import type { UserDepartmentNode, UserRecord, UserRoleRecord } from "./user-types";
+import type {
+    UserDepartmentNode,
+    UserOptionsRecord,
+    UserRecord,
+    UserRoleRecord
+} from "./user-types";
 
-export interface UserPageQuery {
+export interface PageQuery {
     pageNo?: number;
     pageSize?: number;
     departmentId?: string | null;
@@ -12,14 +17,14 @@ export interface UserPageQuery {
     orderBy?: string | null;
 }
 
-export interface UserStatusCommand {
+export interface StatusCommand {
     users: Array<{
         id: string;
         enable?: boolean | null;
     }>;
 }
 
-export interface UserSaveCommand {
+export interface SaveCommand {
     id?: string | null;
     remarks?: string | null;
     loginName?: string | null;
@@ -35,45 +40,51 @@ export interface UserSaveCommand {
     roles?: Array<{ id: string }> | null;
 }
 
-export const pageUsers = (request: UserPageQuery = {}) => {
-    return postJson<Page<UserRecord>, UserPageQuery>("/sys/user/page", {
+export const page = (request: PageQuery = {}) => {
+    return postJson<Page<UserRecord>, PageQuery>("/sys/user/page", {
         body: request
     });
 };
 
-export const listUserDepartments = () => {
+export const listDepartments = () => {
     return postJson<UserDepartmentNode[]>("/sys/user/department/tree");
 };
 
-export const listUserRoles = () => {
+export const listRoles = () => {
     return postJson<UserRoleRecord[]>("/sys/user/role/list");
 };
 
-export const changeUserStatus = (request: UserStatusCommand) => {
+export const getOptions = () => {
+    return postJson<UserOptionsRecord, Record<string, never>>("/sys/user/options", {
+        body: {}
+    });
+};
+
+export const changeStatus = (request: StatusCommand) => {
     return postJson<boolean, Array<{ id: string; enable?: boolean | null }>>("/sys/user/enable", {
         body: request.users
     });
 };
 
-export const removeUsers = (ids: string[]) => {
+export const remove = (ids: string[]) => {
     return postJson<boolean, Array<{ id: string }>>("/sys/user/delete", {
         body: ids.map((id) => ({ id }))
     });
 };
 
-export const createUser = (request: UserSaveCommand) => {
-    return postJson<UserRecord, UserSaveCommand>("/sys/user/create", {
+export const create = (request: SaveCommand) => {
+    return postJson<UserRecord, SaveCommand>("/sys/user/create", {
         body: request
     });
 };
 
-export const changeUserInfo = (request: UserSaveCommand) => {
-    return postJson<UserRecord, UserSaveCommand>("/sys/user/update", {
+export const changeInfo = (request: SaveCommand) => {
+    return postJson<UserRecord, SaveCommand>("/sys/user/update", {
         body: request
     });
 };
 
-export const uploadUserAvatar = (id: string, avatar: File) => {
+export const uploadAvatar = (id: string, avatar: File) => {
     const body = new FormData();
     body.append("id", id);
     body.append("avatar", avatar);

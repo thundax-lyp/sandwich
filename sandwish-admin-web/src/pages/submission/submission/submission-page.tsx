@@ -10,13 +10,7 @@ import type { SandwishTableProps, SandwishTableSortPosition } from "@/components
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { SubmissionDetail } from "./components/submission-detail";
 import { SubmissionEdit } from "./components/submission-edit";
-import {
-    changeSubmissionStatus,
-    createSubmission,
-    removeSubmissions,
-    pageSubmissions,
-    sortSubmissions
-} from "./submission-service";
+import * as service from "./submission-service";
 import type {
     SubmissionPageQuery,
     SubmissionSaveCommand,
@@ -137,7 +131,7 @@ export const SubmissionPage = () => {
 
     const submissionQuery = useQuery({
         queryKey: ["submission", "page", query],
-        queryFn: () => pageSubmissions(query),
+        queryFn: () => service.pageSubmissions(query),
         retry: false
     });
     const submissionPage = submissionQuery.data;
@@ -151,7 +145,7 @@ export const SubmissionPage = () => {
     };
 
     const createMutation = useMutation({
-        mutationFn: createSubmission,
+        mutationFn: service.createSubmission,
         onSuccess: async () => {
             setEditorOpen(false);
             await invalidateSubmissionPage();
@@ -163,7 +157,7 @@ export const SubmissionPage = () => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: removeSubmissions,
+        mutationFn: service.removeSubmissions,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await invalidateSubmissionPage();
@@ -175,7 +169,7 @@ export const SubmissionPage = () => {
     });
 
     const statusMutation = useMutation({
-        mutationFn: changeSubmissionStatus,
+        mutationFn: service.changeSubmissionStatus,
         onSuccess: async () => {
             await invalidateSubmissionPage();
             messageApi.success("提交状态已更新");
@@ -186,7 +180,7 @@ export const SubmissionPage = () => {
     });
 
     const sortMutation = useMutation({
-        mutationFn: sortSubmissions,
+        mutationFn: service.sortSubmissions,
         onSuccess: async () => {
             await invalidateSubmissionPage();
             messageApi.success("提交顺序已更新");

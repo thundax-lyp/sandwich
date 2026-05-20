@@ -39,3 +39,10 @@ export interface UserFormValues {
     admin: boolean;
     enable: boolean;
 }
+
+export interface UserOptionsRecord {
+    statusOptions: Array<{
+        value: string;
+        label: string;
+    }>;
+}

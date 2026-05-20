@@ -10,11 +10,7 @@ import { ListPage } from "@/components/list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
-import {
-    removeStorageObjects,
-    pageStorageObjects,
-    sortStorageObjects
-} from "./storage-object-service";
+import * as service from "./storage-object-service";
 import type { StoragePageQuery } from "./storage-object-service";
 import type { StorageRecord } from "./storage-object-types";
 import "./storage-object-page.css";
@@ -132,7 +128,7 @@ export const StorageObjectPage = () => {
 
     const storageQuery = useQuery({
         queryKey: ["storage-object", "page", query],
-        queryFn: () => pageStorageObjects(query),
+        queryFn: () => service.pageStorageObjects(query),
         retry: false
     });
     const storagePage = storageQuery.data;
@@ -146,7 +142,7 @@ export const StorageObjectPage = () => {
     };
 
     const deleteMutation = useMutation({
-        mutationFn: removeStorageObjects,
+        mutationFn: service.removeStorageObjects,
         onSuccess: async () => {
             setSelectedRowKeys([]);
             await invalidateStoragePage();
@@ -158,7 +154,7 @@ export const StorageObjectPage = () => {
     });
 
     const sortMutation = useMutation({
-        mutationFn: sortStorageObjects,
+        mutationFn: service.sortStorageObjects,
         onSuccess: async () => {
             await invalidateStoragePage();
             messageApi.success("存储对象顺序已更新");

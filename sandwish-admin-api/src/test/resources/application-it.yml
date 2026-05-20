@@ -6,6 +6,8 @@ server:
 spring:
     application:
         name: sandwish-admin-api-it
+    autoconfigure:
+        exclude: ${SANDWISH_IT_MQ_AUTO_CONFIGURATION_EXCLUDE:org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration}
     datasource:
         driver-class-name: ${SANDWISH_IT_DB_DRIVER:com.mysql.jdbc.Driver}
         url: "jdbc:mysql://127.0.0.1:${SANDWISH_IT_MYSQL_PORT:13306}/${SANDWISH_IT_MYSQL_DATABASE:sandwish_integration}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"

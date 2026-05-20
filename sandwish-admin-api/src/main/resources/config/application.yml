@@ -9,6 +9,9 @@ spring:
   application:
     name: sandwish-admin-api
 
+  autoconfigure:
+    exclude: ${SANDWISH_MQ_AUTO_CONFIGURATION_EXCLUDE:org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration}
+
   main:
     banner-mode: "off"
 
@@ -78,7 +81,7 @@ mybatis-plus:
     banner: false
 
 rocketmq:
-  name-server: ${SANDWISH_ROCKETMQ_NAME_SERVER:}
+  name-server: ${SANDWISH_ROCKETMQ_NAME_SERVER:127.0.0.1:9876}
   producer:
     group: ${SANDWISH_ROCKETMQ_PRODUCER_GROUP:sandwish-admin-api-producer}
 
@@ -109,7 +112,7 @@ sandwish:
       whitelist-values: ${SANDWISH_AUTH_CAPTCHA_WHITELIST_VALUES:}
   mq:
     enabled: ${SANDWISH_MQ_ENABLED:true}
-    type: ${SANDWISH_MQ_TYPE:RABBITMQ}
+    type: ${SANDWISH_MQ_TYPE:ROCKETMQ}
   log:
     storage-path: ${SANDWISH_LOG_STORAGE_PATH:${java.io.tmpdir}/sandwish/sys-log}
     sys:

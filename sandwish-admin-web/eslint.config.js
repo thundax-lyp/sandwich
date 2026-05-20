@@ -300,50 +300,82 @@ const localRules = {
                     return match?.[1] ?? "";
                 };
 
-                const reportInvalidClassName = (node, className, pageDomain) => {
-                    if (
-                        className.startsWith(`${pageDomain}-`) ||
-                        className.startsWith("sandwish-")
-                    ) {
-                        return;
+                const readClassText = (attribute) => {
+                    if (!attribute.value) {
+                        return "";
                     }
 
-                    context.report({
-                        node,
-                        message: `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX: page className "${className}" must start with "${pageDomain}-" or "sandwish-".`
-                    });
+                    if (
+                        attribute.value.type === "Literal" &&
+                        typeof attribute.value.value === "string"
+                    ) {
+                        return attribute.value.value;
+                    }
+
+                    if (
+                        attribute.value.type === "JSXExpressionContainer" &&
+                        attribute.value.expression.type === "TemplateLiteral"
+                    ) {
+                        return attribute.value.expression.quasis
+                            .map((quasi) => quasi.value.cooked ?? "")
+                            .join(" ");
+                    }
+
+                    return "";
                 };
 
-                const checkClassNameText = (node, text, pageDomain) => {
-                    text.split(/\s+/)
-                        .filter(Boolean)
-                        .forEach((className) => {
-                            reportInvalidClassName(node, className, pageDomain);
-                        });
+                const hasPageDomainClass = (attribute, pageDomain) => {
+                    return readClassText(attribute)
+                        .split(/\s+/)
+                        .some((className) => className.startsWith(`${pageDomain}-`));
                 };
 
                 return {
-                    JSXAttribute(node) {
+                    Program(node) {
                         const pageDomain = readPageDomain();
-                        if (!pageDomain || node.name.name !== "className" || !node.value) {
+                        if (!pageDomain) {
                             return;
                         }
 
-                        if (node.value.type === "Literal" && typeof node.value.value === "string") {
-                            checkClassNameText(node.value, node.value.value, pageDomain);
-                            return;
-                        }
+                        let hasPageRootClassName = false;
 
-                        if (
-                            node.value.type !== "JSXExpressionContainer" ||
-                            node.value.expression.type !== "TemplateLiteral"
-                        ) {
-                            return;
-                        }
+                        const visit = (currentNode) => {
+                            if (!currentNode || typeof currentNode !== "object") {
+                                return;
+                            }
 
-                        node.value.expression.quasis.forEach((quasi) => {
-                            checkClassNameText(quasi, quasi.value.cooked ?? "", pageDomain);
-                        });
+                            if (
+                                currentNode.type === "JSXAttribute" &&
+                                (currentNode.name.name === "className" ||
+                                    currentNode.name.name === "pageClassName") &&
+                                hasPageDomainClass(currentNode, pageDomain)
+                            ) {
+                                hasPageRootClassName = true;
+                                return;
+                            }
+
+                            Object.keys(currentNode).forEach((key) => {
+                                if (hasPageRootClassName || key === "parent") {
+                                    return;
+                                }
+
+                                const value = currentNode[key];
+                                if (Array.isArray(value)) {
+                                    value.forEach(visit);
+                                    return;
+                                }
+                                visit(value);
+                            });
+                        };
+
+                        visit(node);
+
+                        if (!hasPageRootClassName) {
+                            context.report({
+                                node,
+                                message: `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX: page root className must include a "${pageDomain}-" class.`
+                            });
+                        }
                     }
                 };
             }

@@ -103,8 +103,9 @@
 - `ADMIN_WEB_NAME_BOOLEAN`：布尔变量使用 `is`、`has`、`can` 前缀。
 - `ADMIN_WEB_NAME_CONSTANT`：常量使用 `UPPER_SNAKE_CASE`。
 - `ADMIN_WEB_NAME_SANDWISH_COMPONENT`：`Sandwish*` 只在 `src/components/` 定义。
-- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面 `className` 使用页面域前缀；共享组件 class 使用 `sandwish-`。
+- `ADMIN_WEB_NAME_PAGE_CLASS_PREFIX`：页面根节点 class 使用页面域前缀；共享组件 class 使用 `sandwish-`。
 - `ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION`：组件域 CSS class 只定义在对应组件 CSS 文件中。
+- `ADMIN_WEB_STYLE_PAGE_CLASS_LOCATION`：页面域 CSS class 只定义在对应页面 CSS 文件中。
 
 ### UI
 

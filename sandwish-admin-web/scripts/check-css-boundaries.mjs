@@ -66,6 +66,24 @@ const readComponentName = (className) => {
     });
 };
 
+const pageStyleFiles = listFiles(SOURCE_ROOT, (filePath) =>
+    /\/pages\/.*\/[^/]+-page\.css$/.test(filePath.split(path.sep).join("/"))
+);
+
+const pageStyleByDomain = new Map(
+    pageStyleFiles.map((filePath) => {
+        const normalizedFilePath = filePath.split(path.sep).join("/");
+        const domainName = path.basename(filePath, ".css").replace(/-page$/, "");
+        return [domainName, normalizedFilePath];
+    })
+);
+
+const readPageDomainName = (className) => {
+    return [...pageStyleByDomain.keys()]
+        .sort((left, right) => right.length - left.length)
+        .find((domainName) => className === domainName || className.startsWith(`${domainName}-`));
+};
+
 const cssFiles = listFiles(SOURCE_ROOT, (filePath) => filePath.endsWith(".css"));
 const sourceFiles = listFiles(SOURCE_ROOT, (filePath) => /\.(?:ts|tsx|css)$/.test(filePath));
 const violations = [];
@@ -123,6 +141,21 @@ cssFiles.forEach((filePath) => {
         if (normalizedFilePath !== expectedFilePath) {
             violations.push(
                 `${normalizedFilePath}: ADMIN_WEB_STYLE_COMPONENT_CLASS_LOCATION .${className} must live in ${expectedFilePath}`
+            );
+        }
+    }
+
+    for (const match of content.matchAll(CLASS_NAME_PATTERN)) {
+        const className = match[1];
+        const pageDomainName = readPageDomainName(className);
+        if (!pageDomainName) {
+            continue;
+        }
+
+        const expectedFilePath = pageStyleByDomain.get(pageDomainName);
+        if (normalizedFilePath !== expectedFilePath) {
+            violations.push(
+                `${normalizedFilePath}: ADMIN_WEB_STYLE_PAGE_CLASS_LOCATION .${className} must live in ${expectedFilePath}`
             );
         }
     }

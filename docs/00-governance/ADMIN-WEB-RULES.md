@@ -110,6 +110,7 @@
 ### UI
 
 - `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
+- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口；标题、宽度和窄屏下拉由 `SandwishTable` 处理。
 
 ### Placement
 

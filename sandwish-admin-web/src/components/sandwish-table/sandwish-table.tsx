@@ -5,18 +5,60 @@ import type {
     ReactNode
 } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Table } from "antd";
-import type { TableProps } from "antd";
+import { MoreOutlined } from "@ant-design/icons";
+import { Button, Dropdown, Table } from "antd";
+import type { MenuProps, TableProps } from "antd";
 import { PAGE_SIZE_OPTIONS } from "@/types/page";
 import "./sandwish-table.css";
 
 const DEFAULT_ACTION_COLUMN_KEY = "actions";
 const DEFAULT_ACTION_COLUMN_WIDTH = 116;
 const DEFAULT_ACTION_COLUMN_MOBILE_WIDTH = 54;
+const ACTION_BUTTON_WIDTH = 31;
+const ACTION_CELL_GAP = 3;
+const ACTION_CELL_PADDING = 28;
+const ACTION_DIVIDER_WIDTH = 9;
+const ACTION_INLINE_LIMIT = 2;
+const ACTION_TEXT_BASE_WIDTH = 26;
+const ACTION_TEXT_CHAR_WIDTH = 14;
 const DEFAULT_MIN_COLUMN_WIDTH = 96;
 const MOBILE_MEDIA_QUERY = "(max-width: 760px)";
 
 export type SandwishTableSortPosition = "before" | "after";
+export type SandwishTableRowActionType = "text" | "warning" | "danger";
+
+export interface SandwishTableRowAction<RecordType extends object = object> {
+    ariaLabel?: string;
+    disabled?: boolean;
+    icon?: ReactNode;
+    key: Key;
+    onClick: (record: RecordType) => void;
+    text: string;
+    type?: SandwishTableRowActionType;
+}
+
+export interface SandwishTableRowActionDivider {
+    key?: Key;
+    type: "divider";
+}
+
+export type SandwishTableRowActionOption<RecordType extends object = object> =
+    | SandwishTableRowAction<RecordType>
+    | SandwishTableRowActionDivider;
+
+export type SandwishTableRowActions<RecordType extends object = object> =
+    | SandwishTableRowActionOption<RecordType>[]
+    | ((record: RecordType, index?: number) => SandwishTableRowActionOption<RecordType>[]);
+
+export interface SandwishTableActionColumn<RecordType extends object = object> {
+    inlineLimit?: number;
+    options?: SandwishTableRowActions<RecordType>;
+}
+
+export type SandwishTableColumn<RecordType extends object = object> = NonNullable<
+    TableProps<RecordType>["columns"]
+>[number] &
+    SandwishTableActionColumn<RecordType>;
 
 const readColumnKey = <RecordType extends object>(
     column: NonNullable<TableProps<RecordType>["columns"]>[number]
@@ -63,12 +105,106 @@ const callHandler = <EventType,>(
     }
 };
 
-export interface SandwishTableProps<
-    RecordType extends object = object
-> extends TableProps<RecordType> {
+const isActionDivider = <RecordType extends object>(
+    action: SandwishTableRowActionOption<RecordType>
+): action is SandwishTableRowActionDivider => {
+    return "type" in action && action.type === "divider";
+};
+
+const normalizeRowActions = <RecordType extends object>(
+    actions: SandwishTableRowActions<RecordType> | undefined,
+    record: RecordType,
+    index?: number
+) => {
+    return typeof actions === "function" ? actions(record, index) : (actions ?? []);
+};
+
+const countActionButtons = <RecordType extends object>(
+    actions: SandwishTableRowActionOption<RecordType>[]
+) => {
+    return actions.filter((action) => !isActionDivider(action)).length;
+};
+
+const calculateActionButtonWidth = <RecordType extends object>(
+    action: SandwishTableRowActionOption<RecordType>
+) => {
+    if (isActionDivider(action)) {
+        return ACTION_DIVIDER_WIDTH;
+    }
+
+    if (action.icon) {
+        return ACTION_BUTTON_WIDTH;
+    }
+
+    return Math.max(
+        ACTION_BUTTON_WIDTH,
+        action.text.length * ACTION_TEXT_CHAR_WIDTH + ACTION_TEXT_BASE_WIDTH
+    );
+};
+
+const calculateActionColumnWidth = <RecordType extends object>(
+    actions: SandwishTableRowActionOption<RecordType>[]
+) => {
+    const actionCount = countActionButtons(actions);
+    if (actionCount === 0) {
+        return DEFAULT_ACTION_COLUMN_MOBILE_WIDTH;
+    }
+
+    const visibleActions = actions.filter((action) => !isActionDivider(action));
+    const visibleActionCount = Math.min(actionCount, ACTION_INLINE_LIMIT);
+    const hasOverflow = actionCount > ACTION_INLINE_LIMIT;
+    const inlineWidth = visibleActions
+        .slice(0, ACTION_INLINE_LIMIT)
+        .reduce((total, action) => total + calculateActionButtonWidth(action), 0);
+    const itemCount = visibleActionCount + (hasOverflow ? 1 : 0);
+
+    return (
+        ACTION_CELL_PADDING +
+        inlineWidth +
+        (hasOverflow ? ACTION_BUTTON_WIDTH : 0) +
+        Math.max(0, itemCount - 1) * ACTION_CELL_GAP
+    );
+};
+
+const splitActions = <RecordType extends object>(
+    actions: SandwishTableRowActionOption<RecordType>[],
+    inlineLimit: number
+) => {
+    const inlineActions: SandwishTableRowActionOption<RecordType>[] = [];
+    const overflowActions: SandwishTableRowActionOption<RecordType>[] = [];
+    let actionCount = 0;
+
+    actions.forEach((action) => {
+        if (isActionDivider(action)) {
+            if (actionCount > 0 && actionCount < inlineLimit) {
+                inlineActions.push(action);
+                return;
+            }
+            if (actionCount >= inlineLimit) {
+                overflowActions.push(action);
+            }
+            return;
+        }
+
+        if (actionCount < inlineLimit) {
+            inlineActions.push(action);
+        } else {
+            overflowActions.push(action);
+        }
+        actionCount += 1;
+    });
+
+    return { inlineActions, overflowActions };
+};
+
+export interface SandwishTableProps<RecordType extends object = object> extends Omit<
+    TableProps<RecordType>,
+    "columns"
+> {
     actionColumnKey?: Key;
     actionColumnMobileWidth?: number;
     actionColumnWidth?: number;
+    columns?: SandwishTableColumn<RecordType>[];
     getSortableRowKey?: (record: RecordType, index?: number) => Key;
     minColumnWidth?: number;
     onSort?: (
@@ -172,14 +308,132 @@ export const SandwishTable = <RecordType extends object = object>({
         [minColumnWidth]
     );
 
+    const renderRowActions = useCallback(
+        (
+            actionsConfig: SandwishTableRowActions<RecordType>,
+            inlineLimitConfig: number | undefined,
+            record: RecordType,
+            index: number
+        ) => {
+            const actions = normalizeRowActions(actionsConfig, record, index);
+            const inlineLimit = isMobile ? 0 : (inlineLimitConfig ?? ACTION_INLINE_LIMIT);
+            const actionCount = countActionButtons(actions);
+            const { inlineActions, overflowActions } = splitActions(actions, inlineLimit);
+
+            if (actionCount === 0) {
+                return null;
+            }
+
+            const menuItems: MenuProps["items"] = overflowActions.map((action, actionIndex) => {
+                if (isActionDivider(action)) {
+                    return {
+                        type: "divider",
+                        key: action.key ?? `divider-${actionIndex}`
+                    };
+                }
+
+                return {
+                    key: action.key,
+                    className:
+                        action.type === "warning" ? "sandwish-table-row-action-menu-warning" : "",
+                    danger: action.type === "danger",
+                    disabled: action.disabled,
+                    icon: action.icon,
+                    label: action.text
+                };
+            });
+
+            return (
+                <div className="sandwish-table-row-actions">
+                    <span className="sandwish-table-row-actions-inline">
+                        {inlineActions.map((action, actionIndex) =>
+                            isActionDivider(action) ? (
+                                <span
+                                    aria-hidden="true"
+                                    className="sandwish-table-row-action-divider"
+                                    key={action.key ?? `divider-${actionIndex}`}
+                                />
+                            ) : (
+                                <Button
+                                    aria-label={action.ariaLabel ?? action.text}
+                                    className={[
+                                        "sandwish-table-row-action",
+                                        action.type === "warning"
+                                            ? "sandwish-table-row-action-warning"
+                                            : ""
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                    danger={action.type === "danger"}
+                                    disabled={action.disabled}
+                                    icon={action.icon}
+                                    key={action.key}
+                                    type="text"
+                                    onClick={() => action.onClick(record)}
+                                >
+                                    {action.icon ? null : action.text}
+                                </Button>
+                            )
+                        )}
+                        {overflowActions.length > 0 ? (
+                            <Dropdown
+                                menu={{
+                                    items: menuItems,
+                                    onClick: ({ key }) => {
+                                        const action = overflowActions.find(
+                                            (item) =>
+                                                !isActionDivider(item) &&
+                                                String(item.key) === String(key)
+                                        );
+                                        if (action && !isActionDivider(action)) {
+                                            action.onClick(record);
+                                        }
+                                    }
+                                }}
+                                trigger={["click"]}
+                            >
+                                <Button
+                                    aria-label="展开行操作"
+                                    className="sandwish-table-row-action"
+                                    icon={<MoreOutlined />}
+                                    type="text"
+                                />
+                            </Dropdown>
+                        ) : null}
+                    </span>
+                </div>
+            );
+        },
+        [isMobile]
+    );
+
+    const calculateColumnActionWidth = useCallback(
+        (actionsConfig: SandwishTableRowActions<RecordType> | undefined) => {
+            if (!actionsConfig) {
+                return actionColumnWidth;
+            }
+
+            if (Array.isArray(actionsConfig)) {
+                return calculateActionColumnWidth(actionsConfig);
+            }
+
+            const dataSource = tableProps.dataSource ?? [];
+            const widths = dataSource.map((record, index) =>
+                calculateActionColumnWidth(normalizeRowActions(actionsConfig, record, index))
+            );
+            return widths.length > 0 ? Math.max(...widths) : actionColumnWidth;
+        },
+        [actionColumnWidth, tableProps.dataSource]
+    );
+
     const normalizedColumns = useMemo(() => {
         if (!columns) {
             return columns;
         }
 
         const normalizeColumns = (
-            currentColumns: NonNullable<TableProps<RecordType>["columns"]>
-        ): NonNullable<TableProps<RecordType>["columns"]> => {
+            currentColumns: SandwishTableColumn<RecordType>[]
+        ): SandwishTableColumn<RecordType>[] => {
             return currentColumns.map((column) => {
                 if ("children" in column && Array.isArray(column.children)) {
                     return {
@@ -190,10 +444,11 @@ export const SandwishTable = <RecordType extends object = object>({
 
                 const columnKey = readColumnKey(column);
                 const isActionColumn = columnKey === actionColumnKey;
+                const actionOptions = isActionColumn ? column.options : undefined;
                 const widthKey = columnKey === undefined ? undefined : String(columnKey);
                 const actionWidth = isMobile
                     ? actionColumnMobileWidth
-                    : (readNumericWidth(column.width) ?? actionColumnWidth);
+                    : (readNumericWidth(column.width) ?? calculateColumnActionWidth(actionOptions));
                 const baseWidth = isActionColumn ? actionWidth : readNumericWidth(column.width);
                 const currentWidth =
                     widthKey && columnWidths[widthKey] !== undefined
@@ -207,6 +462,7 @@ export const SandwishTable = <RecordType extends object = object>({
                     columnKey !== undefined &&
                     currentWidth !== undefined &&
                     typeof column.title !== "function";
+                const defaultTitle = isActionColumn ? (column.title ?? "操作") : column.title;
                 const titleNode = canResize ? (
                     <span className="sandwish-table-column-title">
                         {plainTitle}
@@ -217,7 +473,7 @@ export const SandwishTable = <RecordType extends object = object>({
                         />
                     </span>
                 ) : (
-                    column.title
+                    defaultTitle
                 );
 
                 return {
@@ -227,6 +483,11 @@ export const SandwishTable = <RecordType extends object = object>({
                             .filter(Boolean)
                             .join(" ") || undefined,
                     fixed: isActionColumn ? (column.fixed ?? "right") : column.fixed,
+                    render:
+                        isActionColumn && !column.render && actionOptions
+                            ? (_value: unknown, record: RecordType, index: number) =>
+                                  renderRowActions(actionOptions, column.inlineLimit, record, index)
+                            : column.render,
                     title: titleNode,
                     width: currentWidth ?? column.width
                 };
@@ -237,10 +498,11 @@ export const SandwishTable = <RecordType extends object = object>({
     }, [
         actionColumnKey,
         actionColumnMobileWidth,
-        actionColumnWidth,
+        calculateColumnActionWidth,
         columnWidths,
         columns,
         isMobile,
+        renderRowActions,
         resizableColumns,
         startResizeColumn
     ]);

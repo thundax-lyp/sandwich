@@ -1,4 +1,4 @@
-import { ClockCircleOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Avatar, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
@@ -24,8 +24,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     action: 120,
     operator: 180,
     source: 140,
-    summary: 260,
-    actions: 84
+    summary: 260
 };
 
 const ADMIN_OPERATOR_TYPE = "USER";
@@ -268,18 +267,15 @@ export const AuditLogPage = () => {
             render: (summary?: string | null) => summary || "-"
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, log) => (
-                <Button
-                    aria-label={`查看审计日志 ${log.id}`}
-                    className="sandwish-table-row-action"
-                    icon={<EyeOutlined />}
-                    type="text"
-                    onClick={() => setDetailLogId(log.id)}
-                />
-            )
+            options: (log) => [
+                {
+                    key: "view",
+                    text: "查看",
+                    ariaLabel: `查看审计日志 ${log.id}`,
+                    onClick: () => setDetailLogId(log.id)
+                }
+            ]
         }
     ];
 

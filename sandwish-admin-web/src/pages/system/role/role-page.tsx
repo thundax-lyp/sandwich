@@ -1,15 +1,12 @@
 import {
     DeleteOutlined,
-    EditOutlined,
-    HolderOutlined,
-    MoreOutlined,
     PlusOutlined,
     ReloadOutlined,
     SafetyCertificateOutlined,
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Select, Space, Switch, Tag, Typography } from "antd";
+import { App, Button, Select, Space, Switch, Tag, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
@@ -38,8 +35,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     privilege: 120,
     status: 112,
     menuCount: 120,
-    remarks: 280,
-    actions: 154
+    remarks: 280
 };
 
 interface RoleFilters {
@@ -338,74 +334,33 @@ export const RolePage = () => {
             render: (remarks?: string | null) => remarks || null
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, role) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`编辑 ${role.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditRole}
-                            icon={<EditOutlined />}
-                            type="text"
-                            onClick={() => openEditEditor(role)}
-                        />
-                        <Button
-                            aria-label={`删除 ${role.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditRole}
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => confirmDeleteRole(role)}
-                        />
-                        <Button
-                            aria-label={`拖动 ${role.name}`}
-                            className="sandwish-table-row-action role-drag-action"
-                            disabled={!canEditRole || sortMutation.isPending}
-                            icon={<HolderOutlined />}
-                            type="text"
-                        />
-                    </Space.Compact>
-                    <Dropdown
-                        menu={{
-                            items: [
-                                {
-                                    key: "edit",
-                                    disabled: !canEditRole,
-                                    icon: <EditOutlined />,
-                                    label: "编辑"
-                                },
-                                {
-                                    key: "delete",
-                                    danger: true,
-                                    disabled: !canEditRole,
-                                    icon: <DeleteOutlined />,
-                                    label: "删除"
-                                }
-                            ],
-                            onClick: ({ key }) => {
-                                if (key === "edit") {
-                                    openEditEditor(role);
-                                }
-                                if (key === "delete") {
-                                    confirmDeleteRole(role);
-                                }
-                            }
-                        }}
-                        trigger={["click"]}
-                    >
-                        <Button
-                            aria-label={`展开 ${role.name} 操作`}
-                            className="sandwish-table-row-action sandwish-table-row-action-more"
-                            icon={<MoreOutlined />}
-                            type="text"
-                        />
-                    </Dropdown>
-                </div>
-            )
+            options: (role) => [
+                {
+                    key: "edit",
+                    text: "编辑",
+                    ariaLabel: `编辑 ${role.name}`,
+                    disabled: !canEditRole,
+                    onClick: () => openEditEditor(role)
+                },
+                { type: "divider" },
+                {
+                    key: "delete",
+                    text: "删除",
+                    type: "danger",
+                    ariaLabel: `删除 ${role.name}`,
+                    disabled: !canEditRole,
+                    onClick: () => confirmDeleteRole(role)
+                },
+                { type: "divider" },
+                {
+                    key: "drag",
+                    text: "拖动",
+                    ariaLabel: `拖动 ${role.name}`,
+                    disabled: !canEditRole || sortMutation.isPending,
+                    onClick: () => undefined
+                }
+            ]
         }
     ];
 

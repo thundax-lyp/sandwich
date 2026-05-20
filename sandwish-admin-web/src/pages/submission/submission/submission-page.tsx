@@ -1,13 +1,6 @@
-import {
-    DeleteOutlined,
-    EyeOutlined,
-    HolderOutlined,
-    MoreOutlined,
-    ReloadOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
@@ -38,8 +31,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     title: 300,
     status: 120,
     submittedAt: 180,
-    images: 180,
-    actions: 116
+    images: 180
 };
 
 interface SubmissionFilters {
@@ -342,86 +334,40 @@ export const SubmissionPage = () => {
             }
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, submission) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`查看 ${submission.title}`}
-                            className="sandwish-table-row-action"
-                            icon={<EyeOutlined />}
-                            type="text"
-                            onClick={() => setDetailSubmission(submission)}
-                        />
-                        <Button
-                            aria-label={`删除 ${submission.title}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditSubmission}
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => confirmDelete([submission.id])}
-                        />
-                    </Space.Compact>
-                    <button
-                        aria-label={`拖动排序 ${submission.title}`}
-                        className="sandwish-table-row-action sandwish-table-row-drag-handle"
-                        disabled={!canEditSubmission}
-                        type="button"
-                    >
-                        <HolderOutlined />
-                    </button>
-                    <Dropdown
-                        menu={{
-                            items: [
-                                {
-                                    key: "view",
-                                    icon: <EyeOutlined />,
-                                    label: "查看"
-                                },
-                                ...submissionStatusOptions.map((statusOption) => ({
-                                    key: `status:${statusOption.value}`,
-                                    disabled:
-                                        !canEditSubmission ||
-                                        submission.status === statusOption.value,
-                                    label: statusOption.label
-                                })),
-                                {
-                                    key: "delete",
-                                    danger: true,
-                                    disabled: !canEditSubmission,
-                                    icon: <DeleteOutlined />,
-                                    label: "删除"
-                                }
-                            ],
-                            onClick: ({ key }) => {
-                                if (key === "view") {
-                                    setDetailSubmission(submission);
-                                }
-                                if (key === "delete") {
-                                    confirmDelete([submission.id]);
-                                }
-                                if (String(key).startsWith("status:")) {
-                                    changeStatus(
-                                        submission,
-                                        String(key).replace("status:", "") as SubmissionStatus
-                                    );
-                                }
-                            }
-                        }}
-                        trigger={["click"]}
-                    >
-                        <Button
-                            aria-label={`展开 ${submission.title} 操作`}
-                            className="sandwish-table-row-action sandwish-table-row-action-more"
-                            icon={<MoreOutlined />}
-                            type="text"
-                        />
-                    </Dropdown>
-                </div>
-            )
+            inlineLimit: 1,
+            options: (submission) => [
+                {
+                    key: "view",
+                    text: "查看",
+                    ariaLabel: `查看 ${submission.title}`,
+                    onClick: () => setDetailSubmission(submission)
+                },
+                ...submissionStatusOptions.map((statusOption) => ({
+                    key: `status:${statusOption.value}`,
+                    text: statusOption.label,
+                    type: "warning" as const,
+                    disabled: !canEditSubmission || submission.status === statusOption.value,
+                    onClick: () => changeStatus(submission, statusOption.value)
+                })),
+                { type: "divider" as const },
+                {
+                    key: "delete",
+                    text: "删除",
+                    type: "danger" as const,
+                    ariaLabel: `删除 ${submission.title}`,
+                    disabled: !canEditSubmission,
+                    onClick: () => confirmDelete([submission.id])
+                },
+                { type: "divider" as const },
+                {
+                    key: "drag",
+                    text: "拖动",
+                    ariaLabel: `拖动排序 ${submission.title}`,
+                    disabled: !canEditSubmission,
+                    onClick: () => undefined
+                }
+            ]
         }
     ];
 

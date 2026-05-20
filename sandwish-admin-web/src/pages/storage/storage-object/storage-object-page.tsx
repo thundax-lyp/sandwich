@@ -1,14 +1,6 @@
-import {
-    DeleteOutlined,
-    EyeOutlined,
-    FileOutlined,
-    HolderOutlined,
-    MoreOutlined,
-    ReloadOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { DeleteOutlined, FileOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Input, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
@@ -35,8 +27,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     owner: 170,
     objectStatus: 120,
     referenceStatus: 130,
-    remarks: 240,
-    actions: 116
+    remarks: 240
 };
 
 type StorageObjectStatusFilter = "ALL" | "ACTIVE" | "DELETING" | "DELETED";
@@ -338,82 +329,40 @@ export const StorageObjectPage = () => {
             render: (remarks?: string | null) => remarks || null
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, storage) => {
+            options: (storage) => {
                 const filename = readFilename(storage);
                 const previewUrl = toAuthenticatedResourceUrl(storage.contentUrl, accessToken);
-                return (
-                    <div className="sandwish-table-row-actions">
-                        <Space.Compact className="sandwish-table-row-actions-inline">
-                            <Button
-                                aria-label={`预览 ${filename}`}
-                                className="sandwish-table-row-action"
-                                disabled={!previewUrl}
-                                href={previewUrl}
-                                icon={<EyeOutlined />}
-                                target="_blank"
-                                type="text"
-                            />
-                            <Button
-                                aria-label={`删除 ${filename}`}
-                                className="sandwish-table-row-action"
-                                disabled={!canEditStorage}
-                                icon={<DeleteOutlined />}
-                                type="text"
-                                danger
-                                onClick={() => openDeleteConfirm(storage)}
-                            />
-                        </Space.Compact>
-                        <button
-                            aria-label={`拖动排序 ${filename}`}
-                            className="sandwish-table-row-action sandwish-table-row-drag-handle"
-                            disabled={!canEditStorage}
-                            type="button"
-                        >
-                            <HolderOutlined />
-                        </button>
-                        <Dropdown
-                            menu={{
-                                items: [
-                                    {
-                                        key: "preview",
-                                        disabled: !previewUrl,
-                                        icon: <EyeOutlined />,
-                                        label: previewUrl ? (
-                                            <a href={previewUrl} target="_blank" rel="noreferrer">
-                                                预览
-                                            </a>
-                                        ) : (
-                                            "预览"
-                                        )
-                                    },
-                                    {
-                                        key: "delete",
-                                        danger: true,
-                                        disabled: !canEditStorage,
-                                        icon: <DeleteOutlined />,
-                                        label: "删除"
-                                    }
-                                ],
-                                onClick: ({ key }) => {
-                                    if (key === "delete") {
-                                        openDeleteConfirm(storage);
-                                    }
-                                }
-                            }}
-                            trigger={["click"]}
-                        >
-                            <Button
-                                aria-label={`展开 ${filename} 操作`}
-                                className="sandwish-table-row-action sandwish-table-row-action-more"
-                                icon={<MoreOutlined />}
-                                type="text"
-                            />
-                        </Dropdown>
-                    </div>
-                );
+                return [
+                    {
+                        key: "preview",
+                        text: "预览",
+                        ariaLabel: `预览 ${filename}`,
+                        disabled: !previewUrl,
+                        onClick: () => {
+                            if (previewUrl) {
+                                window.open(previewUrl, "_blank", "noopener,noreferrer");
+                            }
+                        }
+                    },
+                    { type: "divider" },
+                    {
+                        key: "delete",
+                        text: "删除",
+                        type: "danger",
+                        ariaLabel: `删除 ${filename}`,
+                        disabled: !canEditStorage,
+                        onClick: () => openDeleteConfirm(storage)
+                    },
+                    { type: "divider" },
+                    {
+                        key: "drag",
+                        text: "拖动",
+                        ariaLabel: `拖动排序 ${filename}`,
+                        disabled: !canEditStorage,
+                        onClick: () => undefined
+                    }
+                ];
             }
         }
     ];

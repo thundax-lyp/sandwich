@@ -1,13 +1,6 @@
-import {
-    BookOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    MoreOutlined,
-    ReloadOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { BookOutlined, DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Input, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
@@ -27,8 +20,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     type: 220,
     label: 180,
     value: 180,
-    remarks: 320,
-    actions: 116
+    remarks: 320
 };
 
 interface DictionaryFilters {
@@ -199,67 +191,25 @@ export const DictionaryPage = () => {
             render: (remarks?: string | null) => remarks || <Text type="secondary">未填写</Text>
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, dictionary) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`编辑 ${dictionary.label}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditDictionary}
-                            icon={<EditOutlined />}
-                            type="text"
-                            onClick={() => openEditEditor(dictionary)}
-                        />
-                        <Button
-                            aria-label={`删除 ${dictionary.label}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditDictionary}
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => confirmDelete([dictionary.id])}
-                        />
-                    </Space.Compact>
-                    <Dropdown
-                        menu={{
-                            items: [
-                                {
-                                    key: "edit",
-                                    disabled: !canEditDictionary,
-                                    icon: <EditOutlined />,
-                                    label: "编辑"
-                                },
-                                {
-                                    key: "delete",
-                                    danger: true,
-                                    disabled: !canEditDictionary,
-                                    icon: <DeleteOutlined />,
-                                    label: "删除"
-                                }
-                            ],
-                            onClick: ({ key }) => {
-                                if (key === "edit") {
-                                    openEditEditor(dictionary);
-                                }
-                                if (key === "delete") {
-                                    confirmDelete([dictionary.id]);
-                                }
-                            }
-                        }}
-                        trigger={["click"]}
-                    >
-                        <Button
-                            aria-label={`展开 ${dictionary.label} 操作`}
-                            className="sandwish-table-row-action sandwish-table-row-action-more"
-                            icon={<MoreOutlined />}
-                            type="text"
-                        />
-                    </Dropdown>
-                </div>
-            )
+            options: (dictionary) => [
+                {
+                    key: "edit",
+                    text: "编辑",
+                    ariaLabel: `编辑 ${dictionary.label}`,
+                    disabled: !canEditDictionary,
+                    onClick: () => openEditEditor(dictionary)
+                },
+                { type: "divider" },
+                {
+                    key: "delete",
+                    text: "删除",
+                    type: "danger",
+                    ariaLabel: `删除 ${dictionary.label}`,
+                    disabled: !canEditDictionary,
+                    onClick: () => confirmDelete([dictionary.id])
+                }
+            ]
         }
     ];
 

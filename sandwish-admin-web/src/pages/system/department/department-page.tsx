@@ -1,11 +1,6 @@
 import {
     ApartmentOutlined,
-    ArrowLeftOutlined,
-    ArrowRightOutlined,
     BranchesOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    HolderOutlined,
     PlusOutlined,
     ReloadOutlined
 } from "@ant-design/icons";
@@ -34,8 +29,7 @@ const { Text } = Typography;
 const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
     namePath: 320,
-    remarks: 320,
-    actions: 208
+    remarks: 320
 };
 
 const buildDepartmentTree = (departments: DepartmentNode[]) => {
@@ -289,61 +283,51 @@ export const DepartmentPage = () => {
             render: (remarks?: string | null) => remarks || <Text type="secondary">未填写</Text>
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, department) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`升级 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={
-                                !canEditDepartment || !department.parentId || moveMutation.isPending
-                            }
-                            icon={<ArrowLeftOutlined />}
-                            type="text"
-                            onClick={() => promoteDepartment(department)}
-                        />
-                        <Button
-                            aria-label={`降级 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={
-                                !canEditDepartment ||
-                                !readPreviousSiblingDepartment(department) ||
-                                moveMutation.isPending
-                            }
-                            icon={<ArrowRightOutlined />}
-                            type="text"
-                            onClick={() => demoteDepartment(department)}
-                        />
-                        <Button
-                            aria-label={`编辑 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditDepartment}
-                            icon={<EditOutlined />}
-                            type="text"
-                            onClick={() => openEditEditor(department)}
-                        />
-                        <Button
-                            aria-label={`删除 ${department.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditDepartment}
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => openDeleteConfirm(department)}
-                        />
-                        <Button
-                            aria-label={`拖动 ${department.name}`}
-                            className="sandwish-table-row-action department-drag-action"
-                            disabled={!canEditDepartment || moveMutation.isPending}
-                            icon={<HolderOutlined />}
-                            type="text"
-                        />
-                    </Space.Compact>
-                </div>
-            )
+            inlineLimit: 6,
+            options: (department) => [
+                {
+                    key: "promote",
+                    text: "升级",
+                    ariaLabel: `升级 ${department.name}`,
+                    disabled: !canEditDepartment || !department.parentId || moveMutation.isPending,
+                    onClick: () => promoteDepartment(department)
+                },
+                {
+                    key: "demote",
+                    text: "降级",
+                    ariaLabel: `降级 ${department.name}`,
+                    disabled:
+                        !canEditDepartment ||
+                        !readPreviousSiblingDepartment(department) ||
+                        moveMutation.isPending,
+                    onClick: () => demoteDepartment(department)
+                },
+                {
+                    key: "edit",
+                    text: "编辑",
+                    ariaLabel: `编辑 ${department.name}`,
+                    disabled: !canEditDepartment,
+                    onClick: () => openEditEditor(department)
+                },
+                { type: "divider" },
+                {
+                    key: "delete",
+                    text: "删除",
+                    type: "danger",
+                    ariaLabel: `删除 ${department.name}`,
+                    disabled: !canEditDepartment,
+                    onClick: () => openDeleteConfirm(department)
+                },
+                { type: "divider" },
+                {
+                    key: "drag",
+                    text: "拖动",
+                    ariaLabel: `拖动 ${department.name}`,
+                    disabled: !canEditDepartment || moveMutation.isPending,
+                    onClick: () => undefined
+                }
+            ]
         }
     ];
 

@@ -1,13 +1,6 @@
-import {
-    EditOutlined,
-    KeyOutlined,
-    MoreOutlined,
-    PoweroffOutlined,
-    ReloadOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { ReloadOutlined, SearchOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Input, Select, Space, Tag, Typography } from "antd";
+import { App, Button, Input, Select, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
@@ -38,8 +31,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
     status: 120,
     expiredAt: 180,
-    permissions: 280,
-    actions: 104
+    permissions: 280
 };
 
 interface OpenClientFilters {
@@ -305,52 +297,31 @@ export const OpenClientPage = () => {
         },
         {
             key: "actions",
-            title: "操作",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, client) => {
+            options: (client) => {
                 const enabled = client.status === "ENABLED";
-                return (
-                    <Space size={4}>
-                        <Button
-                            aria-label={`编辑 ${client.name}`}
-                            icon={<EditOutlined />}
-                            size="small"
-                            loading={
-                                detailMutation.isPending &&
-                                detailMutation.variables?.id === client.id
-                            }
-                            disabled={!canEditOpenClient}
-                            onClick={() => openUpdateEditor(client)}
-                        />
-                        <Dropdown
-                            trigger={["click"]}
-                            menu={{
-                                items: [
-                                    {
-                                        key: "status",
-                                        icon: <PoweroffOutlined />,
-                                        label: enabled ? "停用" : "启用",
-                                        disabled: !canEditOpenClient,
-                                        onClick: () => toggleStatus(client)
-                                    },
-                                    {
-                                        key: "secret",
-                                        icon: <KeyOutlined />,
-                                        label: "重置 API SECRET",
-                                        disabled: !canEditOpenClient,
-                                        onClick: () => confirmResetSecret(client)
-                                    }
-                                ]
-                            }}
-                        >
-                            <Button
-                                aria-label={`更多 ${client.name}`}
-                                icon={<MoreOutlined />}
-                                size="small"
-                            />
-                        </Dropdown>
-                    </Space>
-                );
+                return [
+                    {
+                        key: "edit",
+                        text: "编辑",
+                        ariaLabel: `编辑 ${client.name}`,
+                        disabled: !canEditOpenClient,
+                        onClick: () => openUpdateEditor(client)
+                    },
+                    {
+                        key: "status",
+                        text: enabled ? "停用" : "启用",
+                        type: "warning" as const,
+                        disabled: !canEditOpenClient,
+                        onClick: () => toggleStatus(client)
+                    },
+                    {
+                        key: "secret",
+                        text: "重置密钥",
+                        type: "warning" as const,
+                        disabled: !canEditOpenClient,
+                        onClick: () => confirmResetSecret(client)
+                    }
+                ];
             }
         }
     ];

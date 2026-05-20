@@ -1,15 +1,13 @@
 import {
     ApartmentOutlined,
     DeleteOutlined,
-    EditOutlined,
-    MoreOutlined,
     PlusOutlined,
     PoweroffOutlined,
     ReloadOutlined,
     SearchOutlined
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { App, Button, Dropdown, Input, Select, Space, Tag, Tree, Typography } from "antd";
+import { App, Button, Input, Select, Space, Tag, Tree, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Key } from "react";
@@ -48,8 +46,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     department: 190,
     roles: 190,
     status: 120,
-    ranks: 90,
-    actions: 116
+    ranks: 90
 };
 
 type UserFilterStatus = "ALL" | "ENABLED" | "DISABLED";
@@ -603,76 +600,32 @@ export const UserPage = () => {
             render: (_, user) => <Tag className={rankClassName(user)}>{rankLabel(user)}</Tag>
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, user) => {
+            options: (user) => {
                 const userName = readUserName(user);
                 const canManageCurrentUser = canManageUserByRank(currentUserQuery.data, user);
-                const editDisabled = !canEditUser || !canManageCurrentUser;
-                const deleteDisabled = !canEditUser || !canManageCurrentUser;
-                return (
-                    <div className="sandwish-table-row-actions">
-                        <Space.Compact className="sandwish-table-row-actions-inline">
-                            <Button
-                                aria-label={`编辑 ${userName}`}
-                                className="sandwish-table-row-action"
-                                disabled={editDisabled}
-                                icon={<EditOutlined />}
-                                type="text"
-                                onClick={() => {
-                                    setActiveUser(user);
-                                    setUserEditorOpen(true);
-                                }}
-                            />
-                            <Button
-                                aria-label={`删除 ${userName}`}
-                                className="sandwish-table-row-action"
-                                disabled={deleteDisabled}
-                                icon={<DeleteOutlined />}
-                                type="text"
-                                danger
-                                onClick={() => confirmDeleteUser(user)}
-                            />
-                        </Space.Compact>
-                        <Dropdown
-                            menu={{
-                                items: [
-                                    {
-                                        key: "edit",
-                                        disabled: editDisabled,
-                                        icon: <EditOutlined />,
-                                        label: "编辑"
-                                    },
-                                    {
-                                        key: "delete",
-                                        danger: true,
-                                        disabled: deleteDisabled,
-                                        icon: <DeleteOutlined />,
-                                        label: "删除"
-                                    }
-                                ],
-                                onClick: ({ key }) => {
-                                    if (key === "edit") {
-                                        setActiveUser(user);
-                                        setUserEditorOpen(true);
-                                    }
-                                    if (key === "delete") {
-                                        confirmDeleteUser(user);
-                                    }
-                                }
-                            }}
-                            trigger={["click"]}
-                        >
-                            <Button
-                                aria-label={`展开 ${userName} 操作`}
-                                className="sandwish-table-row-action sandwish-table-row-action-more"
-                                icon={<MoreOutlined />}
-                                type="text"
-                            />
-                        </Dropdown>
-                    </div>
-                );
+                const disabled = !canEditUser || !canManageCurrentUser;
+                return [
+                    {
+                        key: "edit",
+                        text: "编辑",
+                        ariaLabel: `编辑 ${userName}`,
+                        disabled,
+                        onClick: () => {
+                            setActiveUser(user);
+                            setUserEditorOpen(true);
+                        }
+                    },
+                    { type: "divider" },
+                    {
+                        key: "delete",
+                        text: "删除",
+                        type: "danger",
+                        ariaLabel: `删除 ${userName}`,
+                        disabled,
+                        onClick: () => confirmDeleteUser(user)
+                    }
+                ];
             }
         }
     ];

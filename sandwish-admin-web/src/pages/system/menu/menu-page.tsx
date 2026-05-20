@@ -1,13 +1,4 @@
-import {
-    ArrowLeftOutlined,
-    ArrowRightOutlined,
-    DeleteOutlined,
-    EditOutlined,
-    HolderOutlined,
-    MenuOutlined,
-    PlusOutlined,
-    ReloadOutlined
-} from "@ant-design/icons";
+import { MenuOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
@@ -28,8 +19,7 @@ const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
     url: 260,
     perms: 240,
-    display: 96,
-    actions: 208
+    display: 96
 };
 
 const buildMenuTree = (menus: MenuNode[]) => {
@@ -283,59 +273,48 @@ export const MenuPage = () => {
                 display === false ? <Tag>隐藏</Tag> : <Tag color="success">显示</Tag>
         },
         {
-            title: "操作",
             key: "actions",
-            width: DEFAULT_COLUMN_WIDTHS.actions,
-            render: (_, menu) => (
-                <div className="sandwish-table-row-actions">
-                    <Space.Compact className="sandwish-table-row-actions-inline">
-                        <Button
-                            aria-label={`升级 ${menu.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditMenu || !menu.parentId || moveMutation.isPending}
-                            icon={<ArrowLeftOutlined />}
-                            type="text"
-                            onClick={() => promoteMenu(menu)}
-                        />
-                        <Button
-                            aria-label={`降级 ${menu.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={
-                                !canEditMenu ||
-                                !readPreviousSiblingMenu(menu) ||
-                                moveMutation.isPending
-                            }
-                            icon={<ArrowRightOutlined />}
-                            type="text"
-                            onClick={() => demoteMenu(menu)}
-                        />
-                        <Button
-                            aria-label={`编辑 ${menu.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditMenu}
-                            icon={<EditOutlined />}
-                            type="text"
-                            onClick={() => openEditEditor(menu)}
-                        />
-                        <Button
-                            aria-label={`删除 ${menu.name}`}
-                            className="sandwish-table-row-action"
-                            disabled={!canEditMenu}
-                            icon={<DeleteOutlined />}
-                            type="text"
-                            danger
-                            onClick={() => openDeleteConfirm(menu)}
-                        />
-                        <Button
-                            aria-label={`拖动 ${menu.name}`}
-                            className="sandwish-table-row-action menu-drag-action"
-                            disabled={!canEditMenu || moveMutation.isPending}
-                            icon={<HolderOutlined />}
-                            type="text"
-                        />
-                    </Space.Compact>
-                </div>
-            )
+            options: (menu) => [
+                {
+                    key: "promote",
+                    text: "升级",
+                    ariaLabel: `升级 ${menu.name}`,
+                    disabled: !canEditMenu || !menu.parentId || moveMutation.isPending,
+                    onClick: () => promoteMenu(menu)
+                },
+                {
+                    key: "demote",
+                    text: "降级",
+                    ariaLabel: `降级 ${menu.name}`,
+                    disabled:
+                        !canEditMenu || !readPreviousSiblingMenu(menu) || moveMutation.isPending,
+                    onClick: () => demoteMenu(menu)
+                },
+                {
+                    key: "edit",
+                    text: "编辑",
+                    ariaLabel: `编辑 ${menu.name}`,
+                    disabled: !canEditMenu,
+                    onClick: () => openEditEditor(menu)
+                },
+                { type: "divider" },
+                {
+                    key: "delete",
+                    text: "删除",
+                    type: "danger",
+                    ariaLabel: `删除 ${menu.name}`,
+                    disabled: !canEditMenu,
+                    onClick: () => openDeleteConfirm(menu)
+                },
+                { type: "divider" },
+                {
+                    key: "drag",
+                    text: "拖动",
+                    ariaLabel: `拖动 ${menu.name}`,
+                    disabled: !canEditMenu || moveMutation.isPending,
+                    onClick: () => undefined
+                }
+            ]
         }
     ];
 

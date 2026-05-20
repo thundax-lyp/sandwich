@@ -791,6 +791,71 @@ const localRules = {
                 };
             }
         },
+        "table-action-column-shape": {
+            create(context) {
+                const isPageFile = () => {
+                    const normalizedFilePath = context.physicalFilename.split(path.sep).join("/");
+                    return /\/src\/pages\/.*\/[^/]+-page\.tsx$/.test(normalizedFilePath);
+                };
+
+                const readPropertyName = (property) => {
+                    if (property.type !== "Property") {
+                        return "";
+                    }
+                    if (property.key.type === "Identifier") {
+                        return property.key.name;
+                    }
+                    if (property.key.type === "Literal") {
+                        return String(property.key.value);
+                    }
+                    return "";
+                };
+
+                const isActionsColumn = (node) => {
+                    return node.properties.some((property) => {
+                        if (property.type !== "Property" || readPropertyName(property) !== "key") {
+                            return false;
+                        }
+                        return (
+                            property.value.type === "Literal" && property.value.value === "actions"
+                        );
+                    });
+                };
+
+                return {
+                    ObjectExpression(node) {
+                        if (!isPageFile() || !isActionsColumn(node)) {
+                            return;
+                        }
+
+                        const propertyNames = node.properties.map(readPropertyName);
+                        const hasOptions = propertyNames.includes("options");
+                        const hasRender = propertyNames.includes("render");
+
+                        node.properties.forEach((property) => {
+                            const name = readPropertyName(property);
+                            if (name !== "title" && name !== "width") {
+                                return;
+                            }
+
+                            context.report({
+                                node: property,
+                                message:
+                                    "ADMIN_WEB_UI_TABLE_ACTION_COLUMN: actions column title and width are handled by SandwishTable."
+                            });
+                        });
+
+                        if (!hasOptions && !hasRender) {
+                            context.report({
+                                node,
+                                message:
+                                    "ADMIN_WEB_UI_TABLE_ACTION_COLUMN: actions column must provide options or render."
+                            });
+                        }
+                    }
+                };
+            }
+        },
         "service-method-verb-prefix": {
             create(context) {
                 const startsWithServiceVerb = (name) => {
@@ -1443,6 +1508,7 @@ export default tseslint.config(
             "local/service-type-exposure": "error",
             "local/shared-service-types-only": "error",
             "local/shared-component-css-local": "error",
+            "local/table-action-column-shape": "error",
             "local/hook-file-path": "error",
             "@typescript-eslint/naming-convention": [
                 "error",

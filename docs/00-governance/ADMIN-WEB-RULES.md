@@ -110,7 +110,7 @@
 ### UI
 
 - `ADMIN_WEB_UI_CONFIRM_HOOK`：确认操作固定使用 `useSandwishConfirm`，页面不直接调用 `Modal.confirm`。
-- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口；标题、宽度和窄屏下拉由 `SandwishTable` 处理。
+- `ADMIN_WEB_UI_TABLE_ACTION_COLUMN`：表格操作列使用 `key: "actions"`，优先传 `options`；`render` 只作为复杂逃生口；标题、宽度、分隔线清理和窄屏下拉由 `SandwishTable` 处理。
 
 ### Placement
 
@@ -301,6 +301,14 @@ fixed: "right"
 
 操作数量过多时应收敛到下拉菜单。下拉菜单中的危险操作必须放在最后。
 
+操作数量收敛规则：
+
+- `<= 4` 个真实操作直接展示。
+- `> 4` 个真实操作从第 5 个开始收敛到下拉菜单。
+- `divider` 不参与操作数量计算。
+- `divider` 只保留在两个真实操作之间；开头、结尾和连续 `divider` 由 `SandwishTable` 清理。
+- 移动端固定隐藏 inline 操作，只保留行操作下拉入口。
+
 ```tsx
 [
     { key: "copy", label: "复制" },
@@ -309,6 +317,8 @@ fixed: "right"
     { key: "delete", label: "删除", danger: true },
 ]
 ```
+
+可排序表格的拖动入口由 `SandwishTable sortable` 自动生成独立无标题列，固定在最右侧；页面不在 `actions.options` 中手写 `拖动` 操作。
 
 #### Pagination
 
@@ -596,8 +606,6 @@ test("delete requires confirmation", async ({ page }) => {
 
 - 是否把部分 UI 规则沉淀为共享组件默认行为或测试门禁。
 - 是否将筛选项数量固定为 `<= 4` 直接展示、`5-8` 收起高级筛选、`> 8` 使用独立筛选面板。
-- 是否将表格操作数量固定为 `<= 3` 直接展示、`4-5` 部分收敛、`> 5` 必须使用下拉菜单。
-- 是否要求表格操作下拉菜单中的危险操作前必须使用分隔线。
 - 是否固定详情页结构为 `PageHeader`、`Summary`、`BasicInfo`、`BusinessInfo`、`Timeline`、`Logs`。
 - 是否新增统一 `StatusTag` 组件，替代当前页面内分散的 Ant Design `Tag` 状态样式。
 - Playwright 默认覆盖重点是否包含上传和核心业务流程。

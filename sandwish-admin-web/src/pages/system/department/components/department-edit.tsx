@@ -85,7 +85,7 @@ export const DepartmentEdit = ({
                 <div className="department-edit-footer">
                     <Button onClick={onClose}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveDepartment}>
-                        保存部门
+                        保存
                     </Button>
                 </div>
             }

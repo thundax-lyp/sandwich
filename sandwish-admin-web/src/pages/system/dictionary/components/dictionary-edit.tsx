@@ -83,7 +83,7 @@ export const DictionaryEdit = ({
                 <div className="dictionary-edit-footer">
                     <Button onClick={onClose}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveDictionary}>
-                        保存字典项
+                        保存
                     </Button>
                 </div>
             }

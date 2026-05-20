@@ -43,6 +43,12 @@
     gap: 4px;
 }
 
+.submission-editor-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
 .submission-upload-field {
     display: grid;
     gap: 10px;

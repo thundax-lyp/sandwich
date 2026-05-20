@@ -826,7 +826,7 @@ export const UserPage = () => {
                 key={`${userEditorOpen ? "open" : "closed"}-${activeUser?.id || "create"}-${currentUserQuery.data?.ranks ?? "rank"}`}
                 open={userEditorOpen}
                 title={isCreatingUser ? "新增用户" : "编辑用户"}
-                saveText={isCreatingUser ? "新增用户" : "更新用户"}
+                saveText="保存"
                 user={activeUser}
                 currentUser={currentUserQuery.data}
                 departments={departments}

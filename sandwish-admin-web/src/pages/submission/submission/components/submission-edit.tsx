@@ -112,13 +112,13 @@ export const SubmissionEdit = ({ open, saving, onClose, onSave }: SubmissionEdit
             open={Boolean(open)}
             size="middle"
             onClose={closeEditor}
-            extra={
-                <Space>
+            footer={
+                <div className="submission-editor-footer">
                     <Button onClick={closeEditor}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveSubmission}>
                         保存
                     </Button>
-                </Space>
+                </div>
             }
         >
             <Form<SubmissionFormValues>

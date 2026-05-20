@@ -91,7 +91,7 @@ export const MenuEdit = ({ open, menu, parentOptions, saving, onClose, onSave }:
                 <div className="menu-edit-footer">
                     <Button onClick={onClose}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveMenu}>
-                        保存菜单
+                        保存
                     </Button>
                 </div>
             }

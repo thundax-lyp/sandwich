@@ -1,5 +1,5 @@
 import { KeyOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Select, Space, Typography } from "antd";
+import { Button, Form, Input, Select, Typography } from "antd";
 import { useEffect } from "react";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { OpenClientSaveCommand } from "../open-client-service";
@@ -179,13 +179,13 @@ export const OpenClientEdit = ({
             open={Boolean(open)}
             size="middle"
             onClose={onClose}
-            extra={
-                <Space>
+            footer={
+                <div className="open-client-editor-footer">
                     <Button onClick={onClose}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveOpenClient}>
                         保存
                     </Button>
-                </Space>
+                </div>
             }
         >
             <Form form={form} className="open-client-editor-form" layout="vertical">

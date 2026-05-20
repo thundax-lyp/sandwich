@@ -104,6 +104,17 @@ html[data-theme="dark"] .sandwish-drawer-root .ant-drawer-mask {
     padding: 14px 20px 18px;
 }
 
+.sandwish-drawer-root .ant-drawer-footer > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.sandwish-drawer-root .ant-drawer-footer .ant-btn {
+    width: 100%;
+    min-height: 40px;
+}
+
 @media (max-width: 760px) {
     .sandwish-drawer-root {
         --sandwish-drawer-workspace-width: 100vw;

@@ -32,6 +32,12 @@
     gap: 4px;
 }
 
+.open-client-editor-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
 .open-client-editor-api-key {
     margin-bottom: 4px;
 }

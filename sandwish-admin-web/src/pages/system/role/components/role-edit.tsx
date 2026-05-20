@@ -109,7 +109,7 @@ export const RoleEdit = ({
                 <div className="role-edit-footer">
                     <Button onClick={onClose}>取消</Button>
                     <Button type="primary" loading={saving} onClick={saveRole}>
-                        保存角色
+                        保存
                     </Button>
                 </div>
             }

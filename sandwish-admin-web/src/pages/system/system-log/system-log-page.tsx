@@ -11,15 +11,13 @@ import { Button, Input, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { pageLogs } from "./system-log-service";
 import type { LogPageQuery } from "./system-log-service";
 import type { LogRecord } from "./system-log-types";
 import "./system-log-page.css";
 
 const { Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     createDate: 176,
@@ -360,7 +358,6 @@ export const SystemLogPage = () => {
                 current: currentPageNo,
                 pageSize: currentPageSize,
                 total: totalCount,
-                showSizeChanger: true,
                 showTotal: (total) => `共 ${total} 条`,
                 onChange: (pageNo, pageSize) => {
                     setQuery((currentQuery) => ({

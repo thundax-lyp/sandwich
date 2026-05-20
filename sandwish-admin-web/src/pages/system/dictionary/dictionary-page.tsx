@@ -13,6 +13,7 @@ import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { DictionaryEdit } from "./components/dictionary-edit";
 import * as dictionaryService from "./dictionary-service";
 import type { DictPageQuery, DictSaveCommand } from "./dictionary-service";
@@ -20,9 +21,6 @@ import type { DictRecord } from "./dictionary-types";
 import "./dictionary-page.css";
 
 const { Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     type: 220,
@@ -364,7 +362,6 @@ export const DictionaryPage = () => {
                     current: currentPageNo,
                     pageSize: currentPageSize,
                     total: totalCount,
-                    showSizeChanger: true,
                     showTotal: (total) => `共 ${total} 项`,
                     onChange: (pageNo, pageSize) => {
                         setQuery((currentQuery) => ({

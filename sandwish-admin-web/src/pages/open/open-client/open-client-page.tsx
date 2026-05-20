@@ -13,6 +13,7 @@ import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { OpenClientEdit } from "./components/open-client-edit";
 import { OpenClientSecretModal } from "./components/open-client-secret-modal";
 import {
@@ -32,9 +33,6 @@ import type { OpenClientRecord, OpenClientSecretRecord } from "./open-client-typ
 import "./open-client-page.css";
 
 const { Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 260,
@@ -425,7 +423,6 @@ export const OpenClientPage = () => {
                     current: currentPageNo,
                     pageSize: currentPageSize,
                     total: totalCount,
-                    showSizeChanger: true,
                     onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}
             />

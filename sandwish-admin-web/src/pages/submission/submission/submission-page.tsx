@@ -13,6 +13,7 @@ import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
 import { ListPage } from "@/components/list-page";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { SubmissionDetail } from "./components/submission-detail";
 import { SubmissionEdit } from "./components/submission-edit";
 import {
@@ -31,9 +32,6 @@ import type { SubmissionRecord } from "./submission-types";
 import "./submission-page.css";
 
 const { Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     title: 300,
@@ -507,7 +505,6 @@ export const SubmissionPage = () => {
                     current: currentPageNo,
                     pageSize: currentPageSize,
                     total: totalCount,
-                    showSizeChanger: true,
                     showTotal: (total) => `${total} 条提交内容`,
                     onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}

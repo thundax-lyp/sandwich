@@ -21,6 +21,7 @@ import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { getCurrentUserInfo } from "@/service/current-user-service";
 import type { CurrentUserRecord } from "@/service/current-user-types";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { UserAvatar } from "./components/user-avatar";
 import { UserEdit } from "./components/user-edit";
 import {
@@ -39,8 +40,6 @@ import "./user-page.css";
 const { Text } = Typography;
 
 const ALL_DEPARTMENT_ID = "all";
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 const DEPARTMENT_PANEL_BOTTOM_GAP = 8;
 
 const DEFAULT_COLUMN_WIDTHS = {
@@ -793,7 +792,6 @@ export const UserPage = () => {
                     current: query.pageNo || DEFAULT_PAGE_NO,
                     pageSize: query.pageSize || DEFAULT_PAGE_SIZE,
                     total: totalCount,
-                    showSizeChanger: true,
                     showTotal: (total) => `${total} 个用户`,
                     onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}

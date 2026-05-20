@@ -7,6 +7,7 @@ import type {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Table } from "antd";
 import type { TableProps } from "antd";
+import { PAGE_SIZE_OPTIONS } from "@/types/page";
 import "./sandwish-table.css";
 
 const DEFAULT_ACTION_COLUMN_KEY = "actions";
@@ -92,6 +93,7 @@ export const SandwishTable = <RecordType extends object = object>({
     onSort,
     resizableColumns = true,
     responsive = true,
+    pagination,
     rowKey,
     rowSelection,
     scroll,
@@ -252,6 +254,18 @@ export const SandwishTable = <RecordType extends object = object>({
         return totalWidth > 0 ? totalWidth : undefined;
     }, [normalizedColumns, scroll?.x]);
 
+    const mergedPagination = useMemo(() => {
+        if (pagination === false || !pagination) {
+            return pagination;
+        }
+
+        return {
+            showSizeChanger: true,
+            pageSizeOptions: PAGE_SIZE_OPTIONS,
+            ...pagination
+        };
+    }, [pagination]);
+
     const readDropPosition = useCallback(
         (event: ReactDragEvent<HTMLElement>): SandwishTableSortPosition => {
             const rowRect = event.currentTarget.getBoundingClientRect();
@@ -354,6 +368,7 @@ export const SandwishTable = <RecordType extends object = object>({
                 .join(" ")}
             columns={normalizedColumns}
             onRow={mergedOnRow}
+            pagination={mergedPagination}
             rowKey={rowKey}
             rowSelection={rowSelection}
             scroll={{ ...scroll, x: scrollX }}

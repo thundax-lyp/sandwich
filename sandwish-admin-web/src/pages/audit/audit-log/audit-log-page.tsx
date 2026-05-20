@@ -16,6 +16,7 @@ import { ADMIN_API_BASE_URL } from "@/api/http";
 import { ListPage } from "@/components/list-page";
 import { SandwishDrawer } from "@/components/sandwish-drawer";
 import type { SandwishTableProps } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { getAuditLogDetail, getAuditOptions, pageAuditLogs } from "./audit-log-service";
 import type { AuditLogPageQuery } from "./audit-log-service";
 import type {
@@ -27,9 +28,6 @@ import type {
 import "./audit-log-page.css";
 
 const { Paragraph, Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     occurredAt: 180,
@@ -608,7 +606,6 @@ export const AuditLogPage = () => {
                     current: currentPageNo,
                     pageSize: currentPageSize,
                     total: totalCount,
-                    showSizeChanger: true,
                     showTotal: (total) => `共 ${total} 条`,
                     onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}

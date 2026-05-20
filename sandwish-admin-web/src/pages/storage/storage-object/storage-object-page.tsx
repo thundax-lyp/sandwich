@@ -17,6 +17,7 @@ import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ListPage } from "@/components/list-page";
 import { SandwishConfirmModal } from "@/components/sandwish-confirm-modal";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
+import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import {
     removeStorageObjects,
     pageStorageObjects,
@@ -27,9 +28,6 @@ import type { StorageRecord } from "./storage-object-types";
 import "./storage-object-page.css";
 
 const { Text } = Typography;
-
-const DEFAULT_PAGE_NO = 1;
-const DEFAULT_PAGE_SIZE = 10;
 
 const DEFAULT_COLUMN_WIDTHS = {
     name: 280,
@@ -553,7 +551,6 @@ export const StorageObjectPage = () => {
                     current: currentPageNo,
                     pageSize: currentPageSize,
                     total: totalCount,
-                    showSizeChanger: true,
                     showTotal: (total) => `${total} 个存储对象`,
                     onChange: (pageNo, pageSize) => updateQuery({ pageNo, pageSize })
                 }}

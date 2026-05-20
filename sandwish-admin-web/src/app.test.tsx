@@ -471,7 +471,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalPage: 1,
                                 totalCount: 2,
                                 records: [
@@ -528,7 +528,7 @@ describe("App", () => {
                     body: JSON.stringify({
                         type: "user_status",
                         pageNo: 1,
-                        pageSize: 10
+                        pageSize: 20
                     }),
                     headers: expect.objectContaining({
                         "Access-Token": "test-token"
@@ -556,7 +556,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalPage: 1,
                                 totalCount: 1,
                                 records: [
@@ -603,7 +603,7 @@ describe("App", () => {
             expect.objectContaining({
                 body: JSON.stringify({
                     pageNo: 1,
-                    pageSize: 10,
+                    pageSize: 20,
                     sortDirection: "ASC"
                 }),
                 headers: expect.objectContaining({
@@ -631,7 +631,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalPage: 1,
                                 totalCount: 1,
                                 records: [
@@ -701,7 +701,7 @@ describe("App", () => {
             expect.objectContaining({
                 body: JSON.stringify({
                     pageNo: 1,
-                    pageSize: 10
+                    pageSize: 20
                 }),
                 headers: expect.objectContaining({
                     "Access-Token": "test-token"
@@ -762,7 +762,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalPage: 1,
                                 totalCount: 1,
                                 records: [
@@ -896,7 +896,7 @@ describe("App", () => {
             expect.objectContaining({
                 body: JSON.stringify({
                     pageNo: 1,
-                    pageSize: 10
+                    pageSize: 20
                 }),
                 headers: expect.objectContaining({
                     "Access-Token": "test-token"
@@ -930,7 +930,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalPage: 1,
                                 totalCount: 1,
                                 records: [
@@ -1104,7 +1104,7 @@ describe("App", () => {
                             message: "success",
                             data: {
                                 pageNo: 1,
-                                pageSize: 10,
+                                pageSize: 20,
                                 totalCount: records.length,
                                 records
                             }

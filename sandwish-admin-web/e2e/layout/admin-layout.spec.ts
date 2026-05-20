@@ -60,7 +60,7 @@ const mockUserManagementApis = async (page: Page) => {
                 message: "success",
                 data: {
                     pageNo: 1,
-                    pageSize: 10,
+                    pageSize: 20,
                     totalCount: 18,
                     records: Array.from({ length: 10 }, (_, index) => ({
                         id: String(index + 1),
@@ -170,7 +170,7 @@ test.describe("admin layout", () => {
                     message: "success",
                     data: {
                         pageNo: 1,
-                        pageSize: 10,
+                        pageSize: 20,
                         totalCount: 1,
                         records: [
                             {

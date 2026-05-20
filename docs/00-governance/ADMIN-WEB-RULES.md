@@ -207,7 +207,11 @@ Right:
 
 `FilterBar` 必须位于 `DataTable` 上方。
 
-筛选项较少时直接展示；筛选项较多时应通过高级筛选或筛选面板收敛。
+列表页默认展示模糊搜索；筛选面板只承载结构化筛选，不重复展示模糊查询。
+
+页面通过 `SandwishListPage` 的 `filterFields` 声明筛选字段；字段使用 `{ name, label, render }`，由 `SandwishFilterPanel` 统一渲染 label、字段布局和按钮区。
+
+`filterFields` 按屏幕宽度自动决定每行字段数量。字段控件尽量撑满可用宽度；`重置` / `查询` 作为最后一个 field 参与整体布局。
 
 搜索框 placeholder 必须表达可搜索对象。
 
@@ -230,7 +234,7 @@ Right:
 - 回车触发搜索。
 - 重置恢复默认筛选状态。
 - 输入即搜索时必须 debounce `300-500ms`。
-- 搜索按钮在前，重置按钮在后。
+- 固定按钮文案为 `重置`、`查询`，顺序为 `重置` 在前、`查询` 在后。
 
 #### Toolbar
 
@@ -583,6 +587,5 @@ test("delete requires confirmation", async ({ page }) => {
 ## Open Items
 
 - 是否将列表页操作顺序、Drawer footer、Table actions、Confirm hook 继续沉淀为共享组件默认行为或测试门禁。
-- 是否固定筛选布局为：列表页默认展示模糊搜索；筛选面板只承载结构化筛选；不重复展示模糊查询。
 - 是否固定详情页结构为 `PageHeader`、`Summary`、`BasicInfo`、`BusinessInfo`、`Timeline`、`Logs`。
 - Playwright 默认覆盖重点是否包含上传和核心业务流程。

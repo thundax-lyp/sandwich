@@ -103,46 +103,6 @@ html[data-theme="dark"] .role-page {
     box-shadow: 0 0 0 3px var(--role-blue-soft) !important;
 }
 
-.role-filter-form {
-    display: grid;
-    grid-template-columns: minmax(180px, 240px) auto auto;
-    min-width: 0;
-    align-items: flex-end;
-    gap: 12px;
-    padding: 12px;
-    background: linear-gradient(180deg, var(--role-filter-bg-start), var(--role-filter-bg-end));
-    border: 1px solid var(--role-line);
-    border-radius: 10px;
-    box-shadow: inset 0 1px 0 var(--role-filter-inset);
-    backdrop-filter: blur(10px);
-}
-
-.role-filter-form label {
-    display: grid;
-    gap: 5px;
-    min-width: 0;
-    color: var(--role-copy);
-    font-size: 12px;
-}
-
-.role-filter-form .ant-btn {
-    width: 86px;
-    min-width: 86px;
-    max-width: 96px;
-}
-
-.role-filter-form .role-filter-search {
-    color: var(--role-blue);
-    background: var(--role-blue-soft);
-    border-color: var(--role-blue-line);
-}
-
-.role-filter-form .role-filter-search:hover {
-    color: var(--role-blue) !important;
-    background: color-mix(in srgb, var(--role-blue) 14%, transparent) !important;
-    border-color: color-mix(in srgb, var(--role-blue) 34%, transparent) !important;
-}
-
 .role-table-toolbar .ant-btn-dangerous:not(:disabled) {
     color: var(--role-danger);
     border-color: var(--role-danger-line);
@@ -200,15 +160,8 @@ html[data-theme="dark"] .role-page {
 }
 
 @media (max-width: 760px) {
-    .role-filter-form,
     .role-editor-switches {
         grid-template-columns: 1fr;
         align-items: stretch;
-    }
-
-    .role-filter-form label,
-    .role-filter-form .ant-btn {
-        width: 100%;
-        max-width: 100%;
     }
 }

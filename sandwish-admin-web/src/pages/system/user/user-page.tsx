@@ -14,7 +14,7 @@ import type { Key } from "react";
 import { sm2 } from "sm-crypto";
 import { createLoginForm } from "@/auth/auth-service";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishSwitch } from "@/components/sandwish-switch";
 import { SandwishTag } from "@/components/sandwish-tag";
@@ -231,9 +231,10 @@ export const UserPage = () => {
         const updateFloatingBounds = () => {
             frame = 0;
             const floatingContainer =
-                departmentPanel.closest<HTMLElement>(".list-page-table-aside") ?? departmentPanel;
+                departmentPanel.closest<HTMLElement>(".user-department-aside") ?? departmentPanel;
             const tableArea =
-                departmentPanel.closest<HTMLElement>(".list-page-table-area") ?? floatingContainer;
+                departmentPanel.closest<HTMLElement>(".user-department-table-area") ??
+                floatingContainer;
             const topbar = document.querySelector(".topbar")?.getBoundingClientRect();
             const sidebar = document.querySelector(".sidebar")?.getBoundingClientRect();
             const stickyTop = Math.ceil((topbar?.bottom ?? 76) + 12);
@@ -667,7 +668,7 @@ export const UserPage = () => {
 
     return (
         <>
-            <ListPage<UserRecord>
+            <SandwishListPage<UserRecord>
                 pageClassName="user-page"
                 title="用户管理"
                 description="管理后台用户、角色与权限状态。"
@@ -802,6 +803,8 @@ export const UserPage = () => {
                     })
                 }}
                 tableAsidePlacement="left"
+                tableAreaClassName="user-department-table-area"
+                tableAsideClassName="user-department-aside"
                 tableAside={
                     <div className="user-department-panel" ref={departmentPanelRef}>
                         <div className="user-department-panel-head">

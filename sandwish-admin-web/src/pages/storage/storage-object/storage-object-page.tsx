@@ -1,4 +1,4 @@
-import { DeleteOutlined, FileOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FileOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Input, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
@@ -6,7 +6,7 @@ import type { Key } from "react";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { hasPermission } from "@/auth/permission-storage";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
@@ -193,14 +193,13 @@ export const StorageObjectPage = () => {
         updateQuery({ originalFilename: normalizeSearch(value) });
     };
 
-    const applyFilters = (closeFilter: () => void) => {
+    const applyFilters = () => {
         updateQuery({
             contentType: normalizeSearch(filters.contentType),
             objectStatus: readStatusFilterValue(filters.objectStatus),
             referenceStatus: readStatusFilterValue(filters.referenceStatus),
             remarks: normalizeSearch(filters.remarks)
         });
-        closeFilter();
     };
 
     const resetFilters = () => {
@@ -365,7 +364,7 @@ export const StorageObjectPage = () => {
 
     return (
         <>
-            <ListPage<StorageRecord>
+            <SandwishListPage<StorageRecord>
                 pageClassName="storage-object-page"
                 title="存储对象"
                 description="管理上传后的对象文件、存储状态和业务引用入口。"
@@ -377,11 +376,11 @@ export const StorageObjectPage = () => {
                 searchPlaceholder="搜索文件名..."
                 onSearchChange={searchStorages}
                 filterActive={hasActiveFilters}
-                filterClassName="storage-object-filter-panel"
-                filter={({ closeFilter }) => (
-                    <div className="storage-object-filter-form">
-                        <label>
-                            <span>MIME</span>
+                filterFields={[
+                    {
+                        name: "contentType",
+                        label: "MIME",
+                        render: () => (
                             <Input
                                 allowClear
                                 placeholder="image/png"
@@ -393,9 +392,12 @@ export const StorageObjectPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <label>
-                            <span>对象状态</span>
+                        )
+                    },
+                    {
+                        name: "objectStatus",
+                        label: "对象状态",
+                        render: () => (
                             <Select<StorageObjectStatusFilter>
                                 value={filters.objectStatus}
                                 options={[
@@ -411,9 +413,12 @@ export const StorageObjectPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <label>
-                            <span>引用状态</span>
+                        )
+                    },
+                    {
+                        name: "referenceStatus",
+                        label: "引用状态",
+                        render: () => (
                             <Select<StorageReferenceStatusFilter>
                                 value={filters.referenceStatus}
                                 options={[
@@ -428,9 +433,12 @@ export const StorageObjectPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <label>
-                            <span>备注</span>
+                        )
+                    },
+                    {
+                        name: "remarks",
+                        label: "备注",
+                        render: () => (
                             <Input
                                 allowClear
                                 placeholder="业务说明"
@@ -442,19 +450,11 @@ export const StorageObjectPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="storage-object-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => applyFilters(closeFilter)}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
                     <Button
                         icon={<ReloadOutlined />}

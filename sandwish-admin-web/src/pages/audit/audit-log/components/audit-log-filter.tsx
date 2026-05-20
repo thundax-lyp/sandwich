@@ -1,5 +1,6 @@
-import { GlobalOutlined, IdcardOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Select } from "antd";
+import { GlobalOutlined, IdcardOutlined } from "@ant-design/icons";
+import { Input, Select } from "antd";
+import type { SandwishListPageFilterField } from "@/components/sandwish-list-page";
 import type { OptionsRecord } from "@/types/options";
 import type { AuditOptionKeys } from "../audit-log-service";
 
@@ -15,14 +16,11 @@ export interface AuditLogFilters {
     endDate: string;
 }
 
-interface AuditLogFilterProps {
+interface AuditLogFilterFieldsOptions {
     auditOptions?: Partial<OptionsRecord<AuditOptionKeys>>;
     filters: AuditLogFilters;
-    hasActiveFilters: boolean;
     loading?: boolean;
-    onApply: () => void;
     onChange: (filters: AuditLogFilters) => void;
-    onReset: () => void;
 }
 
 const optionItems = (options?: OptionsRecord[string]) => [
@@ -33,106 +31,122 @@ const optionItems = (options?: OptionsRecord[string]) => [
     }))
 ];
 
-export const AuditLogFilter = ({
+export const createAuditLogFilterFields = ({
     auditOptions,
     filters,
-    hasActiveFilters,
     loading = false,
-    onApply,
-    onChange,
-    onReset
-}: AuditLogFilterProps) => {
+    onChange
+}: AuditLogFilterFieldsOptions): SandwishListPageFilterField[] => {
     const updateFilters = (values: Partial<AuditLogFilters>) => {
         onChange({ ...filters, ...values });
     };
 
-    return (
-        <div className="audit-log-filter-form">
-            <label>
-                <span>对象类型</span>
+    return [
+        {
+            name: "objectType",
+            label: "对象类型",
+            render: () => (
                 <Select
                     value={filters.objectType}
                     options={optionItems(auditOptions?.objectTypes)}
                     loading={loading}
                     onChange={(objectType) => updateFilters({ objectType })}
                 />
-            </label>
-            <label>
-                <span>动作</span>
+            )
+        },
+        {
+            name: "action",
+            label: "动作",
+            render: () => (
                 <Select
                     value={filters.action}
                     options={optionItems(auditOptions?.actions)}
                     loading={loading}
                     onChange={(action) => updateFilters({ action })}
                 />
-            </label>
-            <label>
-                <span>操作者类型</span>
+            )
+        },
+        {
+            name: "operatorType",
+            label: "操作者类型",
+            render: () => (
                 <Select
                     value={filters.operatorType}
                     options={optionItems(auditOptions?.operatorTypes)}
                     loading={loading}
                     onChange={(operatorType) => updateFilters({ operatorType })}
                 />
-            </label>
-            <label>
-                <span>对象 ID</span>
+            )
+        },
+        {
+            name: "objectId",
+            label: "对象 ID",
+            render: () => (
                 <Input
                     allowClear
                     prefix={<IdcardOutlined />}
                     value={filters.objectId}
                     onChange={(event) => updateFilters({ objectId: event.target.value })}
                 />
-            </label>
-            <label>
-                <span>操作者 ID</span>
+            )
+        },
+        {
+            name: "operatorId",
+            label: "操作者 ID",
+            render: () => (
                 <Input
                     allowClear
                     value={filters.operatorId}
                     onChange={(event) => updateFilters({ operatorId: event.target.value })}
                 />
-            </label>
-            <label>
-                <span>来源</span>
+            )
+        },
+        {
+            name: "source",
+            label: "来源",
+            render: () => (
                 <Input
                     allowClear
                     prefix={<GlobalOutlined />}
                     value={filters.source}
                     onChange={(event) => updateFilters({ source: event.target.value })}
                 />
-            </label>
-            <label>
-                <span>请求 ID</span>
+            )
+        },
+        {
+            name: "requestId",
+            label: "请求 ID",
+            render: () => (
                 <Input
                     allowClear
                     value={filters.requestId}
                     onChange={(event) => updateFilters({ requestId: event.target.value })}
                 />
-            </label>
-            <label>
-                <span>开始时间</span>
+            )
+        },
+        {
+            name: "beginDate",
+            label: "开始时间",
+            render: () => (
                 <Input
                     allowClear
                     placeholder="2026-05-19 00:00:00"
                     value={filters.beginDate}
                     onChange={(event) => updateFilters({ beginDate: event.target.value })}
                 />
-            </label>
-            <label>
-                <span>结束时间</span>
+            )
+        },
+        {
+            name: "endDate",
+            label: "结束时间",
+            render: () => (
                 <Input
                     allowClear
                     placeholder="2026-05-19 23:59:59"
                     value={filters.endDate}
                     onChange={(event) => updateFilters({ endDate: event.target.value })}
                 />
-            </label>
-            <Button onClick={onReset} disabled={!hasActiveFilters}>
-                重置
-            </Button>
-            <Button className="audit-log-filter-search" icon={<SearchOutlined />} onClick={onApply}>
-                查询
-            </Button>
-        </div>
-    );
+            )
+        }
+    ];
 };

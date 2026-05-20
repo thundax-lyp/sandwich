@@ -1,17 +1,11 @@
-import {
-    DeleteOutlined,
-    PlusOutlined,
-    ReloadOutlined,
-    SafetyCertificateOutlined,
-    SearchOutlined
-} from "@ant-design/icons";
+import { DeleteOutlined, ReloadOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Select, Space, Typography } from "antd";
 import type { DataNode } from "antd/es/tree";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishSwitch } from "@/components/sandwish-switch";
 import { SandwishTag } from "@/components/sandwish-tag";
@@ -389,21 +383,24 @@ export const RolePage = () => {
 
     return (
         <>
-            <ListPage<RoleRecord>
+            <SandwishListPage<RoleRecord>
                 pageClassName="role-page"
                 title="角色管理"
                 description="维护后台角色、角色状态和菜单权限。"
                 subjectName="角色"
+                enableAdd={canEditRole}
                 enableFilter
                 enableSearch
                 searchShortcut="⌘K"
                 searchValue={searchText}
                 onSearchChange={setSearchText}
+                onAdd={openCreateEditor}
                 filterActive={hasActiveFilters}
-                filter={({ closeFilter }) => (
-                    <div className="role-filter-form">
-                        <label>
-                            <span>状态</span>
+                filterFields={[
+                    {
+                        name: "enable",
+                        label: "状态",
+                        render: () => (
                             <Select
                                 value={filters.enable}
                                 options={[
@@ -421,37 +418,15 @@ export const RolePage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="role-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => {
-                                applyFilters();
-                                closeFilter();
-                            }}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
-                    <>
-                        <Button icon={<ReloadOutlined />} onClick={() => roleQuery.refetch()}>
-                            刷新
-                        </Button>
-                        {canEditRole ? (
-                            <Button
-                                type="primary"
-                                icon={<PlusOutlined />}
-                                onClick={openCreateEditor}
-                            >
-                                新增角色
-                            </Button>
-                        ) : null}
-                    </>
+                    <Button icon={<ReloadOutlined />} onClick={() => roleQuery.refetch()}>
+                        刷新
+                    </Button>
                 }
                 batchClassName="role-table-toolbar"
                 selectedCount={selectedRowKeys.length}

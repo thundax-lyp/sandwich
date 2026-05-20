@@ -4,7 +4,7 @@ import { App, Button, Input, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
@@ -216,7 +216,7 @@ export const DictionaryPage = () => {
 
     return (
         <>
-            <ListPage<DictRecord>
+            <SandwishListPage<DictRecord>
                 pageClassName="dictionary-page"
                 title="字典管理"
                 description="维护系统字典类型、展示标签、业务值和备注说明。"

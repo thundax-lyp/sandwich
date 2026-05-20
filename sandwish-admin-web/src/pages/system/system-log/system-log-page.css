@@ -122,48 +122,6 @@ html[data-theme="dark"] .system-log-page {
     box-shadow: 0 0 0 3px var(--system-log-blue-soft) !important;
 }
 
-.system-log-filter-form {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr)) auto auto;
-    min-width: 0;
-    align-items: flex-end;
-    gap: 12px;
-    padding: 12px;
-    background: linear-gradient(
-        180deg,
-        var(--system-log-filter-bg-start),
-        var(--system-log-filter-bg-end)
-    );
-    border: 1px solid var(--system-log-line);
-    border-radius: 10px;
-    box-shadow: inset 0 1px 0 var(--system-log-filter-inset);
-    backdrop-filter: blur(10px);
-}
-
-.system-log-filter-form label {
-    display: grid;
-    gap: 5px;
-    min-width: 0;
-    color: var(--system-log-copy);
-    font-size: 12px;
-}
-
-.system-log-filter-form .ant-btn {
-    min-width: 86px;
-}
-
-.system-log-filter-form .system-log-filter-search {
-    color: var(--system-log-blue);
-    background: var(--system-log-blue-soft);
-    border-color: var(--system-log-blue-line);
-}
-
-.system-log-filter-form .system-log-filter-search:hover {
-    color: var(--system-log-blue) !important;
-    background: color-mix(in srgb, var(--system-log-blue) 14%, transparent) !important;
-    border-color: color-mix(in srgb, var(--system-log-blue) 34%, transparent) !important;
-}
-
 .system-log-time-icon {
     color: var(--system-log-blue);
 }
@@ -199,23 +157,7 @@ html[data-theme="dark"] .system-log-page {
     word-break: break-all;
 }
 
-@media (max-width: 960px) {
-    .system-log-filter-form {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
-    }
-}
-
 @media (max-width: 760px) {
-    .system-log-filter-form {
-        grid-template-columns: 1fr;
-        align-items: stretch;
-    }
-
-    .system-log-filter-form label,
-    .system-log-filter-form .ant-btn {
-        width: 100%;
-    }
-
     .system-log-detail div {
         grid-template-columns: 1fr;
         gap: 4px;

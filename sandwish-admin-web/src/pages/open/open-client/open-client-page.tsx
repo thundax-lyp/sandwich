@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Input, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
@@ -328,7 +328,7 @@ export const OpenClientPage = () => {
 
     return (
         <>
-            <ListPage<OpenClientRecord>
+            <SandwishListPage<OpenClientRecord>
                 pageClassName="open-client-page"
                 title="开放客户端"
                 description="管理第三方系统访问 Open API 使用的 API KEY、IP 白名单、有效期和最小权限集合。"

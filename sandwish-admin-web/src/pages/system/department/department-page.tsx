@@ -9,7 +9,7 @@ import { App, Button, Space, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
 import { DepartmentEdit } from "./components/department-edit";
@@ -318,7 +318,7 @@ export const DepartmentPage = () => {
 
     return (
         <>
-            <ListPage<DepartmentTableNode>
+            <SandwishListPage<DepartmentTableNode>
                 pageClassName="department-page"
                 title="部门管理"
                 description="维护组织树、部门简称、排序和备注信息。"

@@ -1,21 +1,3 @@
-.submission-filter-form {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(160px, 1fr)) auto auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.submission-filter-form label {
-    display: grid;
-    gap: 6px;
-    color: var(--sandwish-color-text-secondary);
-    font-size: 12px;
-}
-
-.submission-filter-search {
-    min-width: 96px;
-}
-
 .submission-title-cell,
 .submission-time-cell,
 .submission-image-list,
@@ -73,10 +55,4 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-@media (max-width: 900px) {
-    .submission-filter-form {
-        grid-template-columns: 1fr;
-    }
 }

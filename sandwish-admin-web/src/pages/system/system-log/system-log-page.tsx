@@ -3,13 +3,12 @@ import {
     GlobalOutlined,
     LinkOutlined,
     ReloadOutlined,
-    SearchOutlined,
     UserOutlined
 } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Button, Input, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
@@ -211,7 +210,7 @@ export const SystemLogPage = () => {
     ];
 
     return (
-        <ListPage<LogRecord>
+        <SandwishListPage<LogRecord>
             pageClassName="system-log-page"
             title="系统日志"
             description="查看后台操作日志、请求记录和审计线索。"
@@ -223,10 +222,11 @@ export const SystemLogPage = () => {
             searchPlaceholder="搜索日志标题..."
             onSearchChange={searchLogs}
             filterActive={hasActiveFilters}
-            filter={({ closeFilter }) => (
-                <div className="system-log-filter-form">
-                    <label>
-                        <span>登录名</span>
+            filterFields={[
+                {
+                    name: "userLoginName",
+                    label: "登录名",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="admin"
@@ -239,9 +239,12 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <label>
-                        <span>用户名</span>
+                    )
+                },
+                {
+                    name: "userName",
+                    label: "用户名",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="张三"
@@ -253,9 +256,12 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <label>
-                        <span>来源</span>
+                    )
+                },
+                {
+                    name: "remoteAddr",
+                    label: "来源",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="127.0.0.1"
@@ -268,9 +274,12 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <label>
-                        <span>请求地址</span>
+                    )
+                },
+                {
+                    name: "requestUri",
+                    label: "请求地址",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="/api/sys/user/page"
@@ -283,9 +292,12 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <label>
-                        <span>开始时间</span>
+                    )
+                },
+                {
+                    name: "beginDate",
+                    label: "开始时间",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="2026-05-14 00:00:00"
@@ -297,9 +309,12 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <label>
-                        <span>结束时间</span>
+                    )
+                },
+                {
+                    name: "endDate",
+                    label: "结束时间",
+                    render: () => (
                         <Input
                             allowClear
                             placeholder="2026-05-14 23:59:59"
@@ -311,22 +326,11 @@ export const SystemLogPage = () => {
                                 }))
                             }
                         />
-                    </label>
-                    <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                        重置
-                    </Button>
-                    <Button
-                        className="system-log-filter-search"
-                        icon={<SearchOutlined />}
-                        onClick={() => {
-                            applyFilters();
-                            closeFilter();
-                        }}
-                    >
-                        查询
-                    </Button>
-                </div>
-            )}
+                    )
+                }
+            ]}
+            onFilterApply={applyFilters}
+            onFilterReset={resetFilters}
             pageActions={
                 <Button icon={<ReloadOutlined />} onClick={() => logQuery.refetch()}>
                     刷新

@@ -4,19 +4,22 @@ import { FilterOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import { Button, Input, Space } from "antd";
 import { SandwishBatchActionBar } from "@/components/sandwish-batch-action-bar";
 import { SandwishFilterPanel } from "@/components/sandwish-filter-panel";
+import type { SandwishFilterPanelField } from "@/components/sandwish-filter-panel";
 import { SandwishPage } from "@/components/sandwish-page";
 import { SandwishTable } from "@/components/sandwish-table";
 import type { SandwishTableProps } from "@/components/sandwish-table";
-import "./list-page.css";
+import "./sandwish-list-page.css";
 
-export interface ListPageFilterState {
+export interface SandwishListPageFilterState {
     closeFilter: () => void;
     filterOpen: boolean;
     openFilter: () => void;
     toggleFilter: () => void;
 }
 
-export interface ListPageProps<RecordType extends object = object> extends Omit<
+export type SandwishListPageFilterField = SandwishFilterPanelField;
+
+export interface SandwishListPageProps<RecordType extends object = object> extends Omit<
     SandwishTableProps<RecordType>,
     "title"
 > {
@@ -30,14 +33,17 @@ export interface ListPageProps<RecordType extends object = object> extends Omit<
     enableSearch?: boolean;
     eyebrow?: ReactNode;
     filterActive?: boolean;
-    filter?: ReactNode | ((filterState: ListPageFilterState) => ReactNode);
+    filter?: ReactNode | ((filterState: SandwishListPageFilterState) => ReactNode);
     filterClassName?: string;
+    filterFields?: SandwishListPageFilterField[];
     filterText?: ReactNode;
     filterOpen?: boolean;
     onAdd?: () => void;
+    onFilterApply?: () => void;
     onFilterOpenChange?: (open: boolean) => void;
+    onFilterReset?: () => void;
     onSearchChange?: (value: string) => void;
-    pageActions?: ReactNode | ((filterState: ListPageFilterState) => ReactNode);
+    pageActions?: ReactNode | ((filterState: SandwishListPageFilterState) => ReactNode);
     pageClassName?: string;
     searchPlaceholder?: string;
     searchShortcut?: ReactNode;
@@ -45,11 +51,13 @@ export interface ListPageProps<RecordType extends object = object> extends Omit<
     selectedCount?: number;
     subjectName?: string;
     tableAside?: ReactNode;
+    tableAsideClassName?: string;
+    tableAreaClassName?: string;
     tableAsidePlacement?: "left" | "right";
     title: ReactNode;
 }
 
-export const ListPage = <RecordType extends object = object>({
+export const SandwishListPage = <RecordType extends object = object>({
     batchActions,
     batchClassName,
     addText,
@@ -62,10 +70,13 @@ export const ListPage = <RecordType extends object = object>({
     filterActive = false,
     filter,
     filterClassName,
+    filterFields,
     filterText = "筛选",
     filterOpen,
     onAdd,
+    onFilterApply,
     onFilterOpenChange,
+    onFilterReset,
     onSearchChange,
     pageActions,
     pageClassName,
@@ -75,10 +86,12 @@ export const ListPage = <RecordType extends object = object>({
     selectedCount = 0,
     subjectName,
     tableAside,
+    tableAsideClassName,
+    tableAreaClassName,
     tableAsidePlacement = "right",
     title,
     ...tableProps
-}: ListPageProps<RecordType>) => {
+}: SandwishListPageProps<RecordType>) => {
     const [internalFilterOpen, setInternalFilterOpen] = useState(defaultFilterOpen);
     const actualFilterOpen = enableFilter ? (filterOpen ?? internalFilterOpen) : false;
     const setFilterOpen = (open: boolean) => {
@@ -87,7 +100,7 @@ export const ListPage = <RecordType extends object = object>({
         }
         onFilterOpenChange?.(open);
     };
-    const filterState: ListPageFilterState = {
+    const filterState: SandwishListPageFilterState = {
         closeFilter: () => setFilterOpen(false),
         filterOpen: actualFilterOpen,
         openFilter: () => setFilterOpen(true),
@@ -100,13 +113,13 @@ export const ListPage = <RecordType extends object = object>({
         searchPlaceholder ?? (subjectName ? `搜索${subjectName}...` : "搜索...");
     const resolvedAddText = addText ?? (subjectName ? `新增${subjectName}` : undefined);
     const headerActions = (
-        <Space className="list-page-actions">
+        <Space className="sandwish-list-page-actions">
             {enableSearch ? (
                 <Input
                     allowClear
                     className={[
-                        "list-page-search",
-                        actualFilterOpen ? "list-page-search-hidden" : ""
+                        "sandwish-list-page-search",
+                        actualFilterOpen ? "sandwish-list-page-search-hidden" : ""
                     ]
                         .filter(Boolean)
                         .join(" ")}
@@ -114,7 +127,9 @@ export const ListPage = <RecordType extends object = object>({
                     prefix={<SearchOutlined />}
                     suffix={
                         searchShortcut ? (
-                            <span className="list-page-search-shortcut">{searchShortcut}</span>
+                            <span className="sandwish-list-page-search-shortcut">
+                                {searchShortcut}
+                            </span>
                         ) : null
                     }
                     value={searchValue}
@@ -125,7 +140,7 @@ export const ListPage = <RecordType extends object = object>({
                 <Button
                     className={
                         actualFilterOpen || filterActive
-                            ? "list-page-filter-toggle-active"
+                            ? "sandwish-list-page-filter-toggle-active"
                             : undefined
                     }
                     icon={<FilterOutlined />}
@@ -152,8 +167,18 @@ export const ListPage = <RecordType extends object = object>({
             eyebrow={eyebrow}
             title={title}
         >
-            {enableFilter && resolvedFilter ? (
-                <SandwishFilterPanel open={actualFilterOpen} className={filterClassName}>
+            {enableFilter && (resolvedFilter || filterFields?.length) ? (
+                <SandwishFilterPanel
+                    open={actualFilterOpen}
+                    className={filterClassName}
+                    fields={filterFields}
+                    resetDisabled={!filterActive}
+                    onApply={() => {
+                        onFilterApply?.();
+                        filterState.closeFilter();
+                    }}
+                    onReset={onFilterReset}
+                >
                     {resolvedFilter}
                 </SandwishFilterPanel>
             ) : null}
@@ -169,14 +194,21 @@ export const ListPage = <RecordType extends object = object>({
             {tableAside ? (
                 <div
                     className={[
-                        "list-page-table-area",
-                        `list-page-table-area-aside-${tableAsidePlacement}`
+                        "sandwish-list-page-table-area",
+                        `sandwish-list-page-table-area-aside-${tableAsidePlacement}`,
+                        tableAreaClassName
                     ].join(" ")}
                 >
-                    <div className="list-page-table-main">
+                    <div className="sandwish-list-page-table-main">
                         <SandwishTable<RecordType> {...tableProps} />
                     </div>
-                    <aside className="list-page-table-aside">{tableAside}</aside>
+                    <aside
+                        className={["sandwish-list-page-table-aside", tableAsideClassName]
+                            .filter(Boolean)
+                            .join(" ")}
+                    >
+                        {tableAside}
+                    </aside>
                 </div>
             ) : (
                 <SandwishTable<RecordType> {...tableProps} />

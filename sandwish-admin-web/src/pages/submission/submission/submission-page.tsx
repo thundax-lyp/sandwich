@@ -1,10 +1,10 @@
-import { DeleteOutlined, ReloadOutlined, SearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { App, Button, Select, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
@@ -240,11 +240,10 @@ export const SubmissionPage = () => {
         });
     };
 
-    const applyFilters = (closeFilter: () => void) => {
+    const applyFilters = () => {
         updateQuery({
             status: readStatusFilterValue(filters.status)
         });
-        closeFilter();
     };
 
     const resetFilters = () => {
@@ -404,7 +403,7 @@ export const SubmissionPage = () => {
 
     return (
         <>
-            <ListPage<SubmissionRecord>
+            <SandwishListPage<SubmissionRecord>
                 pageClassName="submission-page"
                 title="提交内容"
                 description="管理第三方通过开放接口提交的标题、正文和图片资料。"
@@ -414,11 +413,11 @@ export const SubmissionPage = () => {
                 enableFilter
                 onAdd={openCreateEditor}
                 filterActive={hasActiveFilters}
-                filterClassName="submission-filter-panel"
-                filter={({ closeFilter }) => (
-                    <div className="submission-filter-form">
-                        <label>
-                            <span>状态</span>
+                filterFields={[
+                    {
+                        name: "status",
+                        label: "状态",
+                        render: () => (
                             <Select<SubmissionStatus | "ALL">
                                 value={filters.status}
                                 options={[
@@ -432,19 +431,11 @@ export const SubmissionPage = () => {
                                     }))
                                 }
                             />
-                        </label>
-                        <Button onClick={resetFilters} disabled={!hasActiveFilters}>
-                            重置
-                        </Button>
-                        <Button
-                            className="submission-filter-search"
-                            icon={<SearchOutlined />}
-                            onClick={() => applyFilters(closeFilter)}
-                        >
-                            查询
-                        </Button>
-                    </div>
-                )}
+                        )
+                    }
+                ]}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
                     <Button
                         icon={<ReloadOutlined />}

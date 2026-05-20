@@ -5,12 +5,12 @@ import { useMemo, useState } from "react";
 import { useCurrentAccessToken } from "@/auth/hooks/use-current-access-token";
 import { toAuthenticatedResourceUrl } from "@/auth/resource-url";
 import { ADMIN_API_BASE_URL } from "@/api/http";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { SandwishTag } from "@/components/sandwish-tag";
 import type { SandwishTableProps } from "@/components/sandwish-table";
 import { DEFAULT_PAGE_NO, DEFAULT_PAGE_SIZE } from "@/types/page";
 import { AuditLogDetail } from "./components/audit-log-detail";
-import { AuditLogFilter } from "./components/audit-log-filter";
+import { createAuditLogFilterFields } from "./components/audit-log-filter";
 import type { AuditLogFilters } from "./components/audit-log-filter";
 import * as service from "./audit-log-service";
 import type { AuditLogPageQuery } from "./audit-log-service";
@@ -177,7 +177,7 @@ export const AuditLogPage = () => {
         updateQuery({ objectId: normalizeSearch(value) });
     };
 
-    const applyFilters = (closeFilter: () => void) => {
+    const applyFilters = () => {
         updateQuery({
             objectType: readSelectValue(filters.objectType),
             objectId: normalizeSearch(filters.objectId || searchText),
@@ -189,7 +189,6 @@ export const AuditLogPage = () => {
             beginDate: normalizeSearch(filters.beginDate),
             endDate: normalizeSearch(filters.endDate)
         });
-        closeFilter();
     };
 
     const resetFilters = () => {
@@ -284,7 +283,7 @@ export const AuditLogPage = () => {
 
     return (
         <>
-            <ListPage<AuditLogRecord>
+            <SandwishListPage<AuditLogRecord>
                 pageClassName="audit-log-page"
                 title="审计日志"
                 description="查看关键业务对象的变更记录、操作者和字段差异。"
@@ -296,18 +295,14 @@ export const AuditLogPage = () => {
                 searchPlaceholder="搜索对象 ID..."
                 onSearchChange={searchObjectId}
                 filterActive={hasActiveFilters}
-                filterClassName="audit-log-filter-panel"
-                filter={({ closeFilter }) => (
-                    <AuditLogFilter
-                        auditOptions={auditOptions}
-                        filters={filters}
-                        hasActiveFilters={hasActiveFilters}
-                        loading={auditOptionsQuery.isFetching}
-                        onApply={() => applyFilters(closeFilter)}
-                        onChange={setFilters}
-                        onReset={resetFilters}
-                    />
-                )}
+                filterFields={createAuditLogFilterFields({
+                    auditOptions,
+                    filters,
+                    loading: auditOptionsQuery.isFetching,
+                    onChange: setFilters
+                })}
+                onFilterApply={applyFilters}
+                onFilterReset={resetFilters}
                 pageActions={
                     <Button
                         icon={<ReloadOutlined />}

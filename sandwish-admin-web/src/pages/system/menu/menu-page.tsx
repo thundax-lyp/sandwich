@@ -4,7 +4,7 @@ import { App, Button, Space, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { Key } from "react";
 import { hasPermission } from "@/auth/permission-storage";
-import { ListPage } from "@/components/list-page";
+import { SandwishListPage } from "@/components/sandwish-list-page";
 import { useSandwishConfirm } from "@/components/sandwish-confirm-modal/hooks/use-sandwish-confirm";
 import { SandwishSwitch } from "@/components/sandwish-switch";
 import type { SandwishTableProps, SandwishTableSortPosition } from "@/components/sandwish-table";
@@ -335,7 +335,7 @@ export const MenuPage = () => {
 
     return (
         <>
-            <ListPage<MenuTableNode>
+            <SandwishListPage<MenuTableNode>
                 pageClassName="menu-page"
                 title="菜单管理"
                 description="维护后台菜单树、页面入口和权限标识。"

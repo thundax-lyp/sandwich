@@ -351,14 +351,6 @@ export const RolePage = () => {
                     ariaLabel: `删除 ${role.name}`,
                     disabled: !canEditRole,
                     onClick: () => confirmDeleteRole(role)
-                },
-                { type: "divider" },
-                {
-                    key: "drag",
-                    text: "拖动",
-                    ariaLabel: `拖动 ${role.name}`,
-                    disabled: !canEditRole || sortMutation.isPending,
-                    onClick: () => undefined
                 }
             ]
         }

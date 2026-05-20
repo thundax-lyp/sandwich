@@ -358,14 +358,6 @@ export const SubmissionPage = () => {
                     ariaLabel: `删除 ${submission.title}`,
                     disabled: !canEditSubmission,
                     onClick: () => confirmDelete([submission.id])
-                },
-                { type: "divider" as const },
-                {
-                    key: "drag",
-                    text: "拖动",
-                    ariaLabel: `拖动排序 ${submission.title}`,
-                    disabled: !canEditSubmission,
-                    onClick: () => undefined
                 }
             ]
         }

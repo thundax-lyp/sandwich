@@ -318,14 +318,6 @@ export const DepartmentPage = () => {
                     ariaLabel: `删除 ${department.name}`,
                     disabled: !canEditDepartment,
                     onClick: () => openDeleteConfirm(department)
-                },
-                { type: "divider" },
-                {
-                    key: "drag",
-                    text: "拖动",
-                    ariaLabel: `拖动 ${department.name}`,
-                    disabled: !canEditDepartment || moveMutation.isPending,
-                    onClick: () => undefined
                 }
             ]
         }

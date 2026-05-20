@@ -305,14 +305,6 @@ export const MenuPage = () => {
                     ariaLabel: `删除 ${menu.name}`,
                     disabled: !canEditMenu,
                     onClick: () => openDeleteConfirm(menu)
-                },
-                { type: "divider" },
-                {
-                    key: "drag",
-                    text: "拖动",
-                    ariaLabel: `拖动 ${menu.name}`,
-                    disabled: !canEditMenu || moveMutation.isPending,
-                    onClick: () => undefined
                 }
             ]
         }

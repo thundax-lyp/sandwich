@@ -5,7 +5,7 @@ import type {
     ReactNode
 } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MoreOutlined } from "@ant-design/icons";
+import { HolderOutlined, MoreOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Table } from "antd";
 import type { MenuProps, TableProps } from "antd";
 import { PAGE_SIZE_OPTIONS } from "@/types/page";
@@ -14,9 +14,10 @@ import "./sandwish-table.css";
 const DEFAULT_ACTION_COLUMN_KEY = "actions";
 const DEFAULT_ACTION_COLUMN_WIDTH = 116;
 const DEFAULT_ACTION_COLUMN_MOBILE_WIDTH = 54;
+const DEFAULT_SORT_COLUMN_KEY = "__sandwish_sort";
+const DEFAULT_SORT_COLUMN_WIDTH = 36;
 const ACTION_BUTTON_WIDTH = 24;
-const ACTION_CELL_GAP = 0;
-const ACTION_CELL_PADDING = 20;
+const ACTION_CELL_PADDING = 28;
 const ACTION_DIVIDER_WIDTH = 5;
 const ACTION_INLINE_LIMIT = 2;
 const ACTION_TEXT_BASE_WIDTH = 10;
@@ -125,6 +126,30 @@ const countActionButtons = <RecordType extends object>(
     return actions.filter((action) => !isActionDivider(action)).length;
 };
 
+const normalizeActionSeparators = <RecordType extends object>(
+    actions: SandwishTableRowActionOption<RecordType>[]
+) => {
+    const normalizedActions: SandwishTableRowActionOption<RecordType>[] = [];
+    let pendingDivider: SandwishTableRowActionDivider | null = null;
+
+    actions.forEach((action) => {
+        if (isActionDivider(action)) {
+            if (normalizedActions.length > 0) {
+                pendingDivider = action;
+            }
+            return;
+        }
+
+        if (pendingDivider && normalizedActions.length > 0) {
+            normalizedActions.push(pendingDivider);
+        }
+        normalizedActions.push(action);
+        pendingDivider = null;
+    });
+
+    return normalizedActions;
+};
+
 const calculateActionButtonWidth = <RecordType extends object>(
     action: SandwishTableRowActionOption<RecordType>
 ) => {
@@ -143,27 +168,22 @@ const calculateActionButtonWidth = <RecordType extends object>(
 };
 
 const calculateActionColumnWidth = <RecordType extends object>(
-    actions: SandwishTableRowActionOption<RecordType>[]
+    actions: SandwishTableRowActionOption<RecordType>[],
+    inlineLimit = ACTION_INLINE_LIMIT
 ) => {
-    const actionCount = countActionButtons(actions);
+    const actionCount = countActionButtons(normalizeActionSeparators(actions));
     if (actionCount === 0) {
         return DEFAULT_ACTION_COLUMN_MOBILE_WIDTH;
     }
 
-    const { inlineActions, overflowActions } = splitActions(actions, ACTION_INLINE_LIMIT);
+    const { inlineActions, overflowActions } = splitActions(actions, inlineLimit);
     const inlineWidth = inlineActions.reduce(
         (total, action) => total + calculateActionButtonWidth(action),
         0
     );
-    const hasOverflow = actionCount > ACTION_INLINE_LIMIT;
-    const itemCount = inlineActions.length + (overflowActions.length > 0 ? 1 : 0);
+    const hasOverflow = overflowActions.length > 0;
 
-    return (
-        ACTION_CELL_PADDING +
-        inlineWidth +
-        (hasOverflow ? ACTION_BUTTON_WIDTH : 0) +
-        Math.max(0, itemCount - 1) * ACTION_CELL_GAP
-    );
+    return ACTION_CELL_PADDING + inlineWidth + (hasOverflow ? ACTION_BUTTON_WIDTH : 0);
 };
 
 const splitActions = <RecordType extends object>(
@@ -173,24 +193,22 @@ const splitActions = <RecordType extends object>(
     const inlineActions: SandwishTableRowActionOption<RecordType>[] = [];
     const overflowActions: SandwishTableRowActionOption<RecordType>[] = [];
     let actionCount = 0;
+    let lastTarget: SandwishTableRowActionOption<RecordType>[] | undefined;
+    let pendingDivider: SandwishTableRowActionDivider | null = null;
 
-    actions.forEach((action) => {
+    normalizeActionSeparators(actions).forEach((action) => {
         if (isActionDivider(action)) {
-            if (actionCount > 0 && actionCount < inlineLimit) {
-                inlineActions.push(action);
-                return;
-            }
-            if (actionCount >= inlineLimit) {
-                overflowActions.push(action);
-            }
+            pendingDivider = action;
             return;
         }
 
-        if (actionCount < inlineLimit) {
-            inlineActions.push(action);
-        } else {
-            overflowActions.push(action);
+        const target = actionCount < inlineLimit ? inlineActions : overflowActions;
+        if (pendingDivider && lastTarget === target && target.length > 0) {
+            target.push(pendingDivider);
         }
+        target.push(action);
+        lastTarget = target;
+        pendingDivider = null;
         actionCount += 1;
     });
 
@@ -206,6 +224,7 @@ export interface SandwishTableProps<RecordType extends object = object> extends 
     actionColumnWidth?: number;
     columns?: SandwishTableColumn<RecordType>[];
     getSortableRowKey?: (record: RecordType, index?: number) => Key;
+    getSortableRowLabel?: (record: RecordType, index?: number) => string;
     minColumnWidth?: number;
     onSort?: (
         sourceRecord: RecordType,
@@ -224,6 +243,7 @@ export const SandwishTable = <RecordType extends object = object>({
     className,
     columns,
     getSortableRowKey,
+    getSortableRowLabel,
     minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
     onRow,
     onSort,
@@ -266,6 +286,24 @@ export const SandwishTable = <RecordType extends object = object>({
             return undefined;
         },
         [getSortableRowKey, rowKey]
+    );
+
+    const readSortableRowLabel = useCallback(
+        (record: RecordType, index?: number) => {
+            if (getSortableRowLabel) {
+                return getSortableRowLabel(record, index);
+            }
+
+            const labelKeys = ["name", "title", "username", "nickname", "id"];
+            const labelValue = labelKeys
+                .map((labelKey): unknown => record[labelKey as keyof RecordType])
+                .find((value) => typeof value === "string" || typeof value === "number");
+
+            return typeof labelValue === "string" || typeof labelValue === "number"
+                ? ` ${labelValue}`
+                : "";
+        },
+        [getSortableRowLabel]
     );
 
     useEffect(() => {
@@ -408,22 +446,29 @@ export const SandwishTable = <RecordType extends object = object>({
     );
 
     const calculateColumnActionWidth = useCallback(
-        (actionsConfig: SandwishTableRowActions<RecordType> | undefined) => {
+        (
+            actionsConfig: SandwishTableRowActions<RecordType> | undefined,
+            inlineLimitConfig?: number
+        ) => {
+            const inlineLimit = isMobile ? 0 : (inlineLimitConfig ?? ACTION_INLINE_LIMIT);
             if (!actionsConfig) {
                 return actionColumnWidth;
             }
 
             if (Array.isArray(actionsConfig)) {
-                return calculateActionColumnWidth(actionsConfig);
+                return calculateActionColumnWidth(actionsConfig, inlineLimit);
             }
 
             const dataSource = tableProps.dataSource ?? [];
             const widths = dataSource.map((record, index) =>
-                calculateActionColumnWidth(normalizeRowActions(actionsConfig, record, index))
+                calculateActionColumnWidth(
+                    normalizeRowActions(actionsConfig, record, index),
+                    inlineLimit
+                )
             );
             return widths.length > 0 ? Math.max(...widths) : actionColumnWidth;
         },
-        [actionColumnWidth, tableProps.dataSource]
+        [actionColumnWidth, isMobile, tableProps.dataSource]
     );
 
     const normalizedColumns = useMemo(() => {
@@ -448,7 +493,8 @@ export const SandwishTable = <RecordType extends object = object>({
                 const widthKey = columnKey === undefined ? undefined : String(columnKey);
                 const actionWidth = isMobile
                     ? actionColumnMobileWidth
-                    : (readNumericWidth(column.width) ?? calculateColumnActionWidth(actionOptions));
+                    : (readNumericWidth(column.width) ??
+                      calculateColumnActionWidth(actionOptions, column.inlineLimit));
                 const baseWidth = isActionColumn ? actionWidth : readNumericWidth(column.width);
                 const currentWidth =
                     widthKey && columnWidths[widthKey] !== undefined
@@ -494,7 +540,39 @@ export const SandwishTable = <RecordType extends object = object>({
             });
         };
 
-        return normalizeColumns(columns);
+        const nextColumns = normalizeColumns(columns);
+        if (!sortableEnabled) {
+            return nextColumns;
+        }
+
+        const sortColumn: SandwishTableColumn<RecordType> = {
+            className: "sandwish-table-sort-column",
+            fixed: "right",
+            key: DEFAULT_SORT_COLUMN_KEY,
+            render: (_value: unknown, record: RecordType, index: number) => (
+                <Button
+                    aria-label={`拖动${readSortableRowLabel(record, index)}`}
+                    className="sandwish-table-row-drag-handle"
+                    icon={<HolderOutlined />}
+                    type="text"
+                />
+            ),
+            title: null,
+            width: DEFAULT_SORT_COLUMN_WIDTH
+        };
+
+        const actionColumnIndex = nextColumns.findIndex(
+            (column) => readColumnKey(column) === actionColumnKey
+        );
+        if (actionColumnIndex < 0) {
+            return [...nextColumns, sortColumn];
+        }
+
+        return [
+            ...nextColumns.slice(0, actionColumnIndex + 1),
+            sortColumn,
+            ...nextColumns.slice(actionColumnIndex + 1)
+        ];
     }, [
         actionColumnKey,
         actionColumnMobileWidth,
@@ -502,8 +580,10 @@ export const SandwishTable = <RecordType extends object = object>({
         columnWidths,
         columns,
         isMobile,
+        readSortableRowLabel,
         renderRowActions,
         resizableColumns,
+        sortableEnabled,
         startResizeColumn
     ]);
 

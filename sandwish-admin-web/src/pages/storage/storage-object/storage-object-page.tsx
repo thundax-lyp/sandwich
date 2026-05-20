@@ -353,14 +353,6 @@ export const StorageObjectPage = () => {
                         ariaLabel: `删除 ${filename}`,
                         disabled: !canEditStorage,
                         onClick: () => openDeleteConfirm(storage)
-                    },
-                    { type: "divider" },
-                    {
-                        key: "drag",
-                        text: "拖动",
-                        ariaLabel: `拖动排序 ${filename}`,
-                        disabled: !canEditStorage,
-                        onClick: () => undefined
                     }
                 ];
             }
